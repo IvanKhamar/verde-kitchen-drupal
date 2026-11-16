@@ -35,6 +35,9 @@ done
 
 curl --fail --silent --show-error --output /dev/null "$base_url/"
 nid=$($drush php:eval '$ids = \Drupal::entityQuery("node")->accessCheck(FALSE)->condition("type", "product")->sort("nid")->range(0, 1)->execute(); echo reset($ids);')
-curl --fail --silent --show-error "$base_url/node/$nid" | grep --quiet 'Green Glow Smoothie'
+page=$(curl --fail --silent --show-error "$base_url/node/$nid")
+grep --quiet 'Green Glow Smoothie' <<< "$page"
+# The Verde theme is the default theme: its skip link is on every page.
+grep --quiet 'class="skip-link"' <<< "$page"
 
 echo "Install test passed."
