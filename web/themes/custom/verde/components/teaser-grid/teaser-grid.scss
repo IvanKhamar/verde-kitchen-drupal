@@ -1,0 +1,30 @@
+.teaser-grid + .teaser-grid {
+  margin-top: var(--space-8);
+}
+
+.teaser-grid__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.teaser-grid__heading {
+  font-size: var(--font-size-xl);
+}
+
+.teaser-grid__more {
+  font-weight: var(--font-weight-semibold);
+}
+
+// auto-fill + minmax: as many 16rem columns as fit, no media queries needed.
+// One column on phones, two on tablets, up to four on desktops.
+.teaser-grid__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  gap: var(--space-5);
+  padding: 0;
+  list-style: none;
+}

@@ -1,0 +1,42 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Card
+status: stable
+description: A teaser for a product or an article. The whole card is clickable.
+props:
+  type: object
+  required:
+    - title
+    - url
+  properties:
+    title:
+      type: string
+      title: Title
+    url:
+      type: string
+      title: URL
+    heading_level:
+      type: integer
+      title: Heading level
+      description: Choose it so the page has no gaps in its heading order.
+      enum:
+        - 2
+        - 3
+        - 4
+      default: 3
+    meta:
+      type: string
+      title: Meta text
+      description: Small text above the title, for example the category.
+    price:
+      type: string
+      title: Price
+    badges:
+      type: array
+      title: Badges
+      items:
+        type: string
+slots:
+  image:
+    title: Image
+  summary:
+    title: Summary

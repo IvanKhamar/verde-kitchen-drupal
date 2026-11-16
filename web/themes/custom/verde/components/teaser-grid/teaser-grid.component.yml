@@ -1,0 +1,21 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Teaser grid
+status: stable
+description: A responsive grid of cards with an optional heading and a "see all" link.
+props:
+  type: object
+  properties:
+    heading:
+      type: string
+      title: Heading
+      description: Rendered as <h2>. Leave empty when the page title already describes the list.
+    link_label:
+      type: string
+      title: Link label
+    link_url:
+      type: string
+      title: Link URL
+slots:
+  items:
+    title: Items
+    description: The grid items, each one an <li class="teaser-grid__item">.

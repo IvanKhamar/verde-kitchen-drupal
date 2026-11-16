@@ -1,0 +1,34 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Navigation
+status: stable
+description: The main menu. On small screens a disclosure button shows and hides the links.
+props:
+  type: object
+  required:
+    - items
+  properties:
+    label:
+      type: string
+      title: Accessible name
+      description: Names the <nav> landmark, for example "Main".
+    items:
+      type: array
+      title: Menu items
+      items:
+        type: object
+        required:
+          - title
+          - url
+        properties:
+          title:
+            type: string
+          url:
+            type: string
+          active:
+            type: boolean
+# navigation.js uses Drupal.behaviors and once(), so the component's library
+# needs these core libraries. CSS and JS files are found automatically.
+libraryOverrides:
+  dependencies:
+    - core/drupal
+    - core/once

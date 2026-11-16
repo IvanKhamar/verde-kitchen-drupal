@@ -1,0 +1,28 @@
+{#
+  Hero. The "hero" variant holds the page's only <h1>; "promo" uses <h2>.
+
+  |clean_unique_id makes an id that is unique on the page, so two heroes
+  never share one. aria-labelledby turns the <section> into a landmark
+  named by its heading.
+#}
+{% set variant = variant|default('hero') %}
+{% set heading_tag = variant == 'hero' ? 'h1' : 'h2' %}
+{% set heading_id = ('hero-heading')|clean_unique_id %}
+<section{{ attributes.addClass(['hero', 'hero--' ~ variant]).setAttribute('aria-labelledby', heading_id) }}>
+  <div class="hero__content">
+    <{{ heading_tag }} id="{{ heading_id }}" class="hero__heading">{{ heading }}</{{ heading_tag }}>
+    {% if text %}
+      <p class="hero__text">{{ text }}</p>
+    {% endif %}
+    {% if cta_label and cta_url %}
+      {{ include('verde:button', {
+        label: cta_label,
+        url: cta_url,
+        variant: variant == 'hero' ? 'primary' : 'secondary',
+      }, with_context = false) }}
+    {% endif %}
+  </div>
+  {% if image %}
+    <div class="hero__media">{{ image }}</div>
+  {% endif %}
+</section>

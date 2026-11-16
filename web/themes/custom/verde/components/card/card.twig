@@ -1,0 +1,39 @@
+{#
+  Card. Props are plain values (strings, numbers, arrays) checked against
+  card.component.yml. Slots ("image", "summary") take any markup, for example
+  a rendered Drupal field.
+
+  The title link is stretched over the whole card with CSS (card__link::after),
+  so there is one link per card: screen readers announce it once, by its title.
+#}
+{% set heading = 'h' ~ (heading_level|default(3)) %}
+<article{{ attributes.addClass('card') }}>
+  {% if image %}
+    <div class="card__media">{{ image }}</div>
+  {% endif %}
+  <div class="card__body">
+    {% if meta %}
+      <p class="card__meta">{{ meta }}</p>
+    {% endif %}
+    <{{ heading }} class="card__title">
+      <a href="{{ url }}" class="card__link">{{ title }}</a>
+    </{{ heading }}>
+    {% if summary %}
+      <div class="card__summary">{{ summary }}</div>
+    {% endif %}
+    {% if badges or price %}
+      <div class="card__footer">
+        {% if badges %}
+          <ul class="card__badges" role="list">
+            {% for badge in badges %}
+              <li>{{ include('verde:badge', { label: badge }, with_context = false) }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% if price %}
+          <p class="card__price">{{ price }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</article>

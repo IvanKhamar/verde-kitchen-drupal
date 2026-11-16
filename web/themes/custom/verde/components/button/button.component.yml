@@ -1,0 +1,31 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Button
+status: stable
+description: A call to action. Renders a link when "url" is set, otherwise a <button>.
+props:
+  type: object
+  required:
+    - label
+  properties:
+    label:
+      type: string
+      title: Label
+    url:
+      type: string
+      title: URL
+      description: Leave empty to render a <button> element.
+    variant:
+      type: string
+      title: Variant
+      enum:
+        - primary
+        - secondary
+      default: primary
+    type:
+      type: string
+      title: Button type
+      description: Only used for <button>.
+      enum:
+        - button
+        - submit
+      default: button

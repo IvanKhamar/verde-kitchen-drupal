@@ -1,0 +1,23 @@
+{#
+  Navigation: a disclosure pattern (button + list), not an ARIA "menu".
+  Site navigation is a list of links, and role="menu" would make screen
+  readers expect application-style arrow-key behaviour.
+
+  Progressive enhancement: the toggle button starts "hidden". Without
+  JavaScript every link is visible. navigation.js shows the button and
+  collapses the list on small screens.
+#}
+{% set list_id = ('navigation-list')|clean_unique_id %}
+<nav{{ attributes.addClass('navigation').setAttribute('aria-label', label|default('Main')).setAttribute('data-navigation', '') }}>
+  <button type="button" class="navigation__toggle" aria-expanded="false" aria-controls="{{ list_id }}" hidden>
+    <span class="navigation__icon" aria-hidden="true"></span>
+    {{ 'Menu'|t }}
+  </button>
+  <ul id="{{ list_id }}" class="navigation__list" role="list">
+    {% for item in items %}
+      <li class="navigation__item">
+        <a href="{{ item.url }}" class="navigation__link"{% if item.active %} aria-current="page"{% endif %}>{{ item.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

@@ -1,0 +1,71 @@
+@use '../../src/scss/abstracts' as *;
+
+.hero {
+  display: grid;
+  gap: var(--space-5);
+  align-items: center;
+  overflow: hidden;
+  background-color: var(--color-surface-alt);
+  border-radius: var(--radius-lg);
+
+  @include mq('md') {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-6) var(--space-5) 0;
+
+  @include mq('md') {
+    padding: var(--space-7) 0 var(--space-7) var(--space-7);
+  }
+
+  > * {
+    margin: 0;
+  }
+}
+
+.hero__text {
+  max-width: 40ch;
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+}
+
+.hero__media img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.hero--promo {
+  margin-block: var(--space-8);
+  background-color: var(--color-accent-light);
+
+  .hero__heading {
+    font-size: var(--font-size-xl);
+  }
+
+  .hero__text {
+    color: var(--color-accent-dark);
+  }
+
+  // Image on the left on wide screens, to vary the rhythm of the page.
+  @include mq('md') {
+    .hero__media {
+      order: -1;
+    }
+
+    .hero__content {
+      padding: var(--space-6) var(--space-7) var(--space-6) 0;
+    }
+  }
+}
+
+.hero--hero {
+  margin-bottom: var(--space-8);
+}
