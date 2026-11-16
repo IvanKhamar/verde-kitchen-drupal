@@ -39,6 +39,10 @@ home=$(curl --fail --silent --show-error "$base_url/")
 grep --quiet 'Fresh food that feels good' <<< "$home"
 grep --quiet 'class="card"' <<< "$home"
 curl --fail --silent --show-error --output /dev/null "$base_url/products"
+# JSON:API serves products to the React filter, with the computed image URL
+# from the verde_catalog module.
+api=$(curl --fail --silent --show-error "$base_url/jsonapi/node/product?page%5Blimit%5D=1")
+grep --quiet '"card_image_url":"/sites/default/files/styles/card/' <<< "$api"
 curl --fail --silent --show-error --output /dev/null "$base_url/articles"
 nid=$($drush php:eval '$ids = \Drupal::entityQuery("node")->accessCheck(FALSE)->condition("type", "product")->sort("nid")->range(0, 1)->execute(); echo reset($ids);')
 page=$(curl --fail --silent --show-error "$base_url/node/$nid")
