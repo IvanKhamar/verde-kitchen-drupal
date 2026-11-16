@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Theme override for menus other than the main menu (here: the footer menu).
+ *
+ * A macro calls itself for child items, so nested menus work at any depth.
+ *
+ * Available variables:
+ * - items: Menu items, each with title, url, below (child items) and
+ *   in_active_trail.
+ */
+#}
+{% import _self as menus %}
+{{ menus.menu_links(items, attributes, 0) }}
+
+{% macro menu_links(items, attributes, menu_level) %}
+  {% if items %}
+    <ul{{ attributes.addClass(menu_level == 0 ? 'menu' : 'menu menu--nested') }} role="list">
+      {% for item in items %}
+        <li class="menu__item">
+          {{ link(item.title, item.url) }}
+          {% if item.below %}
+            {{ _self.menu_links(item.below, create_attribute(), menu_level + 1) }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}

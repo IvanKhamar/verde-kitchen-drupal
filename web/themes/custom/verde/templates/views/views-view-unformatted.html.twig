@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Theme override for a list of view rows (the "Unformatted list" style).
+ *
+ * Every list of cards on the site goes through the teaser-grid component.
+ * {% set items %}...{% endset %} captures the rows' markup into a variable,
+ * which is then passed to the component's "items" slot.
+ *
+ * "section" (heading and "see all" link) comes from
+ * verde_preprocess_views_view_unformatted().
+ */
+#}
+{% set items %}
+  {% for row in rows %}
+    <li class="teaser-grid__item">{{ row.content }}</li>
+  {% endfor %}
+{% endset %}
+{{ include('verde:teaser-grid', section|merge({ items: items }), with_context = false) }}

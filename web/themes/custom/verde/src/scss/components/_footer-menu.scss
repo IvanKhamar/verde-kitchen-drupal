@@ -1,0 +1,22 @@
+@use '../abstracts' as *;
+
+// The footer menu uses Drupal's default menu.html.twig: <ul class="menu">.
+.site-footer {
+  .menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: 0 0 var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .menu a {
+    display: inline-block;
+    padding-block: var(--space-2);
+  }
+
+  .block--system-powered-by-block {
+    font-size: var(--font-size-sm);
+  }
+}

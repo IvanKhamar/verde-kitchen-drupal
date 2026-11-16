@@ -1,0 +1,14 @@
+{#
+/**
+ * @file
+ * Theme override for the main menu.
+ *
+ * The suffix "--main" is the menu's machine name, so only the main menu uses
+ * this template; other menus keep the default menu.html.twig.
+ * nav_items and nav_label come from verde_preprocess_menu__main().
+ */
+#}
+{{ include('verde:navigation', {
+  label: nav_label,
+  items: nav_items,
+}, with_context = false) }}

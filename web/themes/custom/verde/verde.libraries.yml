@@ -9,3 +9,14 @@ global:
   css:
     theme:
       dist/css/global.css: {}
+
+# Attached only on full product and article pages, from their node templates.
+product:
+  css:
+    theme:
+      dist/css/product.css: {}
+
+article:
+  css:
+    theme:
+      dist/css/article.css: {}

@@ -1,0 +1,41 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ *
+ * Simpler than core's version: one wrapper, no wrapper per item when the
+ * field holds a single value. Field-specific templates are possible with
+ * suggestions such as field--field-price.html.twig or
+ * field--node--body--article.html.twig.
+ *
+ * Available variables:
+ * - field_name, field_type, label_display: Field information.
+ * - label_hidden: Whether the label is hidden.
+ * - multiple: Whether the field can hold more than one value.
+ * - items: The field values, each with "content" and "attributes".
+ */
+#}
+{%
+  set classes = [
+    'field',
+    'field--' ~ field_name|clean_class,
+    'field--type-' ~ field_type|clean_class,
+    'field--label-' ~ label_display,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {% if not label_hidden %}
+    <div{{ title_attributes.addClass('field__label') }}>{{ label }}</div>
+  {% endif %}
+  {% if multiple %}
+    <div class="field__items">
+      {% for item in items %}
+        <div{{ item.attributes.addClass('field__item') }}>{{ item.content }}</div>
+      {% endfor %}
+    </div>
+  {% else %}
+    {% for item in items %}
+      {{ item.content }}
+    {% endfor %}
+  {% endif %}
+</div>

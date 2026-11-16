@@ -1,0 +1,38 @@
+// Article page (library verde/article). Loaded only on full article pages.
+@use '../abstracts' as *;
+
+// A narrow column (about 70 characters per line) is easier to read.
+.article {
+  max-width: 46rem;
+  margin-top: var(--space-4);
+}
+
+.article__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  color: var(--color-text-muted);
+}
+
+.article__media {
+  margin-block: var(--space-5) var(--space-6);
+
+  img {
+    width: 100%;
+    border-radius: var(--radius-lg);
+  }
+}
+
+.article__body {
+  font-size: var(--font-size-md);
+
+  ul,
+  ol {
+    padding-left: var(--space-5);
+  }
+
+  li + li {
+    margin-top: var(--space-2);
+  }
+}

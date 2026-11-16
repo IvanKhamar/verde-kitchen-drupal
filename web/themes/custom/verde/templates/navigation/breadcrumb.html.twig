@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Theme override for a breadcrumb trail.
+ *
+ * aria-current="page" marks the last item for screen readers. The separators
+ * are drawn with CSS, so screen readers do not read them out.
+ */
+#}
+{% if breadcrumb %}
+  <nav class="breadcrumb" aria-label="{{ 'Breadcrumb'|t }}">
+    <ol class="breadcrumb__list">
+      {% for item in breadcrumb %}
+        <li class="breadcrumb__item">
+          {% if item.url and not loop.last %}
+            <a href="{{ item.url }}">{{ item.text }}</a>
+          {% elseif item.url %}
+            <a href="{{ item.url }}" aria-current="page">{{ item.text }}</a>
+          {% else %}
+            {{ item.text }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+{% endif %}
