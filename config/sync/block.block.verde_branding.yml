@@ -1,15 +1,13 @@
-uuid: 7a4e0682-488f-4385-9542-23b96488df63
+uuid: 9ffb30bc-9e93-4b48-88e4-d7d29a6db811
 langcode: en
 status: true
 dependencies:
   module:
     - system
   theme:
-    - stark
-_core:
-  default_config_hash: sG8t_FghbUscJ-GrnQ8zs_vx5YM4bJCfntrK-J5HcAY
-id: stark_branding
-theme: stark
+    - verde
+id: verde_branding
+theme: verde
 region: header
 weight: 0
 provider: null
@@ -21,5 +19,5 @@ settings:
   provider: system
   use_site_logo: true
   use_site_name: true
-  use_site_slogan: true
+  use_site_slogan: false
 visibility: {  }

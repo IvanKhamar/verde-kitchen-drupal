@@ -1,15 +1,13 @@
-uuid: 7bd8cd78-19af-4df1-8dc9-4e8c5301fdb4
+uuid: c2cf5435-76ec-46f4-804f-7cac4eec6858
 langcode: en
 status: true
 dependencies:
   theme:
-    - stark
-_core:
-  default_config_hash: T0wbI6qVdThbbIqXDZFg_1VZ3_ittXBdEoUH7d7ux_E
-id: stark_local_tasks
-theme: stark
+    - verde
+id: verde_local_tasks
+theme: verde
 region: content
-weight: -20
+weight: -9
 provider: null
 plugin: local_tasks_block
 settings:

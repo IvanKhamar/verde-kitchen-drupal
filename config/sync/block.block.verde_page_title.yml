@@ -1,15 +1,13 @@
-uuid: 72f3c794-fe23-4a40-9058-83ec9945ed17
+uuid: a19ac056-b779-4996-a07c-732fe34567af
 langcode: en
 status: true
 dependencies:
   theme:
-    - stark
-_core:
-  default_config_hash: Oh72CHUkp6cj6dbrXMK2hzCsM05w9cHVoD22rMLQUfk
-id: stark_page_title
-theme: stark
+    - verde
+id: verde_page_title
+theme: verde
 region: content
-weight: -30
+weight: -10
 provider: null
 plugin: page_title_block
 settings:
