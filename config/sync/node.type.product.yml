@@ -1,0 +1,11 @@
+uuid: f2d86192-fdfe-479a-8847-04b3289d546a
+langcode: en
+status: true
+dependencies: {  }
+name: Product
+type: product
+description: 'A food or drink product shown in the catalog.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

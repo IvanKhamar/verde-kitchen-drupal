@@ -1,0 +1,11 @@
+uuid: 0ad2c11b-bfe1-4b98-9587-e9c6d15ef076
+langcode: en
+status: true
+dependencies: {  }
+name: Article
+type: article
+description: 'A recipe or a news story.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

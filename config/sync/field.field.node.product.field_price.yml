@@ -1,0 +1,23 @@
+uuid: 849914df-6fe5-46d3-8036-dbbec55dbc3e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_price
+    - node.type.product
+id: node.product.field_price
+field_name: field_price
+entity_type: node
+bundle: product
+label: Price
+description: 'Price in euro.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 0.0
+  max: null
+  prefix: €
+  suffix: ''
+field_type: decimal
