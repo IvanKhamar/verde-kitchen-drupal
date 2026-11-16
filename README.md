@@ -7,7 +7,7 @@ performance and SEO.
 
 > Verde Kitchen is an invented brand. It is not connected to any real company.
 
-**Status:** work in progress — phase 1 of 7 (local environment and project skeleton).
+**Status:** work in progress — phase 2 of 7 (content model and demo content).
 
 ## Stack
 
@@ -36,24 +36,71 @@ git clone https://github.com/IvanKhamar/verde-kitchen-drupal.git
 cd verde-kitchen-drupal
 ddev start
 ddev composer install
-ddev drush site:install minimal --account-name=admin --site-name="Verde Kitchen" -y
+ddev site-setup
 ddev launch
 ```
 
-`site:install` prints a one-time generated admin password. To log in later without it,
-run `ddev drush user:login`.
+`ddev site-setup` (defined in `.ddev/commands/web/site-setup`) installs Drupal from the
+exported configuration in `config/sync` and then creates the demo content. It deletes the
+current database, so it is also the way to reset the site.
 
-> From phase 2 on, the site is installed from the exported configuration
-> (`--existing-config`) and a script creates the demo content. This section will be updated.
+To log in as the administrator, run `ddev drush user:login` and open the link it prints.
+
+The two steps can also be run one by one:
+
+```bash
+ddev drush site:install --existing-config --account-name=admin -y
+ddev drush php:script scripts/demo-content/demo-content.php
+```
+
+## Content model
+
+| Content type | Fields                                                                     |
+| ------------ | -------------------------------------------------------------------------- |
+| Product      | title, image, description (with summary), category, dietary tags, price (€) |
+| Article      | title, article type (recipe / news), image, body                            |
+
+| Vocabulary       | Terms                                                                  |
+| ---------------- | ---------------------------------------------------------------------- |
+| Product category | Drinks, Bowls, Snacks, Breakfast                                       |
+| Dietary tag      | Vegan, Vegetarian, Gluten-free, Dairy-free, High protein, No added sugar |
+
+Demo content: 14 products and 5 articles, created by
+`scripts/demo-content/demo-content.php`. Products marked "Promoted to front page" will be
+the featured products on the home page.
+
+## Working with configuration
+
+Content types, fields, displays and other settings live in `config/sync` as YAML files.
+After changing settings in the admin UI, export them and commit the result:
+
+```bash
+ddev drush config:export -y
+```
+
+To apply configuration from the repository to your database (for example after `git pull`):
+
+```bash
+ddev drush config:import -y
+```
 
 ## Project structure
 
 ```text
-.ddev/          DDEV configuration (PHP, database and Node versions)
-config/sync/    Exported Drupal configuration
-web/            Web root (Drupal core and contributed code are installed by Composer)
-composer.json   PHP dependencies
+.ddev/                  DDEV configuration and the site-setup command
+config/sync/            Exported Drupal configuration
+scripts/demo-content/   Demo content script and its images
+scripts/ci/             Scripts used by GitHub Actions
+web/                    Web root (Drupal core and contributed code are installed by Composer)
+composer.json           PHP dependencies
 ```
+
+## Continuous integration
+
+On every push GitHub Actions scans the history for secrets, validates and audits the
+Composer dependencies, then installs the site from `config/sync` into an empty MariaDB
+database, creates the demo content and requests a few pages
+(`scripts/ci/install-test.sh`).
 
 ## Secrets
 
@@ -75,6 +122,8 @@ _To be added in phase 6._
 - `docs/ARCHITECTURE.md` — theme structure and data flow _(planned)_
 - `docs/LEARNING.md` — how Drupal theming works in this project _(planned)_
 - `docs/design-tokens.md` — colours, typography, spacing, breakpoints _(planned)_
+
+Image and content credits: `CREDITS.md`.
 
 ## License
 
