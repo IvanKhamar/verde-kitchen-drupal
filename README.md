@@ -7,7 +7,7 @@ performance and SEO.
 
 > Verde Kitchen is an invented brand. It is not connected to any real company.
 
-**Status:** work in progress — phase 4 of 7 (components, page templates, preprocess functions).
+**Status:** work in progress — phase 5 of 7 (React catalog filter with JSON:API).
 
 ## Stack
 
@@ -17,8 +17,8 @@ performance and SEO.
 | CMS         | Drupal 11.4 (`drupal/recommended-project`), Drush 13 |
 | Runtime     | PHP 8.4, MariaDB 11.8, Node.js 24                   |
 | Theme       | Custom theme `verde` (no base theme), Twig, Single Directory Components, Views |
-| Front end   | SCSS with design tokens, Webpack 5, PostCSS/Autoprefixer; React widget _(planned)_ |
-| Data        | JSON:API (Drupal core) _(planned)_                  |
+| Front end   | SCSS with design tokens, Webpack 5, Babel, PostCSS/Autoprefixer, React 19 (one widget) |
+| Data        | JSON:API (Drupal core, read-only), a small custom module for a computed field |
 | Quality     | ESLint, Stylelint, Prettier, PHPCS, GitHub Actions _(planned)_ |
 
 ## Requirements
@@ -102,6 +102,28 @@ in `web/themes/custom/verde/components/`. Each folder holds the component's meta
 | `teaser-grid` | Every list of cards; responsive grid without media queries      |
 | `navigation`  | Main menu with an accessible mobile toggle (disclosure pattern) |
 
+## React catalog filter
+
+`/products` has a React widget that filters products by name, category and dietary
+tags. Source: `web/themes/custom/verde/src/js/catalog-filter/`.
+
+- **Data:** JSON:API (`/jsonapi/node/product`, `/jsonapi/taxonomy_term/...`).
+  Category and name search are filtered by Drupal; "all selected tags" is filtered in
+  the browser, because two JSON:API conditions on the same multi-value field never
+  match together (one SQL join, one value per row).
+- **Images:** the `verde_catalog` module adds a computed field `card_image_url` with
+  the "card" image style URL. Only Drupal can create that URL (it contains a security
+  token), and React then uses the same image file as the Twig cards.
+- **Mounting:** the library `verde/catalog-filter` is attached only by the catalog
+  template; `Drupal.behaviors` and `once()` mount React into `[data-catalog-filter]`.
+- **Progressive enhancement:** the server-rendered list stays visible until the first
+  API response, and also when JavaScript or the API fails.
+- **States and accessibility:** loading, results, empty and error (with "Try again");
+  the result count is announced through a `role="status"` live region; native form
+  controls with labels, so the widget works with the keyboard.
+- **Tests:** `npm test` runs unit tests for the JSON:API helpers with Node's built-in
+  test runner.
+
 ## Working with configuration
 
 Content types, fields, displays and other settings live in `config/sync` as YAML files.
@@ -126,6 +148,7 @@ so `node_modules/` is never served by the web server.
 | --------------------- | -------------------------------------------------------------- |
 | `ddev npm run build`  | Production build: compressed CSS, no source maps               |
 | `ddev npm run watch`  | Development build with source maps; rebuilds when a file changes |
+| `ddev npm test`       | JavaScript unit tests (`*.test.js`)                            |
 
 Node.js runs in the DDEV container (version 24, see `.nvmrc`). With Node.js 24 on the
 host, the same commands work without `ddev`.
@@ -152,6 +175,8 @@ config/sync/            Exported Drupal configuration
 scripts/demo-content/   Demo content script and its images
 scripts/ci/             Scripts used by GitHub Actions
 web/                    Web root (Drupal core and contributed code are installed by Composer)
+web/modules/custom/verde_catalog/
+                        Computed "card image URL" field for JSON:API
 web/themes/custom/verde/
   verde.info.yml        Theme definition: regions, global library
   verde.libraries.yml   CSS/JS libraries
@@ -159,6 +184,7 @@ web/themes/custom/verde/
   components/           Single Directory Components (Twig, SCSS, JS)
   templates/            Twig templates that override Drupal's defaults
   src/scss/             SCSS sources: abstracts (tokens, mixins), base, layout, components, pages
+  src/js/               React widget sources and their unit tests
   dist/                 Build output (not committed)
 docs/                   Project documentation
 composer.json           PHP dependencies
@@ -169,7 +195,8 @@ webpack.config.js       Webpack configuration
 ## Continuous integration
 
 On every push GitHub Actions scans the history for secrets, validates and audits the
-Composer and npm dependencies, builds the theme assets, then installs the site from `config/sync` into an empty MariaDB
+Composer and npm dependencies, runs the JavaScript unit tests, builds the theme assets,
+then installs the site from `config/sync` into an empty MariaDB
 database, creates the demo content and requests a few pages
 (`scripts/ci/install-test.sh`).
 
