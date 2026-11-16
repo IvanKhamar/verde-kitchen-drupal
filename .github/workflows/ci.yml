@@ -25,11 +25,30 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    # Same database as the DDEV project. The credentials are throwaway test values
+    # for a container that only lives during this job.
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_DATABASE: drupal
+          MARIADB_USER: drupal
+          MARIADB_PASSWORD: drupal
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      # Not a secret: the CI site is deleted when the job ends.
+      DRUPAL_HASH_SALT: ci-only-hash-salt-not-a-secret
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
+          extensions: gd, pdo_mysql
           tools: composer:v2
           coverage: none
       - name: Validate composer.json and composer.lock
@@ -38,3 +57,7 @@ jobs:
         run: composer install --no-interaction --no-progress --prefer-dist
       - name: Check dependencies for known vulnerabilities
         run: composer audit
+      - name: Install the site from config and smoke-test it
+        env:
+          DB_URL: mysql://drupal:drupal@127.0.0.1:3306/drupal
+        run: bash scripts/ci/install-test.sh
