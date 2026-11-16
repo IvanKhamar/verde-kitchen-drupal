@@ -19,6 +19,7 @@ node_modules/
 /web/INSTALL.txt
 /web/README.md
 /web/autoload.php
+/web/autoload_runtime.php
 /web/example.gitignore
 /web/index.php
 /web/robots.txt
