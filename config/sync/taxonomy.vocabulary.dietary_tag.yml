@@ -1,0 +1,9 @@
+uuid: 726d504f-7027-493c-bf1f-232a29099b58
+langcode: en
+status: true
+dependencies: {  }
+name: 'Dietary tag'
+vid: dietary_tag
+description: 'Diet labels such as vegan or gluten-free.'
+weight: 0
+new_revision: false

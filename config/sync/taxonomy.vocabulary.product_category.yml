@@ -1,0 +1,9 @@
+uuid: 09316243-9e2a-46c4-8216-7c52010c164a
+langcode: en
+status: true
+dependencies: {  }
+name: 'Product category'
+vid: product_category
+description: 'Groups products in the catalog, for example Drinks or Bowls.'
+weight: 0
+new_revision: false

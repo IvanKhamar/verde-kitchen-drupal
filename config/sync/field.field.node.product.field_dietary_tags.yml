@@ -1,0 +1,25 @@
+uuid: 1970e08a-b60d-464d-832a-cb92d74f7656
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_dietary_tags
+    - node.type.product
+    - taxonomy.vocabulary.dietary_tag
+id: node.product.field_dietary_tags
+field_name: field_dietary_tags
+entity_type: node
+bundle: product
+label: 'Dietary tags'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      dietary_tag: dietary_tag
+    auto_create: false
+field_type: entity_reference
