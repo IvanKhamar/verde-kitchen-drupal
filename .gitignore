@@ -1,0 +1,66 @@
+# --- Dependencies (restored by `composer install` / `npm ci`) ---
+/vendor/
+node_modules/
+
+# --- Drupal core and contributed code (managed by Composer) ---
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+/recipes/
+
+# Scaffold files that Composer copies from drupal/core on every install.
+/web/.csslintrc
+/web/.eslintignore
+/web/.eslintrc.json
+/web/.ht.router.php
+/web/.htaccess
+/web/INSTALL.txt
+/web/README.md
+/web/autoload.php
+/web/example.gitignore
+/web/index.php
+/web/robots.txt
+/web/update.php
+/web/web.config
+/web/sites/README.txt
+/web/sites/default/default.services.yml
+/web/sites/default/default.settings.php
+/web/sites/development.services.yml
+/web/sites/example.settings.local.php
+/web/sites/example.sites.php
+/web/modules/README.txt
+/web/profiles/README.txt
+/web/themes/README.txt
+
+# --- Secrets and local settings (never commit) ---
+/web/sites/*/settings.ddev.php
+/web/sites/*/settings.local.php
+/web/sites/*/services.local.yml
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- User-uploaded and generated files ---
+/web/sites/*/files/
+/web/sites/*/private/
+/private/
+
+# --- Database dumps ---
+*.sql
+*.sql.gz
+
+# --- Front-end build output and reports ---
+/web/themes/custom/*/dist/
+/reports/
+
+# --- OS and editor files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
