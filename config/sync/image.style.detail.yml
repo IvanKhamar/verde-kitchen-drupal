@@ -1,0 +1,15 @@
+uuid: 5112c743-c3e3-4dd2-a9f7-8aec1d7b8b6d
+langcode: en
+status: true
+dependencies: {  }
+name: detail
+label: 'Detail (4:3)'
+effects:
+  c3a0632a-f983-43bc-9c03-7cee5b19f7a7:
+    uuid: c3a0632a-f983-43bc-9c03-7cee5b19f7a7
+    id: image_scale_and_crop
+    weight: 0
+    data:
+      width: 960
+      height: 720
+      anchor: center-center

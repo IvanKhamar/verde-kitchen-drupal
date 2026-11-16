@@ -1,0 +1,8 @@
+uuid: 29aa6fdf-d4f0-4ecc-ae8a-547b40570d31
+langcode: en
+status: true
+dependencies: {  }
+id: banner
+label: Banner
+revision: false
+description: 'Hero or promo banner with a heading, text, link and image.'

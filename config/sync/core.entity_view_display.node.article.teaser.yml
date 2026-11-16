@@ -7,7 +7,7 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_article_type
     - field.field.node.article.field_image
-    - image.style.medium
+    - image.style.card
     - node.type.article
   module:
     - image
@@ -39,7 +39,7 @@ content:
     label: hidden
     settings:
       image_link: ''
-      image_style: medium
+      image_style: card
       image_loading:
         attribute: lazy
     third_party_settings: {  }

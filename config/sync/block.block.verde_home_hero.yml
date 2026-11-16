@@ -1,0 +1,28 @@
+uuid: 4d6664a5-2f14-4cf5-a4d8-b5866c322884
+langcode: en
+status: true
+dependencies:
+  content:
+    - 'block_content:banner:b2f1c6a0-5c0e-4f53-9a7e-1c2d3e4f5a60'
+  module:
+    - block_content
+    - system
+  theme:
+    - verde
+id: verde_home_hero
+theme: verde
+region: content
+weight: -20
+provider: null
+plugin: 'block_content:b2f1c6a0-5c0e-4f53-9a7e-1c2d3e4f5a60'
+settings:
+  id: 'block_content:b2f1c6a0-5c0e-4f53-9a7e-1c2d3e4f5a60'
+  label: 'Home hero'
+  label_display: '0'
+  provider: block_content
+  view_mode: full
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'

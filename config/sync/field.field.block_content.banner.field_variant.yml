@@ -1,0 +1,23 @@
+uuid: c72bbd02-9362-4ff9-b7a2-9dbc1d02b03e
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.banner
+    - field.storage.block_content.field_variant
+  module:
+    - options
+id: block_content.banner.field_variant
+field_name: field_variant
+entity_type: block_content
+bundle: banner
+label: Variant
+description: ''
+required: true
+translatable: true
+default_value:
+  -
+    value: promo
+default_value_callback: ''
+settings: {  }
+field_type: list_string

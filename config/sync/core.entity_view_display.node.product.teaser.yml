@@ -9,7 +9,7 @@ dependencies:
     - field.field.node.product.field_dietary_tags
     - field.field.node.product.field_image
     - field.field.node.product.field_price
-    - image.style.medium
+    - image.style.card
     - node.type.product
   module:
     - image
@@ -49,7 +49,7 @@ content:
     label: hidden
     settings:
       image_link: ''
-      image_style: medium
+      image_style: card
       image_loading:
         attribute: lazy
     third_party_settings: {  }

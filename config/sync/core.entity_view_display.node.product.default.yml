@@ -8,7 +8,7 @@ dependencies:
     - field.field.node.product.field_dietary_tags
     - field.field.node.product.field_image
     - field.field.node.product.field_price
-    - image.style.large
+    - image.style.detail
     - node.type.product
   module:
     - image
@@ -47,7 +47,7 @@ content:
     label: hidden
     settings:
       image_link: ''
-      image_style: large
+      image_style: detail
       image_loading:
         attribute: eager
     third_party_settings: {  }

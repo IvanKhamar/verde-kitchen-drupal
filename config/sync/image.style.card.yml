@@ -1,0 +1,15 @@
+uuid: 7461bfaa-7d69-4904-aa93-b84ce484dcb8
+langcode: en
+status: true
+dependencies: {  }
+name: card
+label: 'Card (4:3)'
+effects:
+  50bf58bd-5139-4ee4-a4d9-0133e9c253f7:
+    uuid: 50bf58bd-5139-4ee4-a4d9-0133e9c253f7
+    id: image_scale_and_crop
+    weight: 0
+    data:
+      width: 640
+      height: 480
+      anchor: center-center
