@@ -65,6 +65,8 @@ jobs:
         run: npm ci
       - name: Check Node dependencies for known vulnerabilities
         run: npm audit --audit-level=high
+      - name: Run JavaScript unit tests
+        run: npm test
       - name: Build theme assets
         run: npm run build
       - name: Install the site from config and smoke-test it
