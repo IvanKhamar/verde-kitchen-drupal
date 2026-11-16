@@ -123,6 +123,8 @@ red-lentil-soup|plate|#fbeee4|#f3d3bd|#c8553d|#6fae5a
 three-breakfast-smoothies|plate|#f6e6ea|#ecc7d1|#b5446e|#6fae5a
 recyclable-bottles|sprout|#e8f3e4|#cfe6c6|#c98b4b|#8a5a3c
 autumn-menu|sprout|#fff4e0|#fde2b0|#e76f51|#c8553d
+banner-hero|bowl|#e8f3e4|#cfe6c6|#2f6b3a|#e76f51
+banner-promo|jar|#fde7df|#f8cdbd|#e76f51|#f2c14e
 '
 
 while IFS='|' read -r SLUG SHAPE BG ACCENT MAIN SECOND; do
