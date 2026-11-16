@@ -1,0 +1,41 @@
+{#
+/**
+ * @file
+ * Theme override for the basic structure of a single Drupal page.
+ *
+ * The placeholders (<head-placeholder>, <css-placeholder>, <js-placeholder>,
+ * <js-bottom-placeholder>) are replaced by Drupal at the end of rendering with
+ * the meta tags, CSS and JS of the libraries this page actually uses. The token
+ * makes sure that user content cannot inject a fake placeholder.
+ *
+ * Available variables:
+ * - html_attributes: Attributes for the <html> tag (lang, dir).
+ * - attributes: Attributes for the <body> tag (classes added in verde.theme).
+ * - head_title: Parts of the <title> text.
+ * - page_top, page, page_bottom: Rendered regions and page content.
+ * - placeholder_token: The token for the placeholders above.
+ */
+#}
+<!DOCTYPE html>
+<html{{ html_attributes }}>
+  <head>
+    <head-placeholder token="{{ placeholder_token }}">
+    <title>{{ head_title|safe_join(' | ') }}</title>
+    <css-placeholder token="{{ placeholder_token }}">
+    <js-placeholder token="{{ placeholder_token }}">
+  </head>
+  <body{{ attributes.addClass('page') }}>
+    {#
+      The skip link is the first focusable element, so keyboard and screen
+      reader users can jump over the header and menu. It is hidden until it
+      gets focus (see components/_skip-link.scss).
+    #}
+    <a href="#main-content" class="skip-link">
+      {{ 'Skip to main content'|t }}
+    </a>
+    {{ page_top }}
+    {{ page }}
+    {{ page_bottom }}
+    <js-bottom-placeholder token="{{ placeholder_token }}">
+  </body>
+</html>

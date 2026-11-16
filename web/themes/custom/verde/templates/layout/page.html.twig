@@ -1,0 +1,45 @@
+{#
+/**
+ * @file
+ * Theme override to display a single page.
+ *
+ * Each region from verde.info.yml is available as page.<region>. A region is
+ * empty when no block in it has content, so the {% if %} checks avoid printing
+ * empty wrappers.
+ *
+ * Landmarks (<header>, <nav> inside the menu block, <main>, <footer>) let
+ * screen reader users jump between the parts of the page.
+ */
+#}
+<div class="layout">
+  <header class="site-header" role="banner">
+    <div class="site-header__inner container">
+      {{ page.header }}
+      {{ page.primary_menu }}
+    </div>
+  </header>
+
+  {#
+    tabindex="-1" lets the skip link move keyboard focus into <main>,
+    not only scroll to it.
+  #}
+  <main id="main-content" class="site-main" tabindex="-1">
+    {% if page.highlighted %}
+      <div class="container">{{ page.highlighted }}</div>
+    {% endif %}
+    {% if page.breadcrumb %}
+      <div class="container">{{ page.breadcrumb }}</div>
+    {% endif %}
+    <div class="container">
+      {{ page.content }}
+    </div>
+  </main>
+
+  {% if page.footer %}
+    <footer class="site-footer" role="contentinfo">
+      <div class="container">
+        {{ page.footer }}
+      </div>
+    </footer>
+  {% endif %}
+</div>

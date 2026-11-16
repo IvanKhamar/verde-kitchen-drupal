@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Theme override to display a region.
+ *
+ * Available variables:
+ * - content: The blocks in this region, already rendered.
+ * - region: The machine name of the region, for example "header".
+ * - attributes: HTML attributes for the wrapper.
+ */
+#}
+{%
+  set classes = [
+    'region',
+    'region--' ~ region|clean_class,
+  ]
+%}
+{% if content %}
+  <div{{ attributes.addClass(classes) }}>
+    {{ content }}
+  </div>
+{% endif %}

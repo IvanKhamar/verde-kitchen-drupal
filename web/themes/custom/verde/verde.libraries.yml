@@ -1,0 +1,11 @@
+# A library is a named group of CSS and JS files. Drupal adds a library to a page
+# only when something asks for it: the theme's .info.yml (every page), a template
+# ({{ attach_library('verde/name') }}), a preprocess function or a render array.
+#
+# The files in dist/ are built by Webpack from src/ (npm run build); they are not
+# committed. The "theme" CSS group loads after core and module CSS.
+
+global:
+  css:
+    theme:
+      dist/css/global.css: {}

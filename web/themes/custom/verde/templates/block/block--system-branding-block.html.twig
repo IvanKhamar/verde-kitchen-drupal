@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Theme override for the site branding block (logo and site name).
+ *
+ * The file name follows the pattern block--PLUGIN-ID.html.twig, so Drupal
+ * uses it only for this block. "extends" reuses block.html.twig and replaces
+ * just its "content" block.
+ *
+ * Available variables:
+ * - site_logo: URL of the logo (logo.svg in the theme folder by default).
+ * - site_name: The site name, from Admin > Configuration > Basic site settings.
+ */
+#}
+{% extends 'block.html.twig' %}
+
+{% block content %}
+  {% if site_logo or site_name %}
+    {#
+      The logo image is decorative (alt=""): the visible site name next to
+      it already gives the link its accessible name.
+    #}
+    <a href="{{ path('<front>') }}" rel="home" class="site-branding">
+      {% if site_logo %}
+        <img src="{{ site_logo }}" alt="" width="40" height="40" class="site-branding__logo">
+      {% endif %}
+      {% if site_name %}
+        <span class="site-branding__name">{{ site_name }}</span>
+      {% endif %}
+    </a>
+  {% endif %}
+{% endblock %}
