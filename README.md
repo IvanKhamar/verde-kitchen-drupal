@@ -7,7 +7,7 @@ performance and SEO.
 
 > Verde Kitchen is an invented brand. It is not connected to any real company.
 
-**Status:** work in progress — phase 2 of 7 (content model and demo content).
+**Status:** work in progress — phase 3 of 7 (theme skeleton, SCSS architecture, Webpack build).
 
 ## Stack
 
@@ -16,8 +16,8 @@ performance and SEO.
 | Local env   | [DDEV](https://ddev.com/) 1.25 (Docker)             |
 | CMS         | Drupal 11.4 (`drupal/recommended-project`), Drush 13 |
 | Runtime     | PHP 8.4, MariaDB 11.8, Node.js 24                   |
-| Theme       | Custom theme, Twig, Single Directory Components _(planned)_ |
-| Front end   | SCSS, Webpack, React for one widget _(planned)_     |
+| Theme       | Custom theme `verde` (no base theme), Twig; Single Directory Components _(planned)_ |
+| Front end   | SCSS with design tokens, Webpack 5, PostCSS/Autoprefixer; React widget _(planned)_ |
 | Data        | JSON:API (Drupal core) _(planned)_                  |
 | Quality     | ESLint, Stylelint, Prettier, PHPCS, GitHub Actions _(planned)_ |
 
@@ -36,9 +36,14 @@ git clone https://github.com/IvanKhamar/verde-kitchen-drupal.git
 cd verde-kitchen-drupal
 ddev start
 ddev composer install
+ddev npm ci
+ddev npm run build
 ddev site-setup
 ddev launch
 ```
+
+`npm run build` compiles the theme's SCSS into `web/themes/custom/verde/dist/`. The
+built files are not committed, so this step is required.
 
 `ddev site-setup` (defined in `.ddev/commands/web/site-setup`) installs Drupal from the
 exported configuration in `config/sync` and then creates the demo content. It deletes the
@@ -84,6 +89,23 @@ To apply configuration from the repository to your database (for example after `
 ddev drush config:import -y
 ```
 
+## Front-end build
+
+`package.json` and `webpack.config.js` sit in the project root, outside the web root,
+so `node_modules/` is never served by the web server.
+
+| Command               | What it does                                                   |
+| --------------------- | -------------------------------------------------------------- |
+| `ddev npm run build`  | Production build: compressed CSS, no source maps               |
+| `ddev npm run watch`  | Development build with source maps; rebuilds when a file changes |
+
+Node.js runs in the DDEV container (version 24, see `.nvmrc`). With Node.js 24 on the
+host, the same commands work without `ddev`.
+
+While working on the theme, turn off CSS/JS aggregation and Twig caching
+(Admin > Configuration > Development > Development settings), so changes show up
+on reload.
+
 ## Project structure
 
 ```text
@@ -92,13 +114,23 @@ config/sync/            Exported Drupal configuration
 scripts/demo-content/   Demo content script and its images
 scripts/ci/             Scripts used by GitHub Actions
 web/                    Web root (Drupal core and contributed code are installed by Composer)
+web/themes/custom/verde/
+  verde.info.yml        Theme definition: regions, global library
+  verde.libraries.yml   CSS/JS libraries
+  verde.theme           Preprocess functions (PHP)
+  templates/            Twig templates that override Drupal's defaults
+  src/scss/             SCSS sources: abstracts (tokens, mixins), base, layout, components
+  dist/                 Build output (not committed)
+docs/                   Project documentation
 composer.json           PHP dependencies
+package.json            Front-end build tools and npm scripts
+webpack.config.js       Webpack configuration
 ```
 
 ## Continuous integration
 
 On every push GitHub Actions scans the history for secrets, validates and audits the
-Composer dependencies, then installs the site from `config/sync` into an empty MariaDB
+Composer and npm dependencies, builds the theme assets, then installs the site from `config/sync` into an empty MariaDB
 database, creates the demo content and requests a few pages
 (`scripts/ci/install-test.sh`).
 
@@ -121,7 +153,7 @@ _To be added in phase 6._
 
 - `docs/ARCHITECTURE.md` — theme structure and data flow _(planned)_
 - `docs/LEARNING.md` — how Drupal theming works in this project _(planned)_
-- `docs/design-tokens.md` — colours, typography, spacing, breakpoints _(planned)_
+- [`docs/design-tokens.md`](docs/design-tokens.md) — colours (with WCAG contrast ratios), typography, spacing, breakpoints
 
 Image and content credits: `CREDITS.md`.
 
