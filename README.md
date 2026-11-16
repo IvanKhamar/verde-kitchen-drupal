@@ -7,7 +7,7 @@ performance and SEO.
 
 > Verde Kitchen is an invented brand. It is not connected to any real company.
 
-**Status:** work in progress — phase 3 of 7 (theme skeleton, SCSS architecture, Webpack build).
+**Status:** work in progress — phase 4 of 7 (components, page templates, preprocess functions).
 
 ## Stack
 
@@ -16,7 +16,7 @@ performance and SEO.
 | Local env   | [DDEV](https://ddev.com/) 1.25 (Docker)             |
 | CMS         | Drupal 11.4 (`drupal/recommended-project`), Drush 13 |
 | Runtime     | PHP 8.4, MariaDB 11.8, Node.js 24                   |
-| Theme       | Custom theme `verde` (no base theme), Twig; Single Directory Components _(planned)_ |
+| Theme       | Custom theme `verde` (no base theme), Twig, Single Directory Components, Views |
 | Front end   | SCSS with design tokens, Webpack 5, PostCSS/Autoprefixer; React widget _(planned)_ |
 | Data        | JSON:API (Drupal core) _(planned)_                  |
 | Quality     | ESLint, Stylelint, Prettier, PHPCS, GitHub Actions _(planned)_ |
@@ -70,9 +70,37 @@ ddev drush php:script scripts/demo-content/demo-content.php
 | Product category | Drinks, Bowls, Snacks, Breakfast                                       |
 | Dietary tag      | Vegan, Vegetarian, Gluten-free, Dairy-free, High protein, No added sugar |
 
-Demo content: 14 products and 5 articles, created by
-`scripts/demo-content/demo-content.php`. Products marked "Promoted to front page" will be
-the featured products on the home page.
+| Custom block type | Fields                                                  |
+| ----------------- | ------------------------------------------------------- |
+| Banner            | variant (hero / promo), heading, text, link, image      |
+
+Demo content: 14 products, 5 articles, 2 banners and the main and footer menu links,
+created by `scripts/demo-content/demo-content.php`. Products marked "Promoted to front
+page" are the featured products on the home page.
+
+## Pages
+
+| Path        | What it shows                                                        | Built with                     |
+| ----------- | -------------------------------------------------------------------- | ------------------------------ |
+| `/`         | Hero, featured products, promo banner, latest articles               | Views page + blocks on `<front>` |
+| `/products` | Product catalog                                                      | View `products`                |
+| `/articles` | Recipes and news, newest first, 6 per page                           | View `articles`                |
+| `/node/N`   | Product or article page                                              | `node--TYPE--full.html.twig`   |
+
+## Components
+
+The theme's UI parts are [Single Directory Components](https://www.drupal.org/docs/develop/theming-drupal/using-single-directory-components)
+in `web/themes/custom/verde/components/`. Each folder holds the component's metadata
+(`*.component.yml`, with a JSON schema for its props), Twig template, SCSS and, if needed, JS.
+
+| Component     | Used for                                                        |
+| ------------- | --------------------------------------------------------------- |
+| `button`      | Calls to action (link or `<button>`)                            |
+| `badge`       | Dietary tags, article type                                      |
+| `card`        | Product and article teasers; the whole card is clickable        |
+| `hero`        | Home hero (`<h1>`) and promo banner                             |
+| `teaser-grid` | Every list of cards; responsive grid without media queries      |
+| `navigation`  | Main menu with an accessible mobile toggle (disclosure pattern) |
 
 ## Working with configuration
 
@@ -102,6 +130,16 @@ so `node_modules/` is never served by the web server.
 Node.js runs in the DDEV container (version 24, see `.nvmrc`). With Node.js 24 on the
 host, the same commands work without `ddev`.
 
+`scripts/screenshots.mjs` takes full-page screenshots at 360, 768 and 1280 px with a
+local Chrome or Edge (no npm packages needed):
+
+```bash
+CHROME_PATH="/path/to/chrome" BASE_URL="http://127.0.0.1:PORT" node scripts/screenshots.mjs
+```
+
+`ddev describe` shows the `127.0.0.1` address. Recent Chromium versions block pages on
+public domains that resolve to `127.0.0.1` (such as `*.ddev.site`), so use that direct address.
+
 While working on the theme, turn off CSS/JS aggregation and Twig caching
 (Admin > Configuration > Development > Development settings), so changes show up
 on reload.
@@ -117,9 +155,10 @@ web/                    Web root (Drupal core and contributed code are installed
 web/themes/custom/verde/
   verde.info.yml        Theme definition: regions, global library
   verde.libraries.yml   CSS/JS libraries
-  verde.theme           Preprocess functions (PHP)
+  verde.theme           Preprocess functions and template suggestions (PHP)
+  components/           Single Directory Components (Twig, SCSS, JS)
   templates/            Twig templates that override Drupal's defaults
-  src/scss/             SCSS sources: abstracts (tokens, mixins), base, layout, components
+  src/scss/             SCSS sources: abstracts (tokens, mixins), base, layout, components, pages
   dist/                 Build output (not committed)
 docs/                   Project documentation
 composer.json           PHP dependencies
