@@ -7,17 +7,21 @@
  * Run it with Drush, which boots Drupal before it includes this file:
  *   ddev drush php:script scripts/demo-content/demo-content.php
  *
- * The script is idempotent: it first deletes every product, article and term
- * of the two vocabularies, then creates them again. Use it on a local site only.
+ * The script is idempotent: it first deletes every product, article, term of
+ * the two vocabularies and menu link of the main and footer menus, then
+ * creates them again. The two banners are updated in place.
+ * Use it on a local site only.
  *
  * All names and texts are invented for this portfolio project.
  */
 
 declare(strict_types=1);
 
+use Drupal\block_content\Entity\BlockContent;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\file\FileInterface;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
@@ -137,7 +141,7 @@ $products = [
     'tags' => ['vegan', 'gluten-free'],
     'price' => '2.40',
     'featured' => TRUE,
-    'summary' => 'Bite-sized balls of hazelnut, cocoa and oats-free crispy rice.',
+    'summary' => 'Bite-sized balls of hazelnut, cocoa and crispy rice.',
     'body' => '<p>Roasted hazelnuts, raw cocoa and crispy rice, rolled into small bites. One pack holds six pieces.</p><p>Contains hazelnuts.</p>',
     'alt' => 'Dark chocolate bars with a yellow band',
   ],
@@ -221,6 +225,44 @@ $articles = [
   ],
 ];
 
+// menu => [title, link URI]. "internal:" links point to paths on this site.
+$menus = [
+  'main' => [
+    ['Home', 'internal:/'],
+    ['Products', 'internal:/products'],
+    ['Articles', 'internal:/articles'],
+  ],
+  'footer' => [
+    ['Products', 'internal:/products'],
+    ['Articles', 'internal:/articles'],
+    ['Source code', 'https://github.com/IvanKhamar/verde-kitchen-drupal'],
+  ],
+];
+
+// Banner blocks are content, but their placement (block.block.verde_home_*) is
+// configuration that refers to them by UUID, so the UUIDs must stay fixed.
+$banners = [
+  'b2f1c6a0-5c0e-4f53-9a7e-1c2d3e4f5a60' => [
+    'info' => 'Home hero',
+    'variant' => 'hero',
+    'heading' => 'Fresh food that feels good',
+    'text' => 'Bowls, drinks and snacks made from simple ingredients. Everything is vegetarian, and most of it is vegan.',
+    'link' => ['internal:/products', 'Browse products'],
+    'image' => 'banner-hero',
+    'alt' => 'Green bowl filled with colourful vegetables',
+  ],
+  'b2f1c6a0-5c0e-4f53-9a7e-1c2d3e4f5a61' => [
+    'info' => 'Home promo',
+    'variant' => 'promo',
+    'heading' => 'The autumn menu is here',
+    'text' => 'Warming bowls, a new lentil soup and the return of the spelt banana loaf.',
+    // Replaced below with a link to the "autumn-menu" article.
+    'link' => ['article:autumn-menu', 'See what is new'],
+    'image' => 'banner-promo',
+    'alt' => 'Jar with layers of orange and yellow fruit',
+  ],
+];
+
 // --- Helpers ----------------------------------------------------------------
 
 /**
@@ -274,6 +316,12 @@ $term_ids = $term_storage->getQuery()
   ->execute();
 $term_storage->delete($term_storage->loadMultiple($term_ids));
 
+$link_storage = $entity_type_manager->getStorage('menu_link_content');
+$link_storage->delete($link_storage->loadByProperties(['menu_name' => array_keys($menus)]));
+
+// Banners are updated, not deleted: deleting a custom block also deletes its
+// placements (block.block.verde_home_*), because they depend on it.
+
 // --- Create -----------------------------------------------------------------
 
 $category_ids = verde_demo_terms('product_category', $categories);
@@ -302,9 +350,10 @@ foreach ($products as $slug => $product) {
   ])->save();
 }
 
+$article_ids = [];
 foreach ($articles as $slug => $article) {
   $image = verde_demo_image($slug, 'articles');
-  Node::create([
+  $node = Node::create([
     'type' => 'article',
     'title' => $article['title'],
     'uid' => 1,
@@ -314,13 +363,41 @@ foreach ($articles as $slug => $article) {
     'body' => ['value' => $article['body'], 'format' => 'basic_html'],
     'field_image' => ['target_id' => $image->id(), 'alt' => $article['alt']],
     'field_article_type' => $article['type'],
-  ])->save();
+  ]);
+  $node->save();
+  $article_ids[$slug] = $node->id();
+}
+
+foreach ($menus as $menu => $links) {
+  foreach ($links as $weight => [$title, $uri]) {
+    MenuLinkContent::create(['menu_name' => $menu, 'title' => $title, 'link' => ['uri' => $uri], 'weight' => $weight])->save();
+  }
+}
+
+foreach ($banners as $uuid => $banner) {
+  [$uri, $link_title] = $banner['link'];
+  if (str_starts_with($uri, 'article:')) {
+    // "entity:" links keep working when the article's URL alias changes.
+    $uri = 'entity:node/' . $article_ids[substr($uri, strlen('article:'))];
+  }
+  $image = verde_demo_image($banner['image'], 'banners');
+  $block = \Drupal::service('entity.repository')->loadEntityByUuid('block_content', $uuid)
+    ?? BlockContent::create(['type' => 'banner', 'uuid' => $uuid]);
+  $block->set('info', $banner['info']);
+  $block->set('field_variant', $banner['variant']);
+  $block->set('field_heading', $banner['heading']);
+  $block->set('field_text', $banner['text']);
+  $block->set('field_link', ['uri' => $uri, 'title' => $link_title]);
+  $block->set('field_image', ['target_id' => $image->id(), 'alt' => $banner['alt']]);
+  $block->save();
 }
 
 printf(
-  "Demo content created: %d categories, %d dietary tags, %d products, %d articles.\n",
+  "Demo content created: %d categories, %d dietary tags, %d products, %d articles, %d menu links, %d banners.\n",
   count($category_ids),
   count($tag_ids),
   count($products),
   count($articles),
+  count($menus['main']) + count($menus['footer']),
+  count($banners),
 );
