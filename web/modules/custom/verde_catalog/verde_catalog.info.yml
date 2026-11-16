@@ -1,0 +1,8 @@
+name: 'Verde catalog'
+type: module
+description: 'Adds a computed "card image URL" field to products, so JSON:API returns the same image the server-rendered cards use.'
+package: Verde
+core_version_requirement: ^11
+dependencies:
+  - drupal:image
+  - drupal:node
