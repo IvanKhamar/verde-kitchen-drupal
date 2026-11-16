@@ -1,0 +1,31 @@
+@use 'sass:map';
+@use 'tokens';
+
+// Min-width media query from the breakpoint tokens.
+// Usage: @include mq('md') { ... }
+@mixin mq($name) {
+  @if not map.has-key(tokens.$breakpoints, $name) {
+    @error 'Unknown breakpoint "#{$name}". Use one of: #{map.keys(tokens.$breakpoints)}.';
+  }
+
+  @media (min-width: map.get(tokens.$breakpoints, $name)) {
+    @content;
+  }
+}
+
+// Visible focus indicator for keyboard users. :focus-visible does not show the
+// ring after a mouse click, but always shows it for keyboard navigation.
+@mixin focus-ring {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+// Hides content visually but keeps it available to screen readers.
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  white-space: nowrap !important;
+}

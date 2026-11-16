@@ -1,0 +1,4 @@
+// Abstracts produce no CSS on their own: only variables and mixins.
+// Other files load them with: @use '../abstracts' as *;
+@forward 'tokens';
+@forward 'mixins';
