@@ -41,8 +41,12 @@ grep --quiet 'class="card"' <<< "$home"
 curl --fail --silent --show-error --output /dev/null "$base_url/products"
 # JSON:API serves products to the React filter, with the computed image URL
 # from the verde_catalog module.
-api=$(curl --fail --silent --show-error "$base_url/jsonapi/node/product?page%5Blimit%5D=1")
-grep --quiet '"card_image_url":"/sites/default/files/styles/card/' <<< "$api"
+# The JSON is decoded rather than searched as text: JSON may escape "/" as "\/".
+curl --fail --silent --show-error "$base_url/jsonapi/node/product?page%5Blimit%5D=1" | php -r '
+  $document = json_decode(stream_get_contents(STDIN), true);
+  $url = $document["data"][0]["attributes"]["card_image_url"] ?? "";
+  exit(str_starts_with($url, "/sites/default/files/styles/card/") ? 0 : 1);
+'
 curl --fail --silent --show-error --output /dev/null "$base_url/articles"
 nid=$($drush php:eval '$ids = \Drupal::entityQuery("node")->accessCheck(FALSE)->condition("type", "product")->sort("nid")->range(0, 1)->execute(); echo reset($ids);')
 page=$(curl --fail --silent --show-error "$base_url/node/$nid")
