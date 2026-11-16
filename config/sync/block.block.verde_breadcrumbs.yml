@@ -1,0 +1,20 @@
+uuid: da4e49d4-db35-434a-ae1c-db67b68dc3c5
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - verde
+id: verde_breadcrumbs
+theme: verde
+region: breadcrumb
+weight: 0
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility: {  }

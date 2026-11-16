@@ -1,0 +1,20 @@
+uuid: 19d2d592-169c-490c-93dc-176d6c72475b
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - verde
+id: verde_content
+theme: verde
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  label_display: '0'
+  provider: system
+visibility: {  }

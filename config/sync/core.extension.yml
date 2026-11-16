@@ -29,6 +29,6 @@ module:
   views: 10
   minimal: 1000
 theme:
-  stark: 0
   claro: 0
+  verde: 0
 profile: minimal

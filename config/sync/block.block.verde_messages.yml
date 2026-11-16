@@ -1,15 +1,13 @@
-uuid: 2683927c-9755-4cd0-8e87-239b1e64bdf1
+uuid: 5273ca80-056f-46ae-9d3d-de464785bc50
 langcode: en
 status: true
 dependencies:
   module:
     - system
   theme:
-    - stark
-_core:
-  default_config_hash: aeqlWs7HwctZeZC7ADcbxfqehJzBRfZKmuZz3DsH3_4
-id: stark_messages
-theme: stark
+    - verde
+id: verde_messages
+theme: verde
 region: highlighted
 weight: 0
 provider: null

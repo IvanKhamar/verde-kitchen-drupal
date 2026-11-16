@@ -1,0 +1,20 @@
+uuid: b0c4034e-d033-4fd7-a119-0637d043fca6
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - verde
+id: verde_powered
+theme: verde
+region: footer
+weight: 10
+provider: null
+plugin: system_powered_by_block
+settings:
+  id: system_powered_by_block
+  label: 'Powered by Drupal'
+  label_display: '0'
+  provider: system
+visibility: {  }
