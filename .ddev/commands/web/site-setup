@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+## Description: Install Drupal from the exported configuration and create the demo content
+## Usage: site-setup
+## Example: "ddev site-setup"
+
+# Runs inside the web container. WARNING: site:install deletes the current database.
+set -euo pipefail
+
+# --existing-config installs the site from config/sync instead of an install profile's
+# defaults, so every environment gets exactly the same content types, fields and settings.
+drush site:install --existing-config --account-name=admin --yes
+drush php:script scripts/demo-content/demo-content.php
+drush cache:rebuild
+
+echo "Done. Open the site with 'ddev launch', log in with 'ddev drush user:login'."
