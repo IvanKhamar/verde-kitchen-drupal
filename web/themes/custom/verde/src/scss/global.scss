@@ -1,0 +1,12 @@
+// Entry point of the global library (verde/global), loaded on every page.
+// Order: tokens as custom properties, base element styles, layout, components.
+// Component styles for SDC components live next to each component (phase 4)
+// and load only on pages that use them.
+
+@use 'base/custom-properties';
+@use 'base/reset';
+@use 'base/typography';
+@use 'layout/container';
+@use 'layout/page';
+@use 'components/skip-link';
+@use 'components/site-branding';

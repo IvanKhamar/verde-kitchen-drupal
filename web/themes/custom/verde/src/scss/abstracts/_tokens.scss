@@ -1,0 +1,96 @@
+// Design tokens: the single source of truth for colours, type, spacing and
+// breakpoints. Documented in docs/design-tokens.md.
+//
+// Most tokens are turned into CSS custom properties (base/_custom-properties.scss),
+// so components use var(--color-primary) and the values can change at runtime.
+// Breakpoints stay Sass-only: custom properties do not work inside @media.
+
+// Colours. Every text/background pair used in the theme meets WCAG 2.1 AA
+// (contrast ratios are listed in docs/design-tokens.md).
+$colors: (
+  'text': #1d2a21,
+  'text-muted': #4f5e54,
+  'text-inverse': #fffdf7,
+  'bg': #fffdf7,
+  'surface': #ffffff,
+  'surface-alt': #f1f6ec,
+  'border': #d8e0d3,
+  'border-strong': #7a8a7e,
+  'primary': #2f6b3a,
+  'primary-dark': #1f4a28,
+  'primary-light': #cfe6c6,
+  'accent': #e76f51,
+  'accent-dark': #8a3a22,
+  'accent-light': #fde7df,
+  'footer-bg': #1f3d2b,
+  'focus': #1f4a28,
+  'danger': #b3261e,
+);
+
+// System font stacks: no font files to download, so no layout shift and no
+// render-blocking font requests.
+$font-families: (
+  'body': (system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif),
+  'heading': (ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif),
+  'mono': (ui-monospace, 'Cascadia Code', Consolas, monospace),
+);
+
+// Fluid type scale: clamp(min, preferred, max). Sizes grow with the viewport
+// between 360px and 1280px wide, so no breakpoint is needed for headings.
+$font-sizes: (
+  'sm': 0.875rem,
+  'base': 1rem,
+  'md': clamp(1.125rem, 1.07rem + 0.25vw, 1.25rem),
+  'lg': clamp(1.25rem, 1.14rem + 0.5vw, 1.5rem),
+  'xl': clamp(1.5rem, 1.28rem + 1vw, 2rem),
+  '2xl': clamp(1.875rem, 1.48rem + 1.75vw, 2.75rem),
+  '3xl': clamp(2.25rem, 1.6rem + 2.9vw, 3.75rem),
+);
+
+$font-weights: (
+  'regular': 400,
+  'semibold': 600,
+  'bold': 700,
+);
+
+$line-heights: (
+  'tight': 1.2,
+  'base': 1.6,
+);
+
+// Spacing scale on a 4px grid (1rem = 16px).
+$spacing: (
+  '0': 0,
+  '1': 0.25rem,
+  '2': 0.5rem,
+  '3': 0.75rem,
+  '4': 1rem,
+  '5': 1.5rem,
+  '6': 2rem,
+  '7': 3rem,
+  '8': 4rem,
+  '9': 6rem,
+);
+
+$radii: (
+  'sm': 0.25rem,
+  'md': 0.5rem,
+  'lg': 1rem,
+  'pill': 999px,
+);
+
+$shadows: (
+  'sm': 0 1px 2px rgb(29 42 33 / 0.08),
+  'md': 0 4px 16px rgb(29 42 33 / 0.1),
+);
+
+// Mobile first: styles without a media query are for small screens;
+// mq('md') adds styles from 768px up.
+$breakpoints: (
+  'sm': 480px,
+  'md': 768px,
+  'lg': 1024px,
+  'xl': 1280px,
+);
+
+$container-max-width: 1200px;

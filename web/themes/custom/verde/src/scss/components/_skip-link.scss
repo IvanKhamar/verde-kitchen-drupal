@@ -1,0 +1,20 @@
+@use '../abstracts' as *;
+
+// Hidden off-screen until it receives keyboard focus.
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-inverse);
+  background-color: var(--color-primary-dark);
+  border-radius: var(--radius-md);
+  transform: translateY(-200%);
+
+  &:focus {
+    color: var(--color-text-inverse);
+    transform: translateY(0);
+  }
+}

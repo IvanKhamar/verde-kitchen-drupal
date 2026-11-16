@@ -1,0 +1,39 @@
+@use '../abstracts' as *;
+
+// Turns the Sass token maps into CSS custom properties, for example
+// $colors 'primary' becomes --color-primary.
+:root {
+  @each $name, $value in $colors {
+    --color-#{$name}: #{$value};
+  }
+
+  @each $name, $value in $font-families {
+    --font-family-#{$name}: #{$value};
+  }
+
+  @each $name, $value in $font-sizes {
+    --font-size-#{$name}: #{$value};
+  }
+
+  @each $name, $value in $font-weights {
+    --font-weight-#{$name}: #{$value};
+  }
+
+  @each $name, $value in $line-heights {
+    --line-height-#{$name}: #{$value};
+  }
+
+  @each $name, $value in $spacing {
+    --space-#{$name}: #{$value};
+  }
+
+  @each $name, $value in $radii {
+    --radius-#{$name}: #{$value};
+  }
+
+  @each $name, $value in $shadows {
+    --shadow-#{$name}: #{$value};
+  }
+
+  --container-max-width: #{$container-max-width};
+}
