@@ -33,7 +33,13 @@ for _ in $(seq 1 30); do
   sleep 1
 done
 
-curl --fail --silent --show-error --output /dev/null "$base_url/"
+# The home page shows the hero banner (custom block placed by config, content
+# created by the demo script) and the featured products view.
+home=$(curl --fail --silent --show-error "$base_url/")
+grep --quiet 'Fresh food that feels good' <<< "$home"
+grep --quiet 'class="card"' <<< "$home"
+curl --fail --silent --show-error --output /dev/null "$base_url/products"
+curl --fail --silent --show-error --output /dev/null "$base_url/articles"
 nid=$($drush php:eval '$ids = \Drupal::entityQuery("node")->accessCheck(FALSE)->condition("type", "product")->sort("nid")->range(0, 1)->execute(); echo reset($ids);')
 page=$(curl --fail --silent --show-error "$base_url/node/$nid")
 grep --quiet 'Green Glow Smoothie' <<< "$page"
