@@ -14,8 +14,3 @@
   color: var(--color-text-muted);
   content: '/';
 }
-
-.breadcrumb [aria-current='page'] {
-  color: var(--color-text-muted);
-  text-decoration: none;
-}
