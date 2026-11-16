@@ -1,0 +1,35 @@
+uuid: 33e35024-2e36-4935-8894-0d3437917dcb
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.banner
+    - field.field.block_content.banner.field_heading
+    - field.field.block_content.banner.field_image
+    - field.field.block_content.banner.field_link
+    - field.field.block_content.banner.field_text
+    - field.field.block_content.banner.field_variant
+    - image.style.detail
+  module:
+    - image
+id: block_content.banner.default
+targetEntityType: block_content
+bundle: banner
+mode: default
+content:
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: ''
+      image_style: detail
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_heading: true
+  field_link: true
+  field_text: true
+  field_variant: true

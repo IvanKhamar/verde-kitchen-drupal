@@ -1,19 +1,19 @@
-uuid: b6c5e957-65db-4866-b454-9d4d0c5b8487
+uuid: 3af135b8-d667-4f7f-9bfa-d17648350eb0
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.rss
     - core.entity_view_mode.node.teaser
+    - node.type.article
   module:
     - node
     - user
 _core:
   default_config_hash: OEEnRQIjfIaCFRsz8U3VqDrE82ltQKlo8wNbQJRZXu0
-id: frontpage
-label: Frontpage
+id: articles
+label: Articles
 module: node
-description: 'All content promoted to the front page.'
+description: 'Recipes and news: listing page and the latest-articles block.'
 tag: default
 base_table: node_field_data
 base_field: nid
@@ -24,21 +24,18 @@ display:
     display_plugin: default
     position: 0
     display_options:
-      title: ''
+      title: Articles
       fields: {  }
       pager:
-        type: full
+        type: mini
         options:
           offset: 0
-          pagination_heading_level: h4
-          items_per_page: 10
-          total_pages: 0
+          items_per_page: 6
+          total_pages: null
           id: 0
           tags:
             next: 'Next ›'
             previous: '‹ Previous'
-            first: '« First'
-            last: 'Last »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -47,7 +44,6 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
-          quantity: 9
       exposed_form:
         type: basic
         options:
@@ -74,48 +70,10 @@ display:
           group_type: group
           admin_label: ''
           plugin_id: text_custom
-          label: ''
           empty: true
-          content: 'No front page content has been created yet.<br/>Follow the <a target="_blank" href="https://www.drupal.org/docs/user_guide/en/index.html">User Guide</a> to start building your site.'
+          content: 'Nothing to show yet.'
           tokenize: false
-        node_listing_empty:
-          id: node_listing_empty
-          table: node
-          field: node_listing_empty
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          plugin_id: node_listing_empty
-          label: ''
-          empty: true
-        title:
-          id: title
-          table: views
-          field: title
-          relationship: none
-          group_type: group
-          admin_label: ''
-          plugin_id: title
-          label: ''
-          empty: true
-          title: Welcome!
       sorts:
-        sticky:
-          id: sticky
-          table: node_field_data
-          field: sticky
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: sticky
-          plugin_id: standard
-          order: DESC
-          expose:
-            label: ''
-            field_identifier: sticky
-          exposed: false
         created:
           id: created
           table: node_field_data
@@ -134,18 +92,32 @@ display:
           granularity: second
       arguments: {  }
       filters:
-        promote:
-          id: promote
+        status:
+          id: status
           table: node_field_data
-          field: promote
+          field: status
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
+          expose:
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+        type:
+          id: type
+          table: node_field_data
+          field: type
           relationship: none
           group_type: group
           admin_label: ''
           entity_type: node
-          entity_field: promote
-          plugin_id: boolean
-          operator: '='
-          value: '1'
+          entity_field: type
+          plugin_id: bundle
+          operator: in
+          value:
+            article: article
           group: 1
           exposed: false
           expose:
@@ -162,6 +134,7 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
+            reduce: false
           is_grouped: false
           group_info:
             label: ''
@@ -174,19 +147,6 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        status:
-          id: status
-          table: node_field_data
-          field: status
-          entity_type: node
-          entity_field: status
-          plugin_id: boolean
-          value: '1'
-          group: 1
-          expose:
-            operator: ''
-            operator_limit_selection: false
-            operator_list: {  }
         langcode:
           id: langcode
           table: node_field_data
@@ -234,7 +194,7 @@ display:
         options:
           grouping: {  }
           row_class: ''
-          default_row_class: true
+          default_row_class: false
           uses_fields: false
       row:
         type: 'entity:node'
@@ -260,34 +220,22 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
-  feed_1:
-    id: feed_1
-    display_title: Feed
-    display_plugin: feed
+  block_latest:
+    id: block_latest
+    display_title: Latest
+    display_plugin: block
     position: 2
     display_options:
       pager:
         type: some
         options:
           offset: 0
-          items_per_page: 10
-      style:
-        type: rss
-        options:
-          grouping: {  }
-          uses_fields: false
-          description: ''
-      row:
-        type: node_rss
-        options:
-          relationship: none
-          view_mode: rss
+          items_per_page: 3
+      defaults:
+        pager: false
       display_extenders: {  }
-      path: rss.xml
-      sitename_title: true
-      displays:
-        page_1: page_1
-        default: ''
+      block_description: 'Latest articles'
+      block_hide_empty: true
     cache_metadata:
       max-age: -1
       contexts:
@@ -295,14 +243,14 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
-  page_1:
-    id: page_1
+  page:
+    id: page
     display_title: Page
     display_plugin: page
     position: 1
     display_options:
       display_extenders: {  }
-      path: node
+      path: articles
     cache_metadata:
       max-age: -1
       contexts:

@@ -1,0 +1,29 @@
+uuid: babd061b-5983-4deb-9d8d-42ffc08dba75
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.articles
+  module:
+    - system
+    - views
+  theme:
+    - verde
+id: verde_latest_articles
+theme: verde
+region: content
+weight: 20
+provider: null
+plugin: 'views_block:articles-block_latest'
+settings:
+  id: 'views_block:articles-block_latest'
+  label: 'Latest articles'
+  label_display: '0'
+  provider: views
+  views_label: ''
+  items_per_page: null
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'
