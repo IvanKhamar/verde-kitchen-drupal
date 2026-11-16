@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Theme override for a block.
+ *
+ * Twig escapes every printed variable by default (autoescape): characters such
+ * as < and " become &lt; and &quot;, so text typed by a user cannot become
+ * HTML or JavaScript. Render arrays and Markup objects (like {{ content }})
+ * are already sanitised by Drupal and are printed as they are. That is why
+ * this theme never uses the |raw filter on user data.
+ *
+ * Available variables:
+ * - plugin_id: The block plugin, for example "system_branding_block".
+ * - label: The block title, if it is shown.
+ * - content: The block content.
+ * - title_attributes, attributes: HTML attributes.
+ * - title_prefix, title_suffix: Extra markup from modules (contextual links).
+ */
+#}
+{%
+  set classes = [
+    'block',
+    'block--' ~ plugin_id|clean_class,
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ title_prefix }}
+  {% if label %}
+    <h2{{ title_attributes.addClass('block__title') }}>{{ label }}</h2>
+  {% endif %}
+  {{ title_suffix }}
+  {% block content %}
+    {{ content }}
+  {% endblock %}
+</div>

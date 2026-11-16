@@ -1,0 +1,21 @@
+name: Verde
+type: theme
+description: 'Custom front-end theme for the Verde Kitchen demo site.'
+core_version_requirement: ^11
+# No base theme: every template comes from this theme or, as a fallback, from the
+# Drupal module that owns it. Markup stays small and fully under our control.
+base theme: false
+
+# Attached to every page. Keep it small: page-specific code goes into its own library.
+libraries:
+  - verde/global
+
+# Regions are the places where blocks can be put (Admin > Structure > Block layout).
+# page.html.twig prints each one as {{ page.<machine_name> }}.
+regions:
+  header: Header
+  primary_menu: 'Primary menu'
+  highlighted: Highlighted
+  breadcrumb: Breadcrumb
+  content: Content
+  footer: Footer

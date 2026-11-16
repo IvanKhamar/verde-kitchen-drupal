@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Functions to support theming in the Verde theme.
+ *
+ * Preprocess functions run before a template is rendered. Their name is
+ * THEME_preprocess_HOOK(), where HOOK is the template name without
+ * ".html.twig" and with "-" changed to "_". They receive $variables by
+ * reference: whatever they add becomes a variable in the template.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_preprocess_HOOK() for html.html.twig.
+ */
+function verde_preprocess_html(array &$variables): void {
+  // Add a body class per node type, for example "page--node-type-product",
+  // so page-level CSS can target product pages without extra markup.
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node instanceof \Drupal\node\NodeInterface) {
+    $variables['attributes']['class'][] = 'page--node-type-' . $node->bundle();
+  }
+}
