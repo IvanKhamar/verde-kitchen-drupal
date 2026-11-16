@@ -4,8 +4,9 @@
  *   npm run build   production: compressed CSS, no source maps
  *   npm run watch   development: readable CSS with source maps, rebuilds on save
  *
- * Two kinds of output:
+ * Three kinds of output:
  * - src/scss/<name>.scss              -> dist/css/<name>.css (theme libraries)
+ * - src/js/<widget>/index.jsx         -> dist/js/<widget>.js (React, bundled)
  * - components/<name>/<name>.scss     -> components/<name>/<name>.css
  *   Single Directory Components load <name>.css from their own folder, so the
  *   compiled file must sit next to the component. Those .css files are not committed.
@@ -22,6 +23,9 @@ const libraryEntries = {
   'dist/css/global': './src/scss/global.scss',
   'dist/css/product': './src/scss/pages/product.scss',
   'dist/css/article': './src/scss/pages/article.scss',
+  'dist/css/catalog-filter': './src/scss/pages/catalog-filter.scss',
+  // The React widget: one file with React included, loaded only on /products.
+  'dist/js/catalog-filter': './src/js/catalog-filter/index.jsx',
 };
 
 // Component styles: every components/<name>/<name>.scss found on disk.
@@ -45,10 +49,32 @@ export default (env, argv) => {
       // output path is the theme folder itself. Do not enable output.clean here:
       // it would delete the whole theme.
       path: themePath,
+      filename: '[name].js',
+    },
+    resolve: {
+      extensions: ['.js', '.jsx'],
     },
     devtool: isProduction ? false : 'source-map',
     module: {
       rules: [
+        {
+          // Babel turns JSX into plain JavaScript. preset-env transforms only
+          // what the browsers in "browserslist" do not support yet.
+          // The options live here, not in babel.config.json, because the JSX
+          // transform must know the Webpack mode: React's production build has
+          // no jsxDEV() function, which the development transform calls.
+          test: /\.jsx?$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                '@babel/preset-env',
+                ['@babel/preset-react', { runtime: 'automatic', development: !isProduction }],
+              ],
+            },
+          },
+        },
         {
           test: /\.scss$/,
           // Loaders run from last to first: Sass -> PostCSS -> css-loader -> extract.

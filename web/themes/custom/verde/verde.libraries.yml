@@ -20,3 +20,22 @@ article:
   css:
     theme:
       dist/css/article.css: {}
+
+# React catalog filter. Attached only by the catalog page template, so no other
+# page downloads React. The bundle is already minified by Webpack.
+catalog-filter:
+  css:
+    theme:
+      dist/css/catalog-filter.css: {}
+  js:
+    dist/js/catalog-filter.js: { minified: true }
+  dependencies:
+    - core/drupal
+    - core/once
+    # React renders the same markup as these SDC components, so it needs their
+    # CSS even when Twig does not render the component on the page. Drupal
+    # names component libraries core/components.THEME--COMPONENT.
+    - core/components.verde--button
+    - core/components.verde--badge
+    - core/components.verde--card
+    - core/components.verde--teaser-grid
