@@ -1,0 +1,35 @@
+{
+  "name": "verde-kitchen-drupal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Front-end build for the Verde theme (SCSS and JavaScript).",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "webpack --mode=production",
+    "watch": "webpack --mode=development --watch"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Edge versions",
+    "last 2 Firefox versions",
+    "Firefox ESR",
+    "last 2 Safari versions",
+    "last 2 iOS versions"
+  ],
+  "devDependencies": {
+    "autoprefixer": "^10.6.2",
+    "css-loader": "^7.1.5",
+    "mini-css-extract-plugin": "^2.10.2",
+    "postcss": "^8.5.33",
+    "postcss-loader": "^8.2.1",
+    "sass": "^1.108.2",
+    "sass-loader": "^17.1.0",
+    "webpack": "^5.112.2",
+    "webpack-cli": "^7.3.1",
+    "webpack-remove-empty-scripts": "^1.1.1"
+  }
+}
