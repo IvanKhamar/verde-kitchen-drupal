@@ -1,31 +1,50 @@
 /**
- * Webpack builds the Verde theme's assets from src/ into dist/.
+ * Webpack builds the Verde theme's assets.
  *
  *   npm run build   production: compressed CSS, no source maps
  *   npm run watch   development: readable CSS with source maps, rebuilds on save
  *
- * Each entry becomes one file in dist/. Drupal libraries (verde.libraries.yml)
- * point at those files, and Drupal decides on which pages to load them.
+ * Two kinds of output:
+ * - src/scss/<name>.scss              -> dist/css/<name>.css (theme libraries)
+ * - components/<name>/<name>.scss     -> components/<name>/<name>.css
+ *   Single Directory Components load <name>.css from their own folder, so the
+ *   compiled file must sit next to the component. Those .css files are not committed.
  */
+import fs from 'node:fs';
 import path from 'node:path';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 
 const themePath = path.resolve(import.meta.dirname, 'web/themes/custom/verde');
 
+// Library styles: one entry per file listed here.
+const libraryEntries = {
+  'dist/css/global': './src/scss/global.scss',
+  'dist/css/product': './src/scss/pages/product.scss',
+  'dist/css/article': './src/scss/pages/article.scss',
+};
+
+// Component styles: every components/<name>/<name>.scss found on disk.
+const componentEntries = Object.fromEntries(
+  fs
+    .readdirSync(path.join(themePath, 'components'), { withFileTypes: true })
+    .filter((dir) => dir.isDirectory())
+    .map((dir) => `components/${dir.name}/${dir.name}`)
+    .filter((name) => fs.existsSync(path.join(themePath, `${name}.scss`)))
+    .map((name) => [name, `./${name}.scss`]),
+);
+
 export default (env, argv) => {
   const isProduction = argv.mode === 'production';
 
   return {
     context: themePath,
-    entry: {
-      // Key = output path inside dist/ (without the extension).
-      'css/global': './src/scss/global.scss',
-    },
+    entry: { ...libraryEntries, ...componentEntries },
     output: {
-      path: path.join(themePath, 'dist'),
-      // Delete old files in dist/ before each build.
-      clean: true,
+      // Entry names contain their folder (dist/... or components/...), so the
+      // output path is the theme folder itself. Do not enable output.clean here:
+      // it would delete the whole theme.
+      path: themePath,
     },
     devtool: isProduction ? false : 'source-map',
     module: {

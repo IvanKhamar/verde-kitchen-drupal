@@ -1,0 +1,5 @@
+{#
+  Badge. Usage:
+  {{ include('verde:badge', { label: 'Vegan' }, with_context = false) }}
+#}
+<span{{ attributes.addClass(['badge', 'badge--' ~ (variant|default('default'))]) }}>{{ label }}</span>

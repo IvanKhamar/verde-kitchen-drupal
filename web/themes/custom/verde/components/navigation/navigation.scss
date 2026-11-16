@@ -1,0 +1,108 @@
+@use '../../src/scss/abstracts' as *;
+
+.navigation__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navigation__link {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+
+  &:hover {
+    color: var(--color-primary-dark);
+    background-color: var(--color-surface-alt);
+  }
+
+  &[aria-current='page'] {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+}
+
+.navigation__toggle {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  // `hidden` must win over display: inline-flex above.
+  &[hidden] {
+    display: none;
+  }
+}
+
+// Three bars drawn with one element and two pseudo-elements.
+.navigation__icon,
+.navigation__icon::before,
+.navigation__icon::after {
+  display: block;
+  width: 1.125rem;
+  height: 2px;
+  background-color: currentcolor;
+  border-radius: 1px;
+}
+
+.navigation__icon {
+  position: relative;
+
+  &::before,
+  &::after {
+    position: absolute;
+    left: 0;
+    content: '';
+  }
+
+  &::before {
+    top: -6px;
+  }
+
+  &::after {
+    top: 6px;
+  }
+}
+
+// Small screens with JavaScript: the list becomes a panel under the header.
+@media (width < 768px) {
+  .navigation--enhanced .navigation__list {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: 10;
+    display: none;
+    flex-direction: column;
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+  }
+
+  .navigation--enhanced.is-open .navigation__list {
+    display: flex;
+  }
+}
+
+// Wide screens: always show the links, never the button.
+@include mq('md') {
+  .navigation__toggle:not([hidden]) {
+    display: none;
+  }
+}

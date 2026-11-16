@@ -1,0 +1,20 @@
+{#
+  Teaser grid. role="list" keeps list semantics in Safari, which drops
+  them when list-style is set to none.
+#}
+{% set heading_id = heading ? ('teaser-grid-heading')|clean_unique_id : null %}
+<section{{ attributes.addClass('teaser-grid') }}{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>
+  {% if heading or link_url %}
+    <div class="teaser-grid__header">
+      {% if heading %}
+        <h2 id="{{ heading_id }}" class="teaser-grid__heading">{{ heading }}</h2>
+      {% endif %}
+      {% if link_url and link_label %}
+        <a href="{{ link_url }}" class="teaser-grid__more">{{ link_label }}</a>
+      {% endif %}
+    </div>
+  {% endif %}
+  <ul class="teaser-grid__list" role="list">
+    {{ items }}
+  </ul>
+</section>
