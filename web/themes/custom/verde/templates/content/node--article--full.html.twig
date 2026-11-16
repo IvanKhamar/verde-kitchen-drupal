@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Theme override for an article page (full view mode): a recipe or a news story.
+ *
+ * <time datetime="..."> gives machines (search engines, screen readers) the
+ * date in a standard format, while people read "28 October 2026".
+ */
+#}
+{{ attach_library('verde/article') }}
+<article{{ attributes.addClass('article') }}>
+  <p class="article__meta">
+    {{ include('verde:badge', { label: article_type, variant: 'accent' }, with_context = false) }}
+    <time datetime="{{ published_iso }}">{{ published }}</time>
+  </p>
+  <div class="article__media">
+    {{ content.field_image }}
+  </div>
+  <div class="article__body">
+    {{ content|without('field_image', 'field_article_type', 'links') }}
+  </div>
+</article>

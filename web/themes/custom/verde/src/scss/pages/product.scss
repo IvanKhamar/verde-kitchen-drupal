@@ -1,0 +1,57 @@
+// Product page (library verde/product). Loaded only on full product pages.
+@use '../abstracts' as *;
+
+.product {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-5);
+
+  @include mq('md') {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: start;
+  }
+}
+
+.product__media img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+.product__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+
+  // `gap` sets the spacing between the parts; no extra margins.
+  > * {
+    margin: 0;
+  }
+}
+
+.product__category {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.product__price {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+}
+
+.product__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.product__description {
+  max-width: 60ch;
+}

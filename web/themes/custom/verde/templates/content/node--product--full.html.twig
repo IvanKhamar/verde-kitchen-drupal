@@ -1,0 +1,40 @@
+{#
+/**
+ * @file
+ * Theme override for a product page (full view mode).
+ *
+ * The page title block prints the product name as <h1> above this template.
+ * attach_library() adds the product page CSS only on product pages.
+ *
+ * content|without() prints the remaining fields, so a field added later in the
+ * admin UI still appears without changing this template.
+ */
+#}
+{{ attach_library('verde/product') }}
+<article{{ attributes.addClass('product') }}>
+  <div class="product__media">
+    {{ content.field_image }}
+  </div>
+  <div class="product__info">
+    {% if card.meta %}
+      <p class="product__category">{{ card.meta }}</p>
+    {% endif %}
+    <p class="product__price">{{ card.price }}</p>
+    {% if card.badges %}
+      <ul class="product__badges" role="list" aria-label="{{ 'Dietary tags'|t }}">
+        {% for badge in card.badges %}
+          <li>{{ include('verde:badge', { label: badge }, with_context = false) }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <div class="product__description">
+      {{ content.body }}
+    </div>
+    {{ content|without('field_image', 'body', 'field_price', 'field_category', 'field_dietary_tags', 'links') }}
+    {{ include('verde:button', {
+      label: 'Back to all products'|t|render,
+      url: path('view.products.page_catalog'),
+      variant: 'secondary',
+    }, with_context = false) }}
+  </div>
+</article>

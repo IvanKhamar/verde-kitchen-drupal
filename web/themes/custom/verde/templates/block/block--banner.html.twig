@@ -1,0 +1,11 @@
+{#
+/**
+ * @file
+ * Theme override for "banner" custom blocks (hero and promo).
+ *
+ * This suggestion is added by verde_theme_suggestions_block_alter(); the
+ * hero props come from verde_preprocess_block(). No block wrapper is printed:
+ * the hero component's <section> is the outer element.
+ */
+#}
+{{ include('verde:hero', hero|merge({ image: content.field_image }), with_context = false) }}

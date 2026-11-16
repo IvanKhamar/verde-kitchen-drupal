@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Theme override for nodes in the "teaser" view mode, for every content type.
+ *
+ * Drupal picks the most specific template it finds, from:
+ *   node--NID--teaser, node--NID, node--TYPE--teaser, node--TYPE,
+ *   node--teaser, node
+ * Products and articles look the same as cards, so one node--teaser
+ * template is enough.
+ *
+ * "card" is prepared in verde_preprocess_node(). Slots receive rendered
+ * fields, so image styles and text formats still apply.
+ */
+#}
+{{ include('verde:card', card|merge({
+  image: content.field_image,
+  summary: content.body,
+}), with_context = false) }}

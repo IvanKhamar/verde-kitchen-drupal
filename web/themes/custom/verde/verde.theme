@@ -8,9 +8,17 @@
  * THEME_preprocess_HOOK(), where HOOK is the template name without
  * ".html.twig" and with "-" changed to "_". They receive $variables by
  * reference: whatever they add becomes a variable in the template.
+ *
+ * Rule of thumb in this theme: PHP prepares plain data (strings, numbers,
+ * arrays), Twig decides the markup, and SDC components get only plain props.
  */
 
 declare(strict_types=1);
+
+use Drupal\block_content\BlockContentInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_preprocess_HOOK() for html.html.twig.
@@ -19,7 +27,189 @@ function verde_preprocess_html(array &$variables): void {
   // Add a body class per node type, for example "page--node-type-product",
   // so page-level CSS can target product pages without extra markup.
   $node = \Drupal::routeMatch()->getParameter('node');
-  if ($node instanceof \Drupal\node\NodeInterface) {
+  if ($node instanceof NodeInterface) {
     $variables['attributes']['class'][] = 'page--node-type-' . $node->bundle();
   }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node.html.twig.
+ *
+ * Prepares the props of the card component (node--teaser.html.twig) and the
+ * extra data of the full product and article templates.
+ */
+function verde_preprocess_node(array &$variables): void {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+  $variables['attributes']['class'][] = 'node--type-' . $node->bundle();
+  $variables['attributes']['class'][] = 'node--view-mode-' . $variables['view_mode'];
+
+  // Cards sit under an <h2> section heading on the home page, and directly
+  // under the page <h1> elsewhere. Heading levels must not skip (h1 -> h3).
+  // The cache context tells Drupal that this output differs between the
+  // front page and other pages, so it caches both versions separately.
+  $is_front = \Drupal::service('path.matcher')->isFrontPage();
+  $variables['#cache']['contexts'][] = 'url.path.is_front';
+
+  $card = [
+    'title' => (string) $node->label(),
+    'url' => (string) $variables['url'],
+    'heading_level' => $is_front ? 3 : 2,
+  ];
+
+  if ($node->bundle() === 'product') {
+    $card['price'] = verde_format_price($node->get('field_price')->value);
+    $card['badges'] = [];
+    // Show term names as plain text. Each term's cache tag is added, so the
+    // card is re-rendered when an editor renames a term.
+    $cacheability = new CacheableMetadata();
+    foreach ($node->get('field_dietary_tags')->referencedEntities() as $term) {
+      $card['badges'][] = (string) $term->label();
+      $cacheability->addCacheableDependency($term);
+    }
+    $category = $node->get('field_category')->entity;
+    if ($category) {
+      $card['meta'] = (string) $category->label();
+      $cacheability->addCacheableDependency($category);
+    }
+    $cacheability->applyTo($variables);
+  }
+
+  if ($node->bundle() === 'article') {
+    // Field values come from the database as strings; strict_types needs an int.
+    $created = (int) $node->getCreatedTime();
+    $variables['published'] = \Drupal::service('date.formatter')->format($created, 'custom', 'j F Y');
+    $variables['published_iso'] = date('Y-m-d', $created);
+    $variables['article_type'] = verde_allowed_value_label($node, 'field_article_type');
+    $card['meta'] = $variables['article_type'] . ' · ' . $variables['published'];
+  }
+
+  $variables['card'] = $card;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for field.html.twig.
+ *
+ * Chooses the image style and loading strategy for every field_image in one
+ * place. The first, large image of a page is usually the "Largest Contentful
+ * Paint" (LCP) element, so it loads eagerly with a high fetch priority.
+ * Images further down the page load lazily.
+ */
+function verde_preprocess_field(array &$variables): void {
+  if ($variables['field_name'] !== 'field_image') {
+    return;
+  }
+
+  $entity = $variables['element']['#object'];
+  $view_mode = $variables['element']['#view_mode'];
+  $is_hero = $entity instanceof BlockContentInterface && $entity->get('field_variant')->value === 'hero';
+  $is_full_node = $entity instanceof NodeInterface && $view_mode === 'full';
+
+  $style = $view_mode === 'teaser' ? 'card' : 'detail';
+  $above_the_fold = $is_hero || $is_full_node;
+
+  foreach ($variables['items'] as &$item) {
+    $item['content']['#image_style'] = $style;
+    $item['content']['#item_attributes']['loading'] = $above_the_fold ? 'eager' : 'lazy';
+    if ($above_the_fold) {
+      $item['content']['#item_attributes']['fetchpriority'] = 'high';
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for menu--main.html.twig.
+ *
+ * Turns Drupal's menu tree into the plain array the navigation component
+ * expects: Url objects become strings, and the active trail becomes a flag.
+ */
+function verde_preprocess_menu__main(array &$variables): void {
+  $variables['nav_label'] = (string) t('Main');
+  $variables['nav_items'] = [];
+  foreach ($variables['items'] as $item) {
+    $variables['nav_items'][] = [
+      'title' => (string) $item['title'],
+      'url' => $item['url']->toString(),
+      'active' => !empty($item['in_active_trail']),
+    ];
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for views-view-unformatted.html.twig.
+ *
+ * Adds a heading and a "see all" link to the lists on the home page. The
+ * listing pages need neither: their <h1> already names the list.
+ */
+function verde_preprocess_views_view_unformatted(array &$variables): void {
+  $sections = [
+    'products:home' => [t('Featured products'), t('All products'), 'view.products.page_catalog'],
+    'articles:block_latest' => [t('Latest articles'), t('All articles'), 'view.articles.page'],
+  ];
+  $view = $variables['view'];
+  $key = $view->id() . ':' . $view->current_display;
+
+  $variables['section'] = [];
+  if (isset($sections[$key])) {
+    [$heading, $link_label, $route] = $sections[$key];
+    $variables['section'] = [
+      'heading' => (string) $heading,
+      'link_label' => (string) $link_label,
+      'link_url' => Url::fromRoute($route)->toString(),
+    ];
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for block templates.
+ *
+ * Drupal suggests templates by block plugin (block--block-content--UUID),
+ * which is not useful for reusable block types. This adds the block type,
+ * so every "banner" block uses block--banner.html.twig.
+ */
+function verde_theme_suggestions_block_alter(array &$suggestions, array $variables): void {
+  $block_content = $variables['elements']['content']['#block_content'] ?? NULL;
+  if ($block_content instanceof BlockContentInterface) {
+    $suggestions[] = 'block__' . $block_content->bundle();
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for block.html.twig.
+ *
+ * Prepares the hero component props for banner blocks.
+ */
+function verde_preprocess_block(array &$variables): void {
+  $block_content = $variables['content']['#block_content'] ?? NULL;
+  if (!$block_content instanceof BlockContentInterface || $block_content->bundle() !== 'banner') {
+    return;
+  }
+
+  $hero = [
+    'heading' => (string) $block_content->get('field_heading')->value,
+    'text' => (string) $block_content->get('field_text')->value,
+    'variant' => (string) $block_content->get('field_variant')->value,
+  ];
+  $link = $block_content->get('field_link')->first();
+  if ($link) {
+    $hero['cta_label'] = (string) $link->get('title')->getValue();
+    $hero['cta_url'] = $link->getUrl()->toString();
+  }
+  $variables['hero'] = $hero;
+}
+
+/**
+ * Formats a decimal price value, for example "3.9" as "€3.90".
+ */
+function verde_format_price(?string $value): string {
+  return $value === NULL ? '' : '€' . number_format((float) $value, 2);
+}
+
+/**
+ * Returns the label of a list field's value, for example "Recipe" for "recipe".
+ */
+function verde_allowed_value_label(NodeInterface $node, string $field_name): string {
+  $value = $node->get($field_name)->value;
+  $allowed = $node->get($field_name)->getFieldDefinition()->getFieldStorageDefinition()->getSetting('allowed_values');
+  return (string) ($allowed[$value] ?? $value);
 }
