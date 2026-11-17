@@ -1,0 +1,28 @@
+# Code we do not own, or files tools generate.
+vendor/
+node_modules/
+recipes/
+reports/
+web/core/
+web/modules/contrib/
+web/themes/contrib/
+web/libraries/
+web/sites/
+web/*.*
+web/themes/custom/*/dist/
+web/themes/custom/*/components/**/*.css
+composer.lock
+package-lock.json
+LICENSE.txt
+
+# Drupal writes these YAML files itself (drush config:export).
+config/sync/
+
+# Prettier does not support Twig, PHP or the Drupal .theme file.
+*.twig
+*.php
+*.theme
+
+# DDEV writes its own config; the audit script writes its own report.
+.ddev/
+docs/audit-results.md
