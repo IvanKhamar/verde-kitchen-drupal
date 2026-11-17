@@ -100,21 +100,30 @@ jobs:
       # measured but not enforced here: shared CI machines and PHP's built-in
       # server make timing scores vary from run to run. docs/audit-results.md
       # holds the performance results measured on the DDEV site.
-      - name: Audit accessibility, best practices and SEO (Lighthouse, axe)
+      # The site keeps running in the background for the browser-based steps below.
+      - name: Start the site for browser tests
         env:
-          CHROME_PATH: /usr/bin/google-chrome
-          BASE_URL: http://127.0.0.1:8888
           # Let PHP's built-in server answer several requests at once.
           PHP_CLI_SERVER_WORKERS: '4'
         run: |
           vendor/bin/drush runserver 127.0.0.1:8888 > /tmp/runserver.log 2>&1 &
-          for _ in $(seq 1 30); do curl --silent --output /dev/null "$BASE_URL/" && break; sleep 1; done
-          npm run audit:site -- --skip-performance
-      - name: Upload audit reports
+          for _ in $(seq 1 30); do curl --silent --output /dev/null http://127.0.0.1:8888/ && break; sleep 1; done
+      - name: Audit accessibility, best practices and SEO (Lighthouse, axe)
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+          BASE_URL: http://127.0.0.1:8888
+        run: npm run audit:site -- --skip-performance
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: End-to-end tests (Chromium, Firefox, WebKit, phone emulation)
+        env:
+          BASE_URL: http://127.0.0.1:8888
+        run: npm run test:e2e
+      - name: Upload test and audit reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: audit-reports
+          name: reports
           path: |
             reports/
             docs/audit-results.md
