@@ -303,12 +303,28 @@ git config core.hooksPath .githooks
 
 The project rules are in `.gitleaks.toml`; CI runs the same scan over the whole history.
 
-## Secrets
+## Security
+
+### Secrets
 
 No secret is stored in this repository. `settings.php` is committed without credentials:
 DDEV generates `settings.ddev.php` (git-ignored) with the local database credentials and a
-random hash salt. Outside DDEV, set the `DRUPAL_HASH_SALT` environment variable.
-Every push is scanned with [gitleaks](https://github.com/gitleaks/gitleaks).
+random hash salt. Outside DDEV, set `DRUPAL_HASH_SALT` and `DRUPAL_TRUSTED_HOST_PATTERNS` as
+environment variables. A pre-commit hook and CI scan every change with
+[gitleaks](https://github.com/gitleaks/gitleaks), and GitHub push protection is on.
+
+### Site security
+
+| Area            | Measure                                                                                                                                                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| HTTP headers    | Strict Content Security Policy (CSP module): scripts, styles, fonts and requests only from the site, no inline code, `frame-ancestors 'none'`; plus `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` (`verde_security` module) |
+| CSP and admin   | Administrators also get `style-src 'unsafe-inline'`, because Claro and the toolbar use inline styles; inline scripts stay blocked for everyone                                                                                                                     |
+| Drupal settings | Read-only JSON:API, account registration by administrators only, errors hidden from visitors, trusted host patterns, Automated Cron, flood control for logins                                                                                                      |
+| Escaping        | Twig and React escape text; JSON-LD is encoded with `JSON_HEX_TAG`                                                                                                                                                                                                 |
+| Tests           | E2E: headers, read-only API (`POST` → 405), no public registration, HTML from the API shown as text in React. Install test: a product titled `<script>alert(1)</script>` is escaped in Twig and JSON-LD                                                            |
+| Audits          | [Security Review](https://www.drupal.org/project/security_review) (`ddev drush security:review`), `composer audit`, `npm audit`, GitHub CodeQL, Dependabot                                                                                                         |
+
+How to report a vulnerability: [`SECURITY.md`](SECURITY.md).
 
 ## Screenshots
 

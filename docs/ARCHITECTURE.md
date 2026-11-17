@@ -205,6 +205,52 @@ Theme code adds cache metadata where it reads data:
 - **Open Graph:** title, description, URL and a 1200x630 image (`social` image style).
 - **JSON-LD:** `Product` (with an `Offer`) and `Article`, added by the theme.
 
+## Security
+
+```mermaid
+flowchart LR
+  Dev[Developer] -->|git commit| Hook[pre-commit hook:<br>gitleaks on staged changes]
+  Hook -->|git push| GH[GitHub]
+  GH --> PP[Push protection,<br>secret scanning]
+  GH --> CI[CI: gitleaks on history,<br>composer/npm audit, CodeQL]
+  Browser[Visitor's browser] -->|request| Drupal
+  Drupal -->|response + CSP and<br>security headers| Browser
+```
+
+**Keeping secrets out of a public repository**
+
+- No credentials in committed files: `settings.php` reads the hash salt and trusted host
+  patterns from the environment; DDEV writes the local database settings to the git-ignored
+  `settings.ddev.php`.
+- `.githooks/pre-commit` runs gitleaks on the staged changes and blocks the commit on a
+  finding. `.gitleaks.toml` adds rules for database URLs with passwords and Drupal hash salts.
+- CI runs gitleaks over the whole history; GitHub secret scanning and push protection are on.
+- CI logs are public too: the install test gives the throwaway CI site a random admin
+  password that it never prints.
+
+**HTTP response headers**
+
+| Header                    | Value / effect                                                                                                                       | Set by                      |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------- |
+| `Content-Security-Policy` | `default-src 'self'`, `img-src 'self' data:`, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'` | CSP module (`csp.settings`) |
+| CSP for administrators    | `style-src 'self' 'unsafe-inline'` (Claro and the toolbar use `style=""`)                                                            | `verde_security`            |
+| `X-Frame-Options`         | `DENY` (for browsers without `frame-ancestors`)                                                                                      | `verde_security`            |
+| `X-Content-Type-Options`  | `nosniff`                                                                                                                            | Drupal core                 |
+| `Referrer-Policy`         | `strict-origin-when-cross-origin`                                                                                                    | `verde_security`            |
+| `Permissions-Policy`      | camera, microphone, geolocation, payment, USB: off                                                                                   | `verde_security`            |
+
+`drupalSettings` and JSON-LD are inline `<script>` elements, but with a data type
+(`application/json`, `application/ld+json`): browsers never execute them, so the strict
+policy does not block them, and no `'unsafe-inline'` is needed for scripts.
+
+**Drupal**
+
+- JSON:API in read-only mode; only administrators create accounts; errors are hidden from
+  visitors; flood control limits failed logins; Automated Cron runs maintenance tasks.
+- Output escaping: Twig autoescape, React's text rendering, `JSON_HEX_TAG` for JSON-LD.
+- Security Review (`drush security:review`) passes, except points that depend on the server
+  (file permissions, the uid 1 account), which the production setup handles.
+
 ## Quality checks (GitHub Actions)
 
 | Job       | Steps                                                                                                                          |
