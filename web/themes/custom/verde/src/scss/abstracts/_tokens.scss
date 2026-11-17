@@ -1,6 +1,5 @@
 // Design tokens: the single source of truth for colours, type, spacing and
 // breakpoints. Documented in docs/design-tokens.md.
-//
 // Most tokens are turned into CSS custom properties (base/_custom-properties.scss),
 // so components use var(--color-primary) and the values can change at runtime.
 // Breakpoints stay Sass-only: custom properties do not work inside @media.
@@ -12,7 +11,7 @@ $colors: (
   'text-muted': #4f5e54,
   'text-inverse': #fffdf7,
   'bg': #fffdf7,
-  'surface': #ffffff,
+  'surface': #fff,
   'surface-alt': #f1f6ec,
   'border': #d8e0d3,
   'border-strong': #7a8a7e,
@@ -30,9 +29,30 @@ $colors: (
 // System font stacks: no font files to download, so no layout shift and no
 // render-blocking font requests.
 $font-families: (
-  'body': (system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif),
-  'heading': (ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif),
-  'mono': (ui-monospace, 'Cascadia Code', Consolas, monospace),
+  'body': (
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    'Roboto',
+    'Helvetica Neue',
+    'Arial',
+    sans-serif,
+  ),
+  'heading': (
+    ui-rounded,
+    'SF Pro Rounded',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    'Roboto',
+    sans-serif,
+  ),
+  'mono': (
+    ui-monospace,
+    'Cascadia Code',
+    'Consolas',
+    monospace,
+  ),
 );
 
 // Fluid type scale: clamp(min, preferred, max). Sizes grow with the viewport
@@ -46,13 +66,11 @@ $font-sizes: (
   '2xl': clamp(1.875rem, 1.48rem + 1.75vw, 2.75rem),
   '3xl': clamp(2.25rem, 1.6rem + 2.9vw, 3.75rem),
 );
-
 $font-weights: (
   'regular': 400,
   'semibold': 600,
   'bold': 700,
 );
-
 $line-heights: (
   'tight': 1.2,
   'base': 1.6,
@@ -71,17 +89,15 @@ $spacing: (
   '8': 4rem,
   '9': 6rem,
 );
-
 $radii: (
   'sm': 0.25rem,
   'md': 0.5rem,
   'lg': 1rem,
   'pill': 999px,
 );
-
 $shadows: (
-  'sm': 0 1px 2px rgb(29 42 33 / 0.08),
-  'md': 0 4px 16px rgb(29 42 33 / 0.1),
+  'sm': 0 1px 2px rgb(29 42 33 / 8%),
+  'md': 0 4px 16px rgb(29 42 33 / 10%),
 );
 
 // Mobile first: styles without a media query are for small screens;
@@ -92,5 +108,4 @@ $breakpoints: (
   'lg': 1024px,
   'xl': 1280px,
 );
-
 $container-max-width: 1200px;
