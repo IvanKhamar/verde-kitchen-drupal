@@ -70,3 +70,7 @@ desktop.ini
 
 # Storybook build output
 /storybook-static/
+
+# Static export (Tome) and the finished GitHub Pages site
+/html/
+/site/

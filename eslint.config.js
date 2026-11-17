@@ -21,6 +21,8 @@ export default [
       'recipes/**',
       'reports/**',
       'storybook-static/**',
+      'html/**',
+      'site/**',
       'web/core/**',
       'web/modules/contrib/**',
       'web/themes/contrib/**',

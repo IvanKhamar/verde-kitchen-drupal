@@ -29,3 +29,7 @@ docs/audit-results.md
 
 # Storybook build output.
 storybook-static/
+
+# Static export and GitHub Pages build.
+html/
+site/
