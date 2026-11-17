@@ -61,7 +61,7 @@ export default [
 
   // Node.js code: build configuration, scripts and unit tests.
   {
-    files: ['*.js', 'scripts/**/*.{js,mjs}', '**/*.test.js'],
+    files: ['*.js', 'scripts/**/*.{js,mjs}', '**/*.test.js', 'tests/**/*.js'],
     languageOptions: { globals: globals.node },
   },
 
