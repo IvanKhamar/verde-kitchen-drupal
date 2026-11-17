@@ -205,6 +205,38 @@ Theme code adds cache metadata where it reads data:
 - **Open Graph:** title, description, URL and a 1200x630 image (`social` image style).
 - **JSON-LD:** `Product` (with an `Offer`) and `Article`, added by the theme.
 
+## Multilingual
+
+English has no URL prefix; Ukrainian is under `/uk`. Language negotiation uses the URL only.
+
+```text
+Content translation   products, articles, terms, menu links, banners (text, alt texts)
+Config translation    view titles, empty texts, pager, meta tags, list labels   config/sync/language/uk/
+Interface (Locale)    core/contrib strings: localize.drupal.org                 drush locale:update
+                      theme and React strings: web/themes/custom/verde/translations/uk.po
+```
+
+- The language switcher (`links--language-block.html.twig`) keeps the visitor on the same page
+  and sets `lang` and `hreflang`; content translation adds `<link rel="alternate" hreflang>`.
+- `verde_format_price()` and `formatPrice()` (React) produce the same strings per language.
+- The React widget reads `/uk/jsonapi` (from `path()` in Twig) and filters by `langcode`.
+
+## Static copy (GitHub Pages)
+
+```mermaid
+flowchart LR
+  CI[CI green on main] --> Install[install-site.sh:<br>site + demo content]
+  Install --> Tome[Tome export<br>VERDE_STATIC_EXPORT=1]
+  Tome --> Build[static/build.mjs:<br>sub-path, widget JSON,<br>CSP meta, Storybook]
+  Build --> Check[static/check.mjs:<br>links, catalog filter]
+  Check --> Leaks[gitleaks on the site]
+  Leaks --> Pages[GitHub Pages]
+```
+
+In the static copy the catalog widget gets `data-static-data` instead of using JSON:API: it
+reads `static-data/LANG/products.json` (and the term lists) and filters everything in the
+browser with `filterProducts()` and `filterByTags()`.
+
 ## Security
 
 ```mermaid
@@ -253,11 +285,11 @@ policy does not block them, and no `'unsafe-inline'` is needed for scripts.
 
 ## Quality checks (GitHub Actions)
 
-| Job       | Steps                                                                                                                          |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `secrets` | gitleaks over the whole history                                                                                                |
-| `lint`    | ESLint, Stylelint, Prettier; PHP_CodeSniffer (Drupal, DrupalPractice)                                                          |
-| `build`   | Composer and npm audits, JS unit tests, Webpack build, site install from config + demo content, smoke test, Lighthouse and axe |
+| Job       | Steps                                                                                                                                                                     |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `secrets` | gitleaks over the whole history                                                                                                                                           |
+| `lint`    | ESLint, Stylelint, Prettier; PHP_CodeSniffer (Drupal, DrupalPractice)                                                                                                     |
+| `build`   | Composer and npm audits, JS unit tests, Webpack build, Storybook build and check, site install from config + demo content, smoke test, Lighthouse and axe, Playwright E2E |
 
 The site runs in CI without DDEV: PHP's built-in server and a MariaDB service container are
 enough to install Drupal from config and audit the pages, and they start in seconds, while

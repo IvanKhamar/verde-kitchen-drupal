@@ -212,7 +212,84 @@ slots:
   focus, contrast checked per colour pair, live region for filter results.
 - **SEO:** Pathauto, Metatag, Open Graph, JSON-LD (encoded with `JSON_HEX_TAG`).
 
-## 11. Try it yourself
+## 11. Translations: three different things
+
+Drupal translates three kinds of text in three different ways. Knowing which is which is half
+of multilingual work:
+
+| What                          | Example here                                  | Module and storage                                   |
+| ----------------------------- | --------------------------------------------- | ---------------------------------------------------- |
+| **Interface strings** (`t()`) | "Skip to main content", "Знайдено 3 продукти" | Locale; `.po` files (`translations/uk.po`), database |
+| **Configuration**             | View titles, meta tags, list field labels     | Config Translation; `config/sync/language/uk/*.yml`  |
+| **Content**                   | Product names, article texts, menu links      | Content Translation; a translation of each entity    |
+
+Things this project ran into:
+
+- **Fields decide what is shared.** Price, category and tags are not translatable, so both
+  languages always show the same values. The image field is translatable, but only its alt
+  text: the file is synchronised (`translation_sync`).
+- **Some flags are translatable too.** "Promoted to front page" is a translatable base field,
+  so the Ukrainian translations needed it set, or the Ukrainian home page had no products.
+- **JavaScript strings** are translated only if Drupal finds them: it scans library files for
+  literal `Drupal.t('…')` and `Drupal.formatPlural(…)` calls. A wrapper like `t(text)` hides
+  them. Ukrainian needs three plural forms (`1 продукт`, `3 продукти`, `14 продуктів`); the
+  formula is in the `.po` header.
+- **Language-aware URLs.** `path('<front>')` returns `/uk` on Ukrainian pages, so the React
+  widget gets the right prefix from a data attribute. `/uk/jsonapi` returns Ukrainian data.
+- **Layout.** Ukrainian labels are longer; the reserved height of the filter form is larger
+  for `:lang(uk)`, or the page would shift when the widget appears.
+
+## 12. Storybook for Drupal components
+
+Storybook renders each component's real `*.twig` file with Twig.js, through
+`vite-plugin-twig-drupal`, without a running Drupal. A story is a set of props:
+
+```js
+// components/badge/badge.stories.js
+import badge from './badge.twig';
+export default { title: 'Components/Badge', render: (args) => badge(args) };
+export const Accent = { args: { label: 'Recipe', variant: 'accent' } };
+```
+
+Twig.js is not PHP Twig. Three differences mattered here:
+
+- no named arguments, so nested components use `{% include 'verde:badge' with {…} only %}`
+  instead of `include(…, with_context = false)` (both mean the same in Drupal);
+- Drupal creates `attributes` for every component, Twig.js only for the top-level one, so
+  nested components create it when missing: `attributes|default(create_attribute())`;
+- some Drupal filters are missing (`clean_unique_id`); `.storybook/main.js` adds them.
+
+`npm run test:storybook` opens every story in a headless browser and runs axe on it.
+
+## 13. End-to-end tests with Playwright
+
+E2E tests drive real browsers (Chromium, Firefox, WebKit) like a user would:
+
+```js
+await page.getByLabel('Search by name').fill('bowl');
+await expect(page.getByRole('status')).toHaveText('3 products found');
+```
+
+- Locate elements by **role and name** (`getByRole('button', { name: 'Menu' })`), the way a
+  screen reader sees them. A test that cannot find a button by its name also finds an
+  accessibility bug.
+- `expect(…)` waits and retries until the condition is true or a timeout passes, so no
+  `sleep()` is needed for React updates.
+- `page.route()` changes network responses: the tests make the API fail to test the error
+  state, and put HTML into a product title to test escaping.
+- `test.use({ javaScriptEnabled: false })` tests the server-rendered fallback.
+
+## 14. Security in the front end
+
+- **CSP** (`Content-Security-Policy`) tells the browser where scripts, styles and images may
+  come from. With `default-src 'self'` and no `'unsafe-inline'`, an injected
+  `<script>alert(1)</script>` or `onerror="…"` does not run, even if escaping failed somewhere.
+- **Escaping** is still the first defence: Twig autoescape, React text rendering,
+  `JSON_HEX_TAG` in JSON-LD. Tests check each of them.
+- **Secrets** never go into a public repository; a pre-commit hook, CI and GitHub push
+  protection all scan for them, and CI logs (also public) must not print passwords.
+
+## 15. Try it yourself
 
 1. Add a `field--field-price.html.twig` template that wraps the price in `<data value="…">`.
    Check with Twig debug that Drupal picks it.
@@ -221,6 +298,16 @@ slots:
    `verde_preprocess_node()`? Which cache tags are needed?
 4. Add "Sort by price" to the React widget. Which JSON:API parameter is it?
 5. Make the `teaser-grid` heading level a prop. Where would the value come from?
+6. Add a third language. Which of the three kinds of translation does each part need?
+7. Write a Playwright test for the article listing pager.
+
+8. Add a `field--field-price.html.twig` template that wraps the price in `<data value="…">`.
+   Check with Twig debug that Drupal picks it.
+9. Add a `variant: outline` to the badge component. Update the schema first, then the CSS.
+10. Show the product category as a badge on article cards: what would you change in
+    `verde_preprocess_node()`? Which cache tags are needed?
+11. Add "Sort by price" to the React widget. Which JSON:API parameter is it?
+12. Make the `teaser-grid` heading level a prop. Where would the value come from?
 
 ## Interview questions
 
@@ -320,3 +407,34 @@ breakpoints stay in Sass because `var()` does not work in `@media`.
 The theme controls every line of markup it overrides, and nothing extra is loaded. The cost:
 more templates to write. A base theme or the Starterkit generator is a good choice when a
 project needs many templates quickly.
+
+**21. How do you translate a Drupal site? What kinds of text are there?**
+Three: interface strings (Locale, `.po` files), configuration (Config Translation, YAML in
+`config/sync/language/`) and content (Content Translation, an entity translation per language).
+Each field decides whether it is translatable; here prices and categories are shared.
+
+**22. Why did the React strings need literal `Drupal.t()` calls?**
+Drupal finds translatable JavaScript strings by scanning the files of a library for
+`Drupal.t('…')` and `Drupal.formatPlural(…)`. A helper that calls `Drupal.t(variable)` hides the
+strings, and they stay in English.
+
+**23. What did Storybook teach you about the templates?**
+Twig.js is stricter than PHP Twig: no named arguments, no automatic `attributes` for nested
+components, fewer Drupal filters. Writing templates that work in both made them more explicit
+and easier to test in isolation.
+
+**24. How do you test a front end end-to-end? How do you keep tests stable?**
+Playwright in three browser engines and on emulated phones. Stability comes from locating
+elements by role and accessible name, from auto-waiting assertions instead of sleeps, and from
+controlling the network with `page.route()` to test errors.
+
+**25. What does a Content Security Policy protect against, and what was hard about it?**
+It limits where scripts, styles and other resources may come from, so injected markup cannot
+run code. The hard part was the Drupal admin (Claro, toolbar), which uses inline styles: those
+routes get `style-src 'unsafe-inline'` for administrators only; inline scripts stay blocked.
+
+**26. How did you put a Drupal site on GitHub Pages?**
+Tome exports every page to static HTML; a script adds the repository sub-path to all URLs,
+exports the API data the React widget needs as JSON, and adds the CSP as a meta tag; another
+script checks every link before the site is published. The trade-off: no admin and no live
+API on the static copy.
