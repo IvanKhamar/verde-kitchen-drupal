@@ -111,7 +111,8 @@
         }
     },
     "require-dev": {
-        "drupal/coder": "^9.0"
+        "drupal/coder": "^9.0",
+        "drupal/tome": "^1.16"
     },
     "scripts": {
         "lint": "phpcs",
