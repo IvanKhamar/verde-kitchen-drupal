@@ -1,0 +1,6 @@
+{
+  "GHSA-fc5q-39xc-vjpf": {
+    "reason": "picomatch ReDoS, no fixed version yet (all <= 4.0.7). Only in build tools (Stylelint, Vite, Storybook, the Sass watcher), which match our own file patterns; nothing reaches the site.",
+    "until": "2027-01-31"
+  }
+}

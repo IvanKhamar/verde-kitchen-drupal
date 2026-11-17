@@ -356,7 +356,7 @@ environment variables. A pre-commit hook and CI scan every change with
 | Drupal settings | Read-only JSON:API, account registration by administrators only, errors hidden from visitors, trusted host patterns, Automated Cron, flood control for logins                                                                                                      |
 | Escaping        | Twig and React escape text; JSON-LD is encoded with `JSON_HEX_TAG`                                                                                                                                                                                                 |
 | Tests           | E2E: headers, read-only API (`POST` → 405), no public registration, HTML from the API shown as text in React. Install test: a product titled `<script>alert(1)</script>` is escaped in Twig and JSON-LD                                                            |
-| Audits          | [Security Review](https://www.drupal.org/project/security_review) (`ddev drush security:review`), `composer audit`, `npm audit`, GitHub CodeQL, Dependabot                                                                                                         |
+| Audits          | [Security Review](https://www.drupal.org/project/security_review) (`ddev drush security:review`), `composer audit`, `npm audit` (`scripts/ci/npm-audit.mjs`: reviewed exceptions with an expiry date), GitHub CodeQL, Dependabot                                   |
 
 How to report a vulnerability: [`SECURITY.md`](SECURITY.md).
 
