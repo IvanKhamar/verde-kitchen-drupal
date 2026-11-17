@@ -4,7 +4,16 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { buildProductsUrl, buildTermsUrl, filterByTags, formatPrice, parseProducts, parseTerms } from './api.js';
+import {
+  buildProductsUrl,
+  buildTermsUrl,
+  filterByTags,
+  filterProducts,
+  formatPrice,
+  parseProducts,
+  parseTerms,
+  staticDataUrls,
+} from './api.js';
 
 const params = (url) => new URL(url, 'http://example.test').searchParams;
 
@@ -134,5 +143,36 @@ describe('formatPrice', () => {
   it('returns an empty string without a value', () => {
     assert.equal(formatPrice(null), '');
     assert.equal(formatPrice(''), '');
+  });
+});
+
+describe('filterProducts (static copy)', () => {
+  const products = [
+    { title: 'Quinoa Power Bowl', categoryId: 'bowls' },
+    { title: 'Боул з кіноа', categoryId: 'bowls' },
+    { title: 'Berry Kombucha', categoryId: 'drinks' },
+  ];
+
+  it('matches part of the name, ignoring case, in any alphabet', () => {
+    assert.deepEqual(
+      filterProducts(products, { search: ' BOWL ' }).map((p) => p.title),
+      ['Quinoa Power Bowl'],
+    );
+    assert.equal(filterProducts(products, { search: 'БОУЛ' }).length, 1);
+  });
+
+  it('filters by category and combines it with the search', () => {
+    assert.equal(filterProducts(products, { category: 'bowls' }).length, 2);
+    assert.equal(filterProducts(products, { search: 'kombucha', category: 'bowls' }).length, 0);
+  });
+
+  it('returns everything without filters', () => {
+    assert.equal(filterProducts(products).length, 3);
+  });
+});
+
+describe('staticDataUrls', () => {
+  it('points to the exported files of a language', () => {
+    assert.equal(staticDataUrls('/base/static-data/uk').products, '/base/static-data/uk/products.json');
   });
 });

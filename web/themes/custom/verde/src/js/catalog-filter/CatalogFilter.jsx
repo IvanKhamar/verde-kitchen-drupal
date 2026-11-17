@@ -1,5 +1,14 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { buildProductsUrl, buildTermsUrl, fetchJsonApi, filterByTags, parseProducts, parseTerms } from './api.js';
+import {
+  buildProductsUrl,
+  buildTermsUrl,
+  fetchJsonApi,
+  filterByTags,
+  filterProducts,
+  parseProducts,
+  parseTerms,
+  staticDataUrls,
+} from './api.js';
 import ProductCard from './ProductCard.jsx';
 import useDebouncedValue from './useDebouncedValue.js';
 
@@ -18,6 +27,8 @@ const EMPTY_FILTERS = { search: '', category: '', tags: [] };
  *
  * @param {object} props - Component props.
  * @param {string} props.apiBase - JSON:API root, for example "/jsonapi".
+ * @param {string} [props.staticData] - Folder of exported JSON files; set only
+ *   in the static copy, which has no JSON:API.
  * @param {string} props.basePath - Front page path for the current language,
  *   "/" or "/uk": product links get the same language prefix.
  * @param {string} props.langcode - Current language, "en" or "uk".
@@ -25,7 +36,7 @@ const EMPTY_FILTERS = { search: '', category: '', tags: [] };
  *   shows its own results, and false when the server-rendered list should show.
  * @returns {JSX.Element} The widget.
  */
-export default function CatalogFilter({ apiBase, basePath, langcode, onLiveResultsChange }) {
+export default function CatalogFilter({ apiBase, staticData, basePath, langcode, onLiveResultsChange }) {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [terms, setTerms] = useState({ categories: [], tags: [] });
   const [termsFailed, setTermsFailed] = useState(false);
@@ -48,9 +59,10 @@ export default function CatalogFilter({ apiBase, basePath, langcode, onLiveResul
   // Load the category and tag lists once.
   useEffect(() => {
     const controller = new AbortController();
+    const files = staticData ? staticDataUrls(staticData) : null;
     Promise.all([
-      fetchJsonApi(buildTermsUrl(apiBase, 'product_category'), controller.signal),
-      fetchJsonApi(buildTermsUrl(apiBase, 'dietary_tag'), controller.signal),
+      fetchJsonApi(files?.categories ?? buildTermsUrl(apiBase, 'product_category'), controller.signal),
+      fetchJsonApi(files?.tags ?? buildTermsUrl(apiBase, 'dietary_tag'), controller.signal),
     ])
       .then(([categories, tags]) => setTerms({ categories: parseTerms(categories), tags: parseTerms(tags) }))
       .catch((error) => {
@@ -58,7 +70,7 @@ export default function CatalogFilter({ apiBase, basePath, langcode, onLiveResul
       });
     // Cleanup on unmount: abort requests that are still running.
     return () => controller.abort();
-  }, [apiBase, attempt]);
+  }, [apiBase, staticData, attempt]);
 
   // Every combination of server-side filters (and every retry) is one request.
   const requestKey = JSON.stringify([search.trim(), filters.category, attempt]);
@@ -70,9 +82,15 @@ export default function CatalogFilter({ apiBase, basePath, langcode, onLiveResul
   // twice; the React docs and the react-hooks lint rules advise against it.)
   useEffect(() => {
     const controller = new AbortController();
-    fetchJsonApi(buildProductsUrl(apiBase, { search, category: filters.category, langcode }), controller.signal)
+    // The static copy has one file with every product; the browser filters it.
+    const url = staticData
+      ? staticDataUrls(staticData).products
+      : buildProductsUrl(apiBase, { search, category: filters.category, langcode });
+    fetchJsonApi(url, controller.signal)
       .then((document) => {
-        setResult({ key: requestKey, products: parseProducts(document, basePath), failed: false, loadedOnce: true });
+        let products = parseProducts(document, basePath);
+        if (staticData) products = filterProducts(products, { search, category: filters.category });
+        setResult({ key: requestKey, products, failed: false, loadedOnce: true });
       })
       .catch((error) => {
         // A newer request replaced this one: not an error.
@@ -81,7 +99,7 @@ export default function CatalogFilter({ apiBase, basePath, langcode, onLiveResul
     // Aborting the previous request means an old, slow response can never
     // overwrite the results of a newer one.
     return () => controller.abort();
-  }, [apiBase, basePath, search, filters.category, langcode, requestKey]);
+  }, [apiBase, staticData, basePath, search, filters.category, langcode, requestKey]);
 
   let status = 'success';
   if (termsFailed || (result.key === requestKey && result.failed)) {

@@ -30,6 +30,7 @@ Drupal.behaviors.verdeCatalogFilter = {
       root.render(
         <CatalogFilter
           apiBase={element.dataset.apiBase}
+          staticData={element.dataset.staticData}
           basePath={element.dataset.basePath}
           langcode={document.documentElement.lang || 'en'}
           onLiveResultsChange={toggleFallback}
