@@ -5,6 +5,11 @@
   "attributes" is added by Drupal to every component: callers can pass extra
   classes or attributes, and the component adds its own.
 #}
+{#
+  Drupal gives every component an "attributes" object. Storybook's Twig.js
+  does not do that for nested components, so create one when it is missing.
+#}
+{% set attributes = attributes|default(create_attribute()) %}
 {% set classes = ['button', 'button--' ~ (variant|default('primary'))] %}
 {% if url %}
   <a{{ attributes.addClass(classes).setAttribute('href', url) }}>{{ label }}</a>
