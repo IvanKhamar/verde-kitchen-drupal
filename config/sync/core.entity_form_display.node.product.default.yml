@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.product.field_dietary_tags
     - field.field.node.product.field_image
     - field.field.node.product.field_price
+    - field.field.node.product.field_retailers
     - image.style.thumbnail
     - node.type.product
   module:
@@ -61,6 +62,12 @@ content:
     region: content
     settings:
       placeholder: ''
+    third_party_settings: {  }
+  field_retailers:
+    type: options_buttons
+    weight: 6
+    region: content
+    settings: {  }
     third_party_settings: {  }
   langcode:
     type: language_select

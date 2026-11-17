@@ -1,0 +1,16 @@
+uuid: 427efca3-8549-4ecc-b1e2-d6c4dfb5954c
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.retailer
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: taxonomy_term.retailer
+target_entity_type_id: taxonomy_term
+target_bundle: retailer
+default_langcode: site_default
+language_alterable: true

@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.product.field_dietary_tags
     - field.field.node.product.field_image
     - field.field.node.product.field_price
+    - field.field.node.product.field_retailers
     - node.type.product
     - responsive_image.styles.detail
   module:
@@ -65,5 +66,6 @@ content:
     weight: 2
     region: content
 hidden:
+  field_retailers: true
   langcode: true
   links: true

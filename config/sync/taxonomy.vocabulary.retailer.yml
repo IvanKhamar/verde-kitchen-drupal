@@ -1,0 +1,9 @@
+uuid: dc1a7aaa-43c0-4798-9d9f-6a0e6973b799
+langcode: en
+status: true
+dependencies: {  }
+name: Retailer
+vid: retailer
+description: 'Online shops and store chains that sell Verde Kitchen products.'
+weight: 0
+new_revision: false
