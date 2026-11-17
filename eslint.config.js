@@ -20,6 +20,7 @@ export default [
       'node_modules/**',
       'recipes/**',
       'reports/**',
+      'storybook-static/**',
       'web/core/**',
       'web/modules/contrib/**',
       'web/themes/contrib/**',
@@ -63,6 +64,12 @@ export default [
   {
     files: ['*.js', 'scripts/**/*.{js,mjs}', '**/*.test.js', 'tests/**/*.js'],
     languageOptions: { globals: globals.node },
+  },
+
+  // Storybook: main.js runs in Node, preview.js and the stories in the browser.
+  {
+    files: ['.storybook/**/*.js'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 
   prettier,
