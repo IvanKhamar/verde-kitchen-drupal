@@ -30,7 +30,8 @@
     <div class="product__description">
       {{ content.body }}
     </div>
-    {{ content|without('field_image', 'body', 'field_price', 'field_category', 'field_dietary_tags', 'links') }}
+    {{ content|without('field_image', 'body', 'field_price', 'field_category', 'field_dietary_tags', 'field_retailers', 'links') }}
+    {{ include('verde:where-to-buy', where_to_buy, with_context = false) }}
     {{ include('verde:button', {
       label: 'Back to all products'|t|render,
       url: path('view.products.page_catalog'),

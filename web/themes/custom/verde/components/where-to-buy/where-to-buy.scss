@@ -1,0 +1,91 @@
+.where-to-buy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-5);
+  background-color: var(--color-surface-alt);
+  border-radius: var(--radius-lg);
+
+  > * {
+    margin: 0;
+  }
+}
+
+.where-to-buy__heading {
+  font-size: var(--font-size-lg);
+}
+
+.where-to-buy__subheading {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.where-to-buy__online,
+.where-to-buy__stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.where-to-buy__shop {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+
+  &:hover {
+    background-color: var(--color-primary-light);
+  }
+
+  // A small arrow shows that the link leaves the site.
+  &::after {
+    margin-left: var(--space-2);
+    content: '↗';
+  }
+}
+
+// Read by screen readers, not shown: "(external site)".
+.where-to-buy__hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.where-to-buy__stores {
+  flex-direction: column;
+}
+
+.where-to-buy__store {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.where-to-buy__store-name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.where-to-buy__cities {
+  color: var(--color-text-muted);
+}
+
+.where-to-buy__empty {
+  color: var(--color-text-muted);
+}
