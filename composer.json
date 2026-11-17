@@ -107,5 +107,16 @@
                 "      composer remove drupal/core-project-message"
             ]
         }
+    },
+    "require-dev": {
+        "drupal/coder": "^9.0"
+    },
+    "scripts": {
+        "lint": "phpcs",
+        "lint:fix": "phpcbf"
+    },
+    "scripts-descriptions": {
+        "lint": "Check custom PHP code against the Drupal coding standards (phpcs.xml.dist).",
+        "lint:fix": "Fix what PHP_CodeSniffer can fix automatically."
     }
 }

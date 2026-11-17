@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PHP_CodeSniffer configuration: Drupal coding standards for custom code.
+  Run: composer lint (or vendor/bin/phpcs); fix what can be fixed: composer lint:fix
+-->
+<ruleset name="Verde Kitchen">
+  <description>Drupal and DrupalPractice standards for the custom theme, module and scripts.</description>
+
+  <file>web/themes/custom</file>
+  <file>web/modules/custom</file>
+  <file>scripts/demo-content/demo-content.php</file>
+
+  <!-- The file types Drupal uses for PHP and metadata. -->
+  <arg name="extensions" value="php,module,inc,install,theme,info,yml"/>
+  <arg name="colors"/>
+  <!-- Show progress and the name of each failing sniff. -->
+  <arg value="ps"/>
+
+  <!-- Front-end sources and build output are checked by ESLint and Stylelint. -->
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+  <exclude-pattern>*/dist/*</exclude-pattern>
+  <exclude-pattern>*\.(css|scss|js|jsx|mjs)$</exclude-pattern>
+
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+</ruleset>
