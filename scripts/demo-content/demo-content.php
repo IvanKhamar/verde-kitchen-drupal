@@ -18,6 +18,7 @@
 declare(strict_types=1);
 
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\file\FileInterface;
@@ -285,15 +286,30 @@ function verde_demo_image(string $slug, string $directory): FileInterface {
  * @return array<string, int>
  *   Term IDs keyed by slug.
  */
-function verde_demo_terms(string $vid, array $names): array {
+function verde_demo_terms(string $vid, array $names, array $names_uk): array {
   $ids = [];
   $weight = 0;
   foreach ($names as $slug => $name) {
     $term = Term::create(['vid' => $vid, 'name' => $name, 'weight' => $weight++]);
     $term->save();
+    verde_demo_translate($term, ['name' => $names_uk[$slug]]);
     $ids[$slug] = (int) $term->id();
   }
   return $ids;
+}
+
+/**
+ * Adds the Ukrainian translation of an entity, or updates it if it exists.
+ *
+ * Only translatable fields are passed. Shared fields (price, category, image
+ * file…) are the same in every language and come from the original.
+ */
+function verde_demo_translate(ContentEntityInterface $entity, array $values): void {
+  $translation = $entity->hasTranslation('uk') ? $entity->getTranslation('uk') : $entity->addTranslation('uk');
+  foreach ($values as $field => $value) {
+    $translation->set($field, $value);
+  }
+  $translation->save();
 }
 
 // Clean up: delete the content a previous run created.
@@ -318,15 +334,16 @@ $link_storage->delete($link_storage->loadByProperties(['menu_name' => array_keys
 
 // Banners are updated, not deleted: deleting a custom block also deletes its
 // placements (block.block.verde_home_*), because they depend on it.
-// Create the content.
-$category_ids = verde_demo_terms('product_category', $categories);
-$tag_ids = verde_demo_terms('dietary_tag', $dietary_tags);
+// Create the content, in English with a Ukrainian translation.
+$uk = require __DIR__ . '/demo-content.uk.php';
+$category_ids = verde_demo_terms('product_category', $categories, $uk['categories']);
+$tag_ids = verde_demo_terms('dietary_tag', $dietary_tags, $uk['dietary_tags']);
 
 // Fixed dates keep the order of products stable (useful for screenshots).
 $created = strtotime('2026-09-01 09:00');
 foreach ($products as $slug => $product) {
   $image = verde_demo_image($slug, 'products');
-  Node::create([
+  $node = Node::create([
     'type' => 'product',
     'title' => $product['title'],
     'uid' => 1,
@@ -342,7 +359,17 @@ foreach ($products as $slug => $product) {
     'field_category' => $category_ids[$product['category']],
     'field_dietary_tags' => array_map(fn(string $tag) => $tag_ids[$tag], $product['tags']),
     'field_price' => $product['price'],
-  ])->save();
+  ]);
+  $node->save();
+  $translation = $uk['products'][$slug];
+  verde_demo_translate($node, [
+    'title' => $translation['title'],
+    'status' => 1,
+    // "Promoted to front page" is translatable in Drupal: set it per language.
+    'promote' => $product['featured'],
+    'body' => ['value' => $translation['body'], 'summary' => $translation['summary'], 'format' => 'basic_html'],
+    'field_image' => ['target_id' => $image->id(), 'alt' => $translation['alt']],
+  ]);
 }
 
 $article_ids = [];
@@ -360,12 +387,26 @@ foreach ($articles as $slug => $article) {
     'field_article_type' => $article['type'],
   ]);
   $node->save();
+  $translation = $uk['articles'][$slug];
+  verde_demo_translate($node, [
+    'title' => $translation['title'],
+    'status' => 1,
+    'body' => ['value' => $translation['body'], 'format' => 'basic_html'],
+    'field_image' => ['target_id' => $image->id(), 'alt' => $translation['alt']],
+  ]);
   $article_ids[$slug] = $node->id();
 }
 
 foreach ($menus as $menu => $links) {
   foreach ($links as $weight => [$title, $uri]) {
-    MenuLinkContent::create(['menu_name' => $menu, 'title' => $title, 'link' => ['uri' => $uri], 'weight' => $weight])->save();
+    $link = MenuLinkContent::create([
+      'menu_name' => $menu,
+      'title' => $title,
+      'link' => ['uri' => $uri],
+      'weight' => $weight,
+    ]);
+    $link->save();
+    verde_demo_translate($link, ['title' => $uk['menus'][$menu][$weight], 'link' => ['uri' => $uri]]);
   }
 }
 
@@ -385,6 +426,14 @@ foreach ($banners as $uuid => $banner) {
   $block->set('field_link', ['uri' => $uri, 'title' => $link_title]);
   $block->set('field_image', ['target_id' => $image->id(), 'alt' => $banner['alt']]);
   $block->save();
+  $translation = $uk['banners'][$uuid];
+  verde_demo_translate($block, [
+    'info' => $banner['info'],
+    'field_heading' => $translation['heading'],
+    'field_text' => $translation['text'],
+    'field_link' => ['uri' => $uri, 'title' => $translation['link_title']],
+    'field_image' => ['target_id' => $image->id(), 'alt' => $translation['alt']],
+  ]);
 }
 
 printf(
