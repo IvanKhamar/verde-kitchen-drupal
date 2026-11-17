@@ -12,6 +12,13 @@
  */
 #}
 <div class="layout">
+  {% if static_notice %}
+    {# Only in the static copy on GitHub Pages (see verde_preprocess_page()). #}
+    <p class="static-notice">
+      {{ 'Static preview: no admin and no live API.'|t }}
+      <a href="{{ static_notice.url }}">{{ static_notice.label }}</a>
+    </p>
+  {% endif %}
   <header class="site-header" role="banner">
     <div class="site-header__inner container">
       {{ page.header }}

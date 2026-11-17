@@ -83,3 +83,12 @@ msgstr "Спробувати ще раз"
 
 msgid "No products match your filters."
 msgstr "Жоден продукт не відповідає фільтрам."
+
+msgid "Static preview: no admin and no live API."
+msgstr "Статична копія: без адмінки та живого API."
+
+msgid "Open the full site"
+msgstr "Відкрити повний сайт"
+
+msgid "Source code"
+msgstr "Вихідний код"
