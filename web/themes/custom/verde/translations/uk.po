@@ -111,3 +111,79 @@ msgstr "(зовнішній сайт)"
 
 msgid "Not in shops yet. Check back soon."
 msgstr "Поки що немає в продажу. Загляньте пізніше."
+
+# Shopping list (shopping-list-button, shopping-list.js, ShoppingListPage.jsx).
+msgid "Add to list"
+msgstr "До списку"
+
+msgid "Remove from list"
+msgstr "Прибрати зі списку"
+
+msgid "Shopping list"
+msgstr "Список покупок"
+
+msgid "Shopping list, empty"
+msgstr "Список покупок, порожній"
+
+msgid "Shopping list, 1 item"
+msgid_plural "Shopping list, @count items"
+msgstr[0] "Список покупок, @count позиція"
+msgstr[1] "Список покупок, @count позиції"
+msgstr[2] "Список покупок, @count позицій"
+
+msgid "@product added to your shopping list."
+msgstr "@product додано до списку покупок."
+
+msgid "@product removed from your shopping list."
+msgstr "@product прибрано зі списку покупок."
+
+msgid "@product: @quantity"
+msgstr "@product: @quantity"
+
+msgid "The shopping list is kept in your browser and needs JavaScript."
+msgstr "Список покупок зберігається у вашому браузері, тому потрібен JavaScript."
+
+msgid "Your shopping list is empty."
+msgstr "Ваш список покупок порожній."
+
+msgid "Your shopping list is empty now."
+msgstr "Тепер ваш список покупок порожній."
+
+msgid "Browse products"
+msgstr "Переглянути продукти"
+
+msgid "The products could not be loaded."
+msgstr "Не вдалося завантажити продукти."
+
+msgid "Loading your list…"
+msgstr "Завантажуємо ваш список…"
+
+msgid "Quantity of @product"
+msgstr "Кількість: @product"
+
+msgid "One less"
+msgstr "На одну менше"
+
+msgid "One more"
+msgstr "На одну більше"
+
+msgid "Remove"
+msgstr "Прибрати"
+
+msgid "Estimated total"
+msgstr "Орієнтовна сума"
+
+msgid "Print list"
+msgstr "Надрукувати список"
+
+msgid "Clear list"
+msgstr "Очистити список"
+
+msgid "Clear the list?"
+msgstr "Очистити список?"
+
+msgid "Yes, clear"
+msgstr "Так, очистити"
+
+msgid "Cancel"
+msgstr "Скасувати"
