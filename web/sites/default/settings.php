@@ -899,6 +899,18 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
 $settings['config_sync_directory'] = '../config/sync';
 
 /**
+ * Trusted host names (production).
+ *
+ * Drupal answers only requests whose Host header matches one of these patterns,
+ * which stops "host header" attacks such as poisoned password-reset links.
+ * The production server sets DRUPAL_TRUSTED_HOST_PATTERNS, for example
+ * '^example\.com$,^www\.example\.com$'. DDEV sets its own patterns.
+ */
+if ($trusted_host_patterns = getenv('DRUPAL_TRUSTED_HOST_PATTERNS')) {
+  $settings['trusted_host_patterns'] = explode(',', $trusted_host_patterns);
+}
+
+/**
  * Local environment settings.
  *
  * DDEV generates settings.ddev.php (git-ignored). It holds the database
