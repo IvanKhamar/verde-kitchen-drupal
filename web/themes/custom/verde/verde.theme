@@ -17,7 +17,9 @@ declare(strict_types=1);
 
 use Drupal\block_content\BlockContentInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
+use Drupal\image\Entity\ImageStyle;
 use Drupal\node\NodeInterface;
 
 /**
@@ -90,30 +92,50 @@ function verde_preprocess_node(array &$variables): void {
 /**
  * Implements hook_preprocess_HOOK() for field.html.twig.
  *
- * Chooses the image style and loading strategy for every field_image in one
- * place. The first, large image of a page is usually the "Largest Contentful
- * Paint" (LCP) element, so it loads eagerly with a high fetch priority.
- * Images further down the page load lazily.
+ * Chooses the responsive image style and loading strategy for every
+ * field_image in one place.
+ *
+ * The first large image of a page is usually the "Largest Contentful Paint"
+ * (LCP) element. Lazy loading it would delay LCP, because the browser waits
+ * for layout before it requests lazy images. So it loads eagerly, and the
+ * hero and full-page images also get fetchpriority="high". Images further
+ * down the page load lazily.
  */
 function verde_preprocess_field(array &$variables): void {
   if ($variables['field_name'] !== 'field_image') {
     return;
   }
 
-  $entity = $variables['element']['#object'];
-  $view_mode = $variables['element']['#view_mode'];
+  $element = $variables['element'];
+  $entity = $element['#object'];
+  $view_mode = $element['#view_mode'];
   $is_hero = $entity instanceof BlockContentInterface && $entity->get('field_variant')->value === 'hero';
   $is_full_node = $entity instanceof NodeInterface && $view_mode === 'full';
+  // Set by verde_preprocess_views_view_unformatted() on the first cards of a list.
+  $is_first_row = !empty($element['#verde_eager']);
 
-  $style = $view_mode === 'teaser' ? 'card' : 'detail';
-  $above_the_fold = $is_hero || $is_full_node;
+  $priority = $is_hero || $is_full_node;
+  $eager = $priority || $is_first_row;
 
   foreach ($variables['items'] as &$item) {
-    $item['content']['#image_style'] = $style;
-    $item['content']['#item_attributes']['loading'] = $above_the_fold ? 'eager' : 'lazy';
-    if ($above_the_fold) {
-      $item['content']['#item_attributes']['fetchpriority'] = 'high';
+    // The responsive image formatter takes <img> attributes in "#attributes"
+    // (the plain image formatter uses "#item_attributes").
+    $item['content']['#responsive_image_style_id'] = $view_mode === 'teaser' ? 'card' : 'detail';
+    $item['content']['#attributes']['loading'] = $eager ? 'eager' : 'lazy';
+    if ($priority) {
+      $item['content']['#attributes']['fetchpriority'] = 'high';
     }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node.html.twig, runs after the one above.
+ *
+ * Passes the "first row" flag from the view down to the image field.
+ */
+function verde_preprocess_node__teaser(array &$variables): void {
+  if (!empty($variables['elements']['#verde_eager']) && isset($variables['content']['field_image'])) {
+    $variables['content']['field_image']['#verde_eager'] = TRUE;
   }
 }
 
@@ -148,6 +170,18 @@ function verde_preprocess_views_view_unformatted(array &$variables): void {
   ];
   $view = $variables['view'];
   $key = $view->id() . ':' . $view->current_display;
+
+  // The listing pages show cards right under the title: the first ones are in
+  // the first screen, so their images must not be lazy (see
+  // verde_preprocess_field()). The rows are still render arrays here, not
+  // HTML, so a flag can be added. The extra cache key keeps this "eager"
+  // version separate from the cached lazy version of the same card.
+  if (in_array($key, ['products:page_catalog', 'articles:page'], TRUE)) {
+    foreach (array_slice(array_keys($variables['rows']), 0, 2) as $index) {
+      $variables['rows'][$index]['content']['#verde_eager'] = TRUE;
+      $variables['rows'][$index]['content']['#cache']['keys'][] = 'verde_eager';
+    }
+  }
 
   $variables['section'] = [];
   if (isset($sections[$key])) {
@@ -212,4 +246,108 @@ function verde_allowed_value_label(NodeInterface $node, string $field_name): str
   $value = $node->get($field_name)->value;
   $allowed = $node->get($field_name)->getFieldDefinition()->getFieldStorageDefinition()->getSetting('allowed_values');
   return (string) ($allowed[$value] ?? $value);
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ *
+ * Adds structured data (JSON-LD, https://schema.org) to product and article
+ * pages, so search engines can show rich results such as the price.
+ * Themes may implement this alter hook; it runs after all modules.
+ */
+function verde_page_attachments_alter(array &$attachments): void {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if (!$node instanceof NodeInterface || !in_array($node->bundle(), ['product', 'article'], TRUE)) {
+    return;
+  }
+
+  $data = $node->bundle() === 'product' ? verde_product_schema($node) : verde_article_schema($node);
+
+  // JSON_HEX_TAG writes "<" and ">" as < and >. Without it, a title
+  // containing "</script>" would end the script element early and let the
+  // rest run as HTML: an XSS hole. With it, the JSON can be printed as is.
+  $json = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#type' => 'html_tag',
+      '#tag' => 'script',
+      '#attributes' => ['type' => 'application/ld+json'],
+      '#value' => Markup::create($json),
+    ],
+    'verde_json_ld',
+  ];
+
+  // The page must be re-rendered when the node or its terms change.
+  $cacheability = CacheableMetadata::createFromRenderArray($attachments)->addCacheableDependency($node);
+  foreach (['field_category', 'field_dietary_tags'] as $field) {
+    if ($node->hasField($field)) {
+      foreach ($node->get($field)->referencedEntities() as $term) {
+        $cacheability->addCacheableDependency($term);
+      }
+    }
+  }
+  $cacheability->applyTo($attachments);
+}
+
+/**
+ * Builds schema.org Product data for a product node.
+ */
+function verde_product_schema(NodeInterface $node): array {
+  $data = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Product',
+    'name' => $node->label(),
+    'description' => (string) $node->get('body')->summary,
+    'url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
+    'brand' => ['@type' => 'Brand', 'name' => \Drupal::config('system.site')->get('name')],
+    'offers' => [
+      '@type' => 'Offer',
+      'price' => number_format((float) $node->get('field_price')->value, 2, '.', ''),
+      'priceCurrency' => 'EUR',
+      'availability' => 'https://schema.org/InStock',
+    ],
+  ];
+  if ($category = $node->get('field_category')->entity) {
+    $data['category'] = $category->label();
+  }
+  if ($image = verde_schema_image_url($node)) {
+    $data['image'] = $image;
+  }
+  return $data;
+}
+
+/**
+ * Builds schema.org Article data for an article node.
+ */
+function verde_article_schema(NodeInterface $node): array {
+  $site_name = \Drupal::config('system.site')->get('name');
+  $organization = [
+    '@type' => 'Organization',
+    'name' => $site_name,
+    'url' => Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(),
+  ];
+  $data = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Article',
+    'headline' => $node->label(),
+    'url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
+    'datePublished' => date(DATE_ATOM, (int) $node->getCreatedTime()),
+    'dateModified' => date(DATE_ATOM, (int) $node->getChangedTime()),
+    'author' => $organization,
+    'publisher' => $organization,
+  ];
+  if ($image = verde_schema_image_url($node)) {
+    $data['image'] = $image;
+  }
+  return $data;
+}
+
+/**
+ * Returns the absolute URL of a node's image in the "social" image style.
+ */
+function verde_schema_image_url(NodeInterface $node): ?string {
+  $file = $node->get('field_image')->entity;
+  $style = ImageStyle::load('social');
+  return $file && $style ? $style->buildUrl($file->getFileUri()) : NULL;
 }
