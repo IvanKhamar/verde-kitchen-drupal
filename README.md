@@ -103,6 +103,25 @@ in `web/themes/custom/verde/components/`. Each folder holds the component's meta
 | `teaser-grid` | Every list of cards; responsive grid without media queries      |
 | `navigation`  | Main menu with an accessible mobile toggle (disclosure pattern) |
 
+### Storybook
+
+[Storybook](https://storybook.js.org/) shows every component with its variants, without a running
+Drupal site: [vite-plugin-twig-drupal](https://github.com/larowlan/vite-plugin-twig-drupal)
+renders the components' real Twig templates with Twig.js and Drupal's Twig extensions. Stories
+sit next to each component (`components/*/NAME.stories.js`); the a11y addon runs axe in the
+Storybook UI.
+
+```bash
+ddev npm run storybook          # development server on port 6006
+npm run build-storybook         # static build in storybook-static/
+CHROME_PATH="/path/to/chrome" npm run test:storybook   # every story renders and passes axe
+```
+
+Two details make the templates work in both Drupal and Twig.js: components include other
+components with the `{% include 'verde:badge' with {…} only %}` tag, and they create their
+`attributes` object when it is missing (Drupal always provides it, Twig.js only for the
+top-level component).
+
 ## React catalog filter
 
 `/products` has a React widget that filters products by name, category and dietary
