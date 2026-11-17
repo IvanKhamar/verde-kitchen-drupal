@@ -1,0 +1,37 @@
+# gitleaks configuration: the default rules plus rules for this project's own
+# kinds of secrets. Used by CI, the pre-commit hook and the deploy workflows.
+
+title = "Verde Kitchen"
+
+[extend]
+useDefault = true
+
+# A database URL with a real password, for example in a drush command or a .env file.
+[[rules]]
+id = "database-url-with-password"
+description = "Database connection URL that contains a password"
+regex = '''(?i)\b(?:mysql|mariadb|pgsql|postgres(?:ql)?)://[^:\s/@]+:([^@\s/]{3,})@'''
+secretGroup = 1
+keywords = ["mysql://", "mariadb://", "pgsql://", "postgres://", "postgresql://"]
+  # Throwaway values used by the CI database container and in documentation examples.
+  [[rules.allowlists]]
+  regexes = ['''^(?:drupal|db|pass|password|root)$''']
+
+# Drupal's hash salt, written as a literal into a settings file.
+[[rules]]
+id = "drupal-hash-salt"
+description = "Drupal hash salt set to a literal value"
+regex = '''hash_salt'\]\s*=\s*['"]([^'"]{20,})['"]'''
+secretGroup = 1
+keywords = ["hash_salt"]
+
+# Drupal hash salt or database password passed through an environment variable.
+[[rules]]
+id = "drupal-env-secret"
+description = "Drupal secret in an environment variable assignment"
+regex = '''(?i)\b(?:DRUPAL_HASH_SALT|DB_PASSWORD|MARIADB_PASSWORD|MARIADB_ROOT_PASSWORD|MYSQL_PASSWORD)\s*[:=]\s*['"]?([^\s'"]{8,})'''
+secretGroup = 1
+keywords = ["drupal_hash_salt", "db_password", "mariadb_password", "mariadb_root_password", "mysql_password"]
+  # The CI-only salt is a fixed, public test value, documented as not secret.
+  [[rules.allowlists]]
+  regexes = ['''^ci-only-hash-salt-not-a-secret$''']
