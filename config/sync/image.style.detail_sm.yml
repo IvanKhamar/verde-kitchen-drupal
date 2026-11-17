@@ -1,0 +1,21 @@
+uuid: 8d526aa7-9a26-4a35-be49-4fc472c7e1b0
+langcode: en
+status: true
+dependencies: {  }
+name: detail_sm
+label: 'Detail small (4:3, 480)'
+effects:
+  27b97e5a-cb00-48bd-9b94-36f2c1de62fd:
+    uuid: 27b97e5a-cb00-48bd-9b94-36f2c1de62fd
+    id: image_scale_and_crop
+    weight: 0
+    data:
+      width: 480
+      height: 360
+      anchor: center-center
+  abfc0da8-1ad7-48ca-b2f4-256ec1a06756:
+    uuid: abfc0da8-1ad7-48ca-b2f4-256ec1a06756
+    id: image_convert
+    weight: 1
+    data:
+      extension: webp

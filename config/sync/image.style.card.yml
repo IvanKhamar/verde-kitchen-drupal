@@ -3,13 +3,19 @@ langcode: en
 status: true
 dependencies: {  }
 name: card
-label: 'Card (4:3)'
+label: 'Card (4:3, 640)'
 effects:
-  50bf58bd-5139-4ee4-a4d9-0133e9c253f7:
-    uuid: 50bf58bd-5139-4ee4-a4d9-0133e9c253f7
+  b806b42b-f25d-4124-9138-a133ae4b57c7:
+    uuid: b806b42b-f25d-4124-9138-a133ae4b57c7
     id: image_scale_and_crop
     weight: 0
     data:
       width: 640
       height: 480
       anchor: center-center
+  386fa86a-5f96-43ba-871e-47d0b0772b38:
+    uuid: 386fa86a-5f96-43ba-871e-47d0b0772b38
+    id: image_convert
+    weight: 1
+    data:
+      extension: webp

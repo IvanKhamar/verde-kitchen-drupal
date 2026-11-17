@@ -6,11 +6,11 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_article_type
     - field.field.node.article.field_image
-    - image.style.detail
     - node.type.article
+    - responsive_image.styles.detail
   module:
-    - image
     - options
+    - responsive_image
     - text
     - user
 id: node.article.default
@@ -33,13 +33,13 @@ content:
     weight: -1
     region: content
   field_image:
-    type: image
+    type: responsive_image
     label: hidden
     settings:
+      responsive_image_style: detail
       image_link: ''
-      image_style: detail
       image_loading:
-        attribute: eager
+        attribute: lazy
     third_party_settings: {  }
     weight: 0
     region: content

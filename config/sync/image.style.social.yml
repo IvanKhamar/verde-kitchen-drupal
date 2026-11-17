@@ -1,0 +1,15 @@
+uuid: ef18c15b-32a8-47a6-bf19-40a9e791925c
+langcode: en
+status: true
+dependencies: {  }
+name: social
+label: 'Social share (1200x630, PNG)'
+effects:
+  62e737c8-853c-44e3-81e6-a93cd6f6eed7:
+    uuid: 62e737c8-853c-44e3-81e6-a93cd6f6eed7
+    id: image_scale_and_crop
+    weight: 0
+    data:
+      width: 1200
+      height: 630
+      anchor: center-center

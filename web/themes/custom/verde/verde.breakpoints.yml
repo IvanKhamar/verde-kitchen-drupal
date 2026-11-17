@@ -1,0 +1,25 @@
+# Breakpoints are used by responsive image styles. The same widths as
+# $breakpoints in src/scss/abstracts/_tokens.scss.
+#
+# The responsive image styles in this theme use "sizes" + "srcset" with one
+# breakpoint that matches every screen (verde.all): the browser then picks
+# the best file itself from the widths in srcset. Width-based <picture>
+# sources (art direction) would use the other breakpoints.
+verde.all:
+  label: All screens
+  mediaQuery: ''
+  weight: 0
+  multipliers:
+    - 1x
+verde.md:
+  label: Medium (768px and up)
+  mediaQuery: 'all and (min-width: 768px)'
+  weight: 1
+  multipliers:
+    - 1x
+verde.lg:
+  label: Large (1024px and up)
+  mediaQuery: 'all and (min-width: 1024px)'
+  weight: 2
+  multipliers:
+    - 1x

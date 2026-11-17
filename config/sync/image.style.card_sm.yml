@@ -1,0 +1,21 @@
+uuid: d6f7f845-1b01-4b72-b65e-ec80e967d8bf
+langcode: en
+status: true
+dependencies: {  }
+name: card_sm
+label: 'Card small (4:3, 320)'
+effects:
+  28764aff-b65b-474a-94b7-46c68386ec1f:
+    uuid: 28764aff-b65b-474a-94b7-46c68386ec1f
+    id: image_scale_and_crop
+    weight: 0
+    data:
+      width: 320
+      height: 240
+      anchor: center-center
+  b80bd3bc-9658-4e5b-864c-7c710acbeac6:
+    uuid: b80bd3bc-9658-4e5b-864c-7c710acbeac6
+    id: image_convert
+    weight: 1
+    data:
+      extension: webp
