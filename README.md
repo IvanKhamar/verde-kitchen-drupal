@@ -342,14 +342,16 @@ Made with `npm run screenshots` and converted to WebP.
 
 Lighthouse, mobile preset (emulated phone, slow 4G, 4x CPU slowdown), on the local DDEV site:
 
-| Page    | Performance | Accessibility | Best Practices | SEO |
-| ------- | ----------: | ------------: | -------------: | --: |
-| Home    |         100 |           100 |            100 | 100 |
-| Catalog |          98 |           100 |            100 | 100 |
-| Product |         100 |           100 |            100 | 100 |
-| Article |         100 |           100 |            100 | 100 |
+| Page               | Performance | Accessibility | Best Practices | SEO |
+| ------------------ | ----------: | ------------: | -------------: | --: |
+| Home               |         100 |           100 |            100 | 100 |
+| Catalog            |          98 |           100 |            100 | 100 |
+| Product            |         100 |           100 |            100 | 100 |
+| Article            |         100 |           100 |            100 | 100 |
+| Home, Ukrainian    |         100 |           100 |            100 | 100 |
+| Catalog, Ukrainian |          98 |           100 |            100 | 100 |
 
-axe-core (WCAG 2.0/2.1 A and AA, plus best practices): **0 violations** on all four pages at
+axe-core (WCAG 2.0/2.1 A and AA, plus best practices): **0 violations** on all six pages at
 360 and 1280 px, with the mobile menu open and with the catalog filter applied.
 
 Full numbers (LCP, CLS, TBT per page): [`docs/audit-results.md`](docs/audit-results.md).

@@ -10,9 +10,11 @@ Mobile preset: emulated mid-range phone, slow 4G, 4x CPU slowdown. Target: 90 or
 | Page | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
 | ---- | ----------: | ------------: | -------------: | --: | --: | --: | --: |
 | Home | 100 | 100 | 100 | 100 | 1.1 s | 0 | 0 ms |
-| Catalog | 98 | 100 | 100 | 100 | 2.3 s | 0.035 | 30 ms |
+| Catalog | 98 | 100 | 100 | 100 | 2.3 s | 0.033 | 30 ms |
 | Product | 100 | 100 | 100 | 100 | 1.0 s | 0 | 0 ms |
 | Article | 100 | 100 | 100 | 100 | 1.0 s | 0 | 0 ms |
+| Home, Ukrainian | 100 | 100 | 100 | 100 | 1.1 s | 0 | 10 ms |
+| Catalog, Ukrainian | 98 | 100 | 100 | 100 | 2.4 s | 0.033 | 20 ms |
 
 ## axe-core
 
@@ -25,9 +27,13 @@ The numbers count affected elements.
 | Catalog (mobile) | 0 | 0 | 0 | 0 |
 | Product (mobile) | 0 | 0 | 0 | 0 |
 | Article (mobile) | 0 | 0 | 0 | 0 |
+| Home, Ukrainian (mobile) | 0 | 0 | 0 | 0 |
+| Catalog, Ukrainian (mobile) | 0 | 0 | 0 | 0 |
 | Home (desktop) | 0 | 0 | 0 | 0 |
 | Catalog (desktop) | 0 | 0 | 0 | 0 |
 | Product (desktop) | 0 | 0 | 0 | 0 |
 | Article (desktop) | 0 | 0 | 0 | 0 |
+| Home, Ukrainian (desktop) | 0 | 0 | 0 | 0 |
+| Catalog, Ukrainian (desktop) | 0 | 0 | 0 | 0 |
 | Home, mobile menu open (mobile) | 0 | 0 | 0 | 0 |
 | Catalog, filter applied (mobile) | 0 | 0 | 0 | 0 |
