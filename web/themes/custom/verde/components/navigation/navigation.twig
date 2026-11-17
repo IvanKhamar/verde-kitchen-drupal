@@ -3,13 +3,13 @@
   Site navigation is a list of links, and role="menu" would make screen
   readers expect application-style arrow-key behaviour.
 
-  Progressive enhancement: the toggle button starts "hidden". Without
-  JavaScript every link is visible. navigation.js shows the button and
-  collapses the list on small screens.
+  Progressive enhancement: CSS shows the button and collapses the list only
+  when JavaScript is enabled ((scripting: enabled) in navigation.scss).
+  navigation.js opens and closes it. Without JavaScript every link is visible.
 #}
 {% set list_id = ('navigation-list')|clean_unique_id %}
 <nav{{ attributes.addClass('navigation').setAttribute('aria-label', label|default('Main')).setAttribute('data-navigation', '') }}>
-  <button type="button" class="navigation__toggle" aria-expanded="false" aria-controls="{{ list_id }}" hidden>
+  <button type="button" class="navigation__toggle" aria-expanded="false" aria-controls="{{ list_id }}">
     <span class="navigation__icon" aria-hidden="true"></span>
     {{ 'Menu'|t }}
   </button>
