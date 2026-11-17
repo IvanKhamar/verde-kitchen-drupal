@@ -47,6 +47,26 @@ export default function ProductCard({ product, langcode, category, badges }) {
             {price && <p className="card__price">{price}</p>}
           </div>
         )}
+        {/*
+          Same markup as the shopping-list-button component. The page-wide
+          shopping-list.js handles the click and sets the right label.
+        */}
+        <div className="card__actions">
+          <button
+            type="button"
+            className="shopping-list-button"
+            data-shopping-list-toggle
+            data-product-id={product.id}
+            data-product-title={product.title}
+          >
+            <span className="shopping-list-button__icon" aria-hidden="true" />
+            <span data-label="add">{Drupal.t('Add to list')}</span>
+            <span data-label="remove" hidden>
+              {Drupal.t('Remove from list')}
+            </span>
+            <span className="shopping-list-button__context">: {product.title}</span>
+          </button>
+        </div>
       </div>
     </article>
   );

@@ -1,0 +1,8 @@
+verde_catalog.shopping_list:
+  path: '/shopping-list'
+  defaults:
+    _controller: '\Drupal\verde_catalog\Controller\ShoppingListController::page'
+    _title: 'Shopping list'
+  requirements:
+    # Everyone may open the page: the list itself lives in the visitor's browser.
+    _access: 'TRUE'

@@ -1,0 +1,12 @@
+{#
+  Shopping list button. Both labels are in the markup; shopping-list.js shows
+  the one that fits. The visually hidden product name makes the accessible
+  name unique on pages with many cards: "Add to list: Green Glow Smoothie".
+#}
+{% set attributes = attributes|default(create_attribute()) %}
+<button type="button"{{ attributes.addClass('shopping-list-button') }} data-shopping-list-toggle data-product-id="{{ product_id }}" data-product-title="{{ product_title }}">
+  <span class="shopping-list-button__icon" aria-hidden="true"></span>
+  <span data-label="add">{{ add_label }}</span>
+  <span data-label="remove" hidden>{{ remove_label }}</span>
+  <span class="shopping-list-button__context">: {{ product_title }}</span>
+</button>

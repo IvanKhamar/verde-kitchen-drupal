@@ -1,0 +1,55 @@
+.shopping-list-button {
+  // Above the card's stretched link, so the click reaches the button.
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-dark);
+  cursor: pointer;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+
+  &:hover {
+    background-color: var(--color-primary-light);
+  }
+
+  &.is-in-list {
+    color: #fff;
+    background-color: var(--color-primary);
+
+    &:hover {
+      background-color: var(--color-primary-dark);
+    }
+  }
+
+  // The button only works with JavaScript.
+  @media (scripting: none) {
+    display: none;
+  }
+}
+
+// "+" when the product can be added, "✓" when it is on the list.
+.shopping-list-button__icon::before {
+  content: '+';
+}
+
+.shopping-list-button.is-in-list .shopping-list-button__icon::before {
+  content: '✓';
+}
+
+// For screen readers only: the product name.
+.shopping-list-button__context {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}

@@ -26,6 +26,10 @@ const libraryEntries = {
   'dist/css/catalog-filter': './src/scss/pages/catalog-filter.scss',
   // The React widget: one file with React included, loaded only on /products.
   'dist/js/catalog-filter': './src/js/catalog-filter/index.jsx',
+  // Shopping list: a small script for every page, and the list page (React).
+  'dist/js/shopping-list': './src/js/shopping-list/index.js',
+  'dist/js/shopping-list-page': './src/js/shopping-list/page.jsx',
+  'dist/css/shopping-list-page': './src/scss/pages/shopping-list-page.scss',
 };
 
 // Component styles: every components/<name>/<name>.scss found on disk.

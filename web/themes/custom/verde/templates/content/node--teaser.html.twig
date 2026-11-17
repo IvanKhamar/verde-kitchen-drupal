@@ -9,11 +9,18 @@
  * Products and articles look the same as cards, so one node--teaser
  * template is enough.
  *
- * "card" is prepared in verde_preprocess_node(). Slots receive rendered
- * fields, so image styles and text formats still apply.
+ * "card" and "shopping_list" are prepared in verde_preprocess_node(). Slots
+ * receive rendered fields, so image styles and text formats still apply.
+ * {% set actions %}…{% endset %} captures the button's markup for the slot.
  */
 #}
+{% set actions %}
+  {% if shopping_list %}
+    {{ include('verde:shopping-list-button', shopping_list, with_context = false) }}
+  {% endif %}
+{% endset %}
 {{ include('verde:card', card|merge({
   image: content.field_image,
   summary: content.body,
+  actions: shopping_list ? actions : '',
 }), with_context = false) }}

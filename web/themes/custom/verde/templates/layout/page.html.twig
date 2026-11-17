@@ -23,6 +23,18 @@
     <div class="site-header__inner container">
       {{ page.header }}
       {{ page.primary_menu }}
+      {#
+        Shopping list link with a counter. shopping-list.js fills the counter
+        and sets an aria-label such as "Shopping list, 3 items".
+      #}
+      <a href="{{ path('verde_catalog.shopping_list') }}" class="shopping-list-link" data-shopping-list-link>
+        <svg class="shopping-list-link__icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+          <path d="M4 7h16l-1.5 11.5a2 2 0 0 1-2 1.5h-9a2 2 0 0 1-2-1.5L4 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M9 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="shopping-list-link__text">{{ 'Shopping list'|t }}</span>
+        <span class="shopping-list-link__count" data-shopping-list-count hidden></span>
+      </a>
     </div>
   </header>
 

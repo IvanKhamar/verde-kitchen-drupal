@@ -210,3 +210,27 @@ export function filterProducts(products, { search = '', category = '' } = {}) {
       (!query || product.title.toLocaleLowerCase().includes(query)) && (!category || product.categoryId === category),
   );
 }
+
+/**
+ * Builds the URL that loads specific products by UUID: the shopping list page
+ * asks only for the products on the list.
+ *
+ * JSON:API's IN operator takes the values as an array:
+ * filter[ids][condition][value][]=A&filter[ids][condition][value][]=B
+ *
+ * @param {string} apiBase - The JSON:API root, usually "/jsonapi".
+ * @param {string[]} ids - Product UUIDs.
+ * @param {string} [langcode] - Limits the results to one language.
+ * @returns {string} A root-relative URL.
+ */
+export function buildProductsByIdUrl(apiBase, ids, langcode = '') {
+  const params = new URLSearchParams();
+  params.set('filter[status]', '1');
+  params.set('fields[node--product]', PRODUCT_FIELDS);
+  params.set('page[limit]', '50');
+  params.set('filter[ids][condition][path]', 'id');
+  params.set('filter[ids][condition][operator]', 'IN');
+  ids.forEach((id) => params.append('filter[ids][condition][value][]', id));
+  if (langcode) params.set('filter[langcode]', langcode);
+  return `${apiBase}/node/product?${params}`;
+}

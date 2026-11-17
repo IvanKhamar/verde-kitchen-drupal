@@ -5,6 +5,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
+  buildProductsByIdUrl,
   buildProductsUrl,
   buildTermsUrl,
   filterByTags,
@@ -174,5 +175,14 @@ describe('filterProducts (static copy)', () => {
 describe('staticDataUrls', () => {
   it('points to the exported files of a language', () => {
     assert.equal(staticDataUrls('/base/static-data/uk').products, '/base/static-data/uk/products.json');
+  });
+});
+
+describe('buildProductsByIdUrl', () => {
+  it('asks for the given UUIDs with the IN operator', () => {
+    const p = params(buildProductsByIdUrl('/uk/jsonapi', ['a', 'b'], 'uk'));
+    assert.equal(p.get('filter[ids][condition][operator]'), 'IN');
+    assert.deepEqual(p.getAll('filter[ids][condition][value][]'), ['a', 'b']);
+    assert.equal(p.get('filter[langcode]'), 'uk');
   });
 });

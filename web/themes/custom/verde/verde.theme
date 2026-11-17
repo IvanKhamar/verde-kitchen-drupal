@@ -46,6 +46,7 @@ function verde_preprocess_node(array &$variables): void {
   $node = $variables['node'];
   $variables['attributes']['class'][] = 'node--type-' . $node->bundle();
   $variables['attributes']['class'][] = 'node--view-mode-' . $variables['view_mode'];
+  $variables['shopping_list'] = NULL;
 
   // Cards sit under an <h2> section heading on the home page, and directly
   // under the page <h1> elsewhere. Heading levels must not skip (h1 -> h3).
@@ -78,6 +79,14 @@ function verde_preprocess_node(array &$variables): void {
     if ($variables['view_mode'] === 'full') {
       $variables['where_to_buy'] = verde_where_to_buy($node, $cacheability);
     }
+    // Props of the shopping list button. The UUID, not the node ID: it is the
+    // ID JSON:API uses, so the list page can load the products by it.
+    $variables['shopping_list'] = [
+      'product_id' => $node->uuid(),
+      'product_title' => (string) $node->label(),
+      'add_label' => (string) t('Add to list'),
+      'remove_label' => (string) t('Remove from list'),
+    ];
     $cacheability->applyTo($variables);
   }
 

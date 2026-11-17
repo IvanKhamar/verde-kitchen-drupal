@@ -1,0 +1,21 @@
+{#
+/**
+ * @file
+ * Theme override for the shopping list page (route verde_catalog.shopping_list).
+ *
+ * The module's default template only has a mount point; this one adds the
+ * theme's React app and a fallback text for browsers without JavaScript.
+ */
+#}
+{{ attach_library('verde/shopping-list-page') }}
+<div
+  class="shopping-list-page"
+  data-shopping-list-page
+  data-api-base="{{ api_base }}"
+  data-base-path="{{ base_path }}"
+  {% if static_data %}data-static-data="{{ static_data }}"{% endif %}
+>
+  <noscript>
+    <p>{{ 'The shopping list is kept in your browser and needs JavaScript.'|t }}</p>
+  </noscript>
+</div>

@@ -1,0 +1,47 @@
+@use '../abstracts' as *;
+
+// Header link to the shopping list, with the number of items.
+.shopping-list-link {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+
+  &:hover {
+    color: var(--color-primary-dark);
+    background-color: var(--color-surface-alt);
+  }
+}
+
+// Only the icon and the counter on small screens; the name stays in the
+// accessible name (aria-label set by shopping-list.js).
+.shopping-list-link__text {
+  @media (width < 480px) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+}
+
+.shopping-list-link__count {
+  min-width: 1.5rem;
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  line-height: 1.5rem;
+  color: #fff;
+  text-align: center;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-pill);
+
+  &[hidden] {
+    display: none;
+  }
+}
