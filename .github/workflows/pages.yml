@@ -1,0 +1,111 @@
+name: Pages
+
+# Publishes a static copy of the site and the Storybook to GitHub Pages:
+# https://ivankhamar.github.io/verde-kitchen-drupal/ (Storybook under /storybook/).
+# Runs only after CI has passed on main, so a broken build is never published.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer run waits instead of cancelling a deployment.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the static site
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    # Same throwaway database as in CI; the site only exists during this job.
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_DATABASE: drupal
+          MARIADB_USER: drupal
+          MARIADB_PASSWORD: drupal
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      # Not a secret: the build site is deleted when the job ends.
+      DRUPAL_HASH_SALT: ci-only-hash-salt-not-a-secret
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The commit CI tested, not whatever main points to now.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, pdo_mysql
+          tools: composer:v2
+          coverage: none
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install Node dependencies
+        run: npm ci
+      - name: Build theme assets and Storybook
+        run: |
+          npm run build
+          npm run build-storybook
+      - name: Install the site with the demo content
+        env:
+          DB_URL: mysql://drupal:drupal@127.0.0.1:3306/drupal
+        run: bash scripts/ci/install-site.sh
+      - name: Export static HTML (Tome)
+        env:
+          # The theme adds the "static preview" notice and the widget's data folder.
+          VERDE_STATIC_EXPORT: '1'
+        run: |
+          vendor/bin/drush pm:install tome_static --yes
+          vendor/bin/drush cache:rebuild
+          vendor/bin/drush tome:static --uri=https://ivankhamar.github.io --yes
+      - name: Build the GitHub Pages site (sub-path, widget data, CSP meta, Storybook)
+        env:
+          PHP_CLI_SERVER_WORKERS: '4'
+        run: |
+          vendor/bin/drush runserver 127.0.0.1:8888 > /tmp/runserver.log 2>&1 &
+          for _ in $(seq 1 30); do curl --silent --output /dev/null http://127.0.0.1:8888/ && break; sleep 1; done
+          node scripts/static/build.mjs --export html --api http://127.0.0.1:8888 --storybook storybook-static
+      - name: Check the static site (links, catalog filter)
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: node scripts/static/check.mjs --dir html
+      # The repository is public, and so is everything published: scan the
+      # finished site for keys and passwords before it leaves the runner.
+      - name: Scan the site for secrets
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            dir /repo/html --redact --no-banner --config /repo/.gitleaks.toml
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: html
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
