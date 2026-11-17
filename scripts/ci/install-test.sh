@@ -13,13 +13,7 @@ set -euo pipefail
 drush=vendor/bin/drush
 base_url=http://127.0.0.1:8888
 
-# A random admin password that is never printed: without --account-pass, Drush
-# would print a generated one, and CI logs of a public repository are public.
-$drush site:install --existing-config --db-url="$DB_URL" --account-pass="$(openssl rand -hex 24)" --yes
-# Ukrainian interface translations (localize.drupal.org and the theme's .po file).
-$drush locale:check
-$drush locale:update
-$drush php:script scripts/demo-content/demo-content.php
+bash scripts/ci/install-site.sh
 
 # The active configuration must match config/sync exactly.
 changes=$($drush config:status --format=list 2>/dev/null)
