@@ -1,0 +1,40 @@
+{#
+  Where to buy. Shop links open in the same tab: opening new tabs surprises
+  keyboard and screen reader users. A hidden hint says that the link leaves
+  the site; rel="external" marks it for browsers and search engines.
+#}
+{% set attributes = attributes|default(create_attribute()) %}
+{% set heading_id = ('where-to-buy-heading')|clean_unique_id %}
+<section{{ attributes.addClass('where-to-buy').setAttribute('aria-labelledby', heading_id) }}>
+  <h2 id="{{ heading_id }}" class="where-to-buy__heading">{{ heading }}</h2>
+
+  {% if online %}
+    <h3 class="where-to-buy__subheading">{{ online_heading }}</h3>
+    <ul class="where-to-buy__online" role="list">
+      {% for shop in online %}
+        <li>
+          <a href="{{ shop.url }}" class="where-to-buy__shop" rel="external noopener">
+            {{- shop.label -}}
+            {% if external_hint %}<span class="where-to-buy__hint"> {{ external_hint }}</span>{% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if stores %}
+    <h3 class="where-to-buy__subheading">{{ stores_heading }}</h3>
+    <ul class="where-to-buy__stores" role="list">
+      {% for store in stores %}
+        <li class="where-to-buy__store">
+          <span class="where-to-buy__store-name">{{ store.name }}</span>
+          {% if store.cities %}<span class="where-to-buy__cities">{{ store.cities }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if not online and not stores %}
+    <p class="where-to-buy__empty">{{ empty_text }}</p>
+  {% endif %}
+</section>

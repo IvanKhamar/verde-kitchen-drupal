@@ -75,15 +75,16 @@ ddev drush php:script scripts/demo-content/demo-content.php
 
 ## Content model
 
-| Content type | Fields                                                                      |
-| ------------ | --------------------------------------------------------------------------- |
-| Product      | title, image, description (with summary), category, dietary tags, price (€) |
-| Article      | title, article type (recipe / news), image, body                            |
+| Content type | Fields                                                                                                |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| Product      | title, image, description (with summary), category, dietary tags, price (€), where to buy (retailers) |
+| Article      | title, article type (recipe / news), image, body                                                      |
 
-| Vocabulary       | Terms                                                                    |
-| ---------------- | ------------------------------------------------------------------------ |
-| Product category | Drinks, Bowls, Snacks, Breakfast                                         |
-| Dietary tag      | Vegan, Vegetarian, Gluten-free, Dairy-free, High protein, No added sugar |
+| Vocabulary       | Terms                                                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Product category | Drinks, Bowls, Snacks, Breakfast                                                                                     |
+| Dietary tag      | Vegan, Vegetarian, Gluten-free, Dairy-free, High protein, No added sugar                                             |
+| Retailer         | Online shops (website link) and store chains (cities): GreenBasket, Daily Box, FreshCorner, Market 37 — all invented |
 
 | Custom block type | Fields                                             |
 | ----------------- | -------------------------------------------------- |
@@ -133,14 +134,15 @@ The theme's UI parts are [Single Directory Components](https://www.drupal.org/do
 in `web/themes/custom/verde/components/`. Each folder holds the component's metadata
 (`*.component.yml`, with a JSON schema for its props), Twig template, SCSS and, if needed, JS.
 
-| Component     | Used for                                                        |
-| ------------- | --------------------------------------------------------------- |
-| `button`      | Calls to action (link or `<button>`)                            |
-| `badge`       | Dietary tags, article type                                      |
-| `card`        | Product and article teasers; the whole card is clickable        |
-| `hero`        | Home hero (`<h1>`) and promo banner                             |
-| `teaser-grid` | Every list of cards; responsive grid without media queries      |
-| `navigation`  | Main menu with an accessible mobile toggle (disclosure pattern) |
+| Component      | Used for                                                                                  |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| `button`       | Calls to action (link or `<button>`)                                                      |
+| `badge`        | Dietary tags, article type                                                                |
+| `card`         | Product and article teasers; the whole card is clickable                                  |
+| `hero`         | Home hero (`<h1>`) and promo banner                                                       |
+| `teaser-grid`  | Every list of cards; responsive grid without media queries                                |
+| `navigation`   | Main menu with an accessible mobile toggle (disclosure pattern)                           |
+| `where-to-buy` | Product page: online shops as external links, store chains with their cities, empty state |
 
 ### Storybook
 

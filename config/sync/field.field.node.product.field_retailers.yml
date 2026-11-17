@@ -1,0 +1,28 @@
+uuid: c9e81654-f740-4c1b-b218-b1e52ae37a2a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_retailers
+    - node.type.product
+    - taxonomy.vocabulary.retailer
+id: node.product.field_retailers
+field_name: field_retailers
+entity_type: node
+bundle: product
+label: 'Where to buy'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      retailer: retailer
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+field_type: entity_reference

@@ -1,0 +1,8 @@
+settings:
+  allowed_values:
+    -
+      value: online
+      label: Інтернет-магазин
+    -
+      value: store
+      label: 'Мережа магазинів'

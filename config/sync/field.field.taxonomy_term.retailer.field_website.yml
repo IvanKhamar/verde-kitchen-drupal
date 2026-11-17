@@ -1,0 +1,23 @@
+uuid: 6518f831-5735-4441-bd02-1cb8d2af6462
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_website
+    - taxonomy.vocabulary.retailer
+  module:
+    - link
+id: taxonomy_term.retailer.field_website
+field_name: field_website
+entity_type: taxonomy_term
+bundle: retailer
+label: Website
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 0
+  link_type: 16
+field_type: link

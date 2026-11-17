@@ -92,3 +92,22 @@ msgstr "Відкрити повний сайт"
 
 msgid "Source code"
 msgstr "Вихідний код"
+
+# Where to buy (verde_where_to_buy()).
+msgid "Where to buy"
+msgstr "Де купити"
+
+msgid "Online"
+msgstr "Онлайн"
+
+msgid "In stores"
+msgstr "У магазинах"
+
+msgid "Buy at @shop"
+msgstr "Купити в @shop"
+
+msgid "(external site)"
+msgstr "(зовнішній сайт)"
+
+msgid "Not in shops yet. Check back soon."
+msgstr "Поки що немає в продажу. Загляньте пізніше."

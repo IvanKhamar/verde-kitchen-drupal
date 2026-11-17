@@ -1,0 +1,44 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Where to buy
+status: stable
+description: Online shops (links to their sites) and store chains (with cities) that sell a product.
+props:
+  type: object
+  required:
+    - heading
+  properties:
+    heading:
+      type: string
+      title: Heading
+    online_heading:
+      type: string
+      title: Heading of the online shops list
+    stores_heading:
+      type: string
+      title: Heading of the store chains list
+    empty_text:
+      type: string
+      title: Text when no shop sells the product
+    external_hint:
+      type: string
+      title: Hidden text after each shop link
+      description: Tells screen reader users that the link leaves the site, for example "(external site)".
+    online:
+      type: array
+      title: Online shops
+      items:
+        type: object
+        required: [name, url, label]
+        properties:
+          name: { type: string }
+          url: { type: string }
+          label: { type: string, description: 'Link text, for example "Buy at GreenBasket".' }
+    stores:
+      type: array
+      title: Store chains
+      items:
+        type: object
+        required: [name]
+        properties:
+          name: { type: string }
+          cities: { type: string, description: 'Comma-separated city names.' }
