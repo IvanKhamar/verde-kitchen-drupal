@@ -11,7 +11,9 @@
   "scripts": {
     "build": "webpack --mode=production",
     "watch": "webpack --mode=development --watch",
-    "test": "node --test \"web/themes/custom/verde/src/js/**/*.test.js\""
+    "test": "node --test \"web/themes/custom/verde/src/js/**/*.test.js\"",
+    "screenshots": "node scripts/screenshots.mjs",
+    "audit:site": "node scripts/audit.mjs"
   },
   "browserslist": [
     "last 2 Chrome versions",
@@ -26,8 +28,11 @@
     "@babel/preset-env": "^8.0.7",
     "@babel/preset-react": "^8.0.1",
     "autoprefixer": "^10.6.2",
+    "axe-core": "^4.14.1",
     "babel-loader": "^10.1.1",
+    "chrome-launcher": "^1.2.3",
     "css-loader": "^7.1.5",
+    "lighthouse": "^13.6.0",
     "mini-css-extract-plugin": "^2.10.2",
     "postcss": "^8.5.33",
     "postcss-loader": "^8.2.1",
