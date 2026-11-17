@@ -96,12 +96,13 @@ page" are the featured products on the home page.
 
 ## Pages
 
-| Path                               | What it shows                                          | Built with                       |
-| ---------------------------------- | ------------------------------------------------------ | -------------------------------- |
-| `/`                                | Hero, featured products, promo banner, latest articles | Views page + blocks on `<front>` |
-| `/products`                        | Product catalog                                        | View `products`                  |
-| `/articles`                        | Recipes and news, newest first, 6 per page             | View `articles`                  |
-| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)     | `node--TYPE--full.html.twig`     |
+| Path                               | What it shows                                             | Built with                       |
+| ---------------------------------- | --------------------------------------------------------- | -------------------------------- |
+| `/`                                | Hero, featured products, promo banner, latest articles    | Views page + blocks on `<front>` |
+| `/products`                        | Product catalog                                           | View `products`                  |
+| `/articles`                        | Recipes and news, newest first, 6 per page                | View `articles`                  |
+| `/shopping-list`                   | The visitor's shopping list (React, saved in the browser) | Route in `verde_catalog` + React |
+| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)        | `node--TYPE--full.html.twig`     |
 
 Every page also exists in Ukrainian under `/uk/`, for example `/uk/products/smuzi-zelene-syayvo`.
 
@@ -134,15 +135,16 @@ The theme's UI parts are [Single Directory Components](https://www.drupal.org/do
 in `web/themes/custom/verde/components/`. Each folder holds the component's metadata
 (`*.component.yml`, with a JSON schema for its props), Twig template, SCSS and, if needed, JS.
 
-| Component      | Used for                                                                                  |
-| -------------- | ----------------------------------------------------------------------------------------- |
-| `button`       | Calls to action (link or `<button>`)                                                      |
-| `badge`        | Dietary tags, article type                                                                |
-| `card`         | Product and article teasers; the whole card is clickable                                  |
-| `hero`         | Home hero (`<h1>`) and promo banner                                                       |
-| `teaser-grid`  | Every list of cards; responsive grid without media queries                                |
-| `navigation`   | Main menu with an accessible mobile toggle (disclosure pattern)                           |
-| `where-to-buy` | Product page: online shops as external links, store chains with their cities, empty state |
+| Component              | Used for                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------- |
+| `button`               | Calls to action (link or `<button>`)                                                      |
+| `badge`                | Dietary tags, article type                                                                |
+| `card`                 | Product and article teasers; the whole card is clickable                                  |
+| `hero`                 | Home hero (`<h1>`) and promo banner                                                       |
+| `teaser-grid`          | Every list of cards; responsive grid without media queries                                |
+| `navigation`           | Main menu with an accessible mobile toggle (disclosure pattern)                           |
+| `where-to-buy`         | Product page: online shops as external links, store chains with their cities, empty state |
+| `shopping-list-button` | "Add to list" / "Remove from list" toggle on product cards and product pages              |
 
 ### Storybook
 
@@ -184,6 +186,28 @@ tags. Source: `web/themes/custom/verde/src/js/catalog-filter/`.
   controls with labels, so the widget works with the keyboard.
 - **Tests:** `npm test` runs unit tests for the JSON:API helpers with Node's built-in
   test runner.
+
+## Shopping list
+
+Visitors can collect products into a shopping list and take it to the shop: "Add to list"
+on every product card and product page, a counter in the header, and a list page at
+`/shopping-list` with quantities, an estimated total, "Print list" and "Clear list".
+
+- **No accounts, no server state:** the list is product UUIDs and quantities in
+  `localStorage` (`src/js/shopping-list/store.js`, pure functions with unit tests). The
+  data is validated on every read, so a broken or edited value never breaks the page.
+  This also keeps every page cacheable for anonymous visitors.
+- **Two scripts:** a small plain-JavaScript file on every page (no React) handles the
+  buttons and the counter; React loads only on the list page, which fetches the products
+  by UUID from JSON:API in the page language (or from the exported JSON in the static copy).
+- **Sync:** a custom event updates every button and the counter on the page, and the
+  browser's `storage` event keeps other open tabs in step.
+- **Accessibility:** the button names include the product ("Add to list: Berry Kombucha"),
+  changes are announced with `Drupal.announce()`, the header link says how many items the
+  list holds, quantity buttons use `aria-disabled` at the limits so keyboard focus is not
+  lost, and "Clear list" asks first and moves focus to the safe choice.
+- **Without JavaScript** the buttons are hidden and the list page explains that it needs
+  JavaScript; the rest of the site works as before.
 
 ## Working with configuration
 
@@ -288,11 +312,15 @@ ddev npm test
 Firefox and WebKit (Safari's engine), and phone emulation for Chrome on Android and Safari on
 iOS. The tests live in `tests/e2e/`:
 
-| File                 | What it checks                                                                                                                                                   |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `navigation.spec.js` | Skip link focus, the mobile menu with the keyboard (Enter, Escape), wide-screen menu                                                                             |
-| `catalog.spec.js`    | Search, category, "all selected tags", empty state, "Clear filters" focus, API error and "Try again" (the API failure is simulated), the page without JavaScript |
-| `pages.spec.js`      | One `<h1>` per page, `lang`, meta description, Product JSON-LD, responsive WebP images                                                                           |
+| File                    | What it checks                                                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `navigation.spec.js`    | Skip link focus, the mobile menu with the keyboard (Enter, Escape), wide-screen menu                                                                               |
+| `catalog.spec.js`       | Search, category, "all selected tags", empty state, "Clear filters" focus, API error and "Try again" (the API failure is simulated), the page without JavaScript   |
+| `pages.spec.js`         | One `<h1>` per page, `lang`, meta description, Product JSON-LD, responsive WebP images                                                                             |
+| `i18n.spec.js`          | Language switcher, `hreflang`, the Ukrainian home page and catalog filter                                                                                          |
+| `security.spec.js`      | Security headers, read-only JSON:API, closed registration, HTML from the API shown as text                                                                         |
+| `where-to-buy.spec.js`  | Online shops as external links, store chains with cities, empty state, Ukrainian version                                                                           |
+| `shopping-list.spec.js` | Adding from product pages and React cards, header counter, quantities and totals, remove, "Clear list" confirmation and focus, persistence after reload, Ukrainian |
 
 ```bash
 BASE_URL="http://127.0.0.1:PORT" npm run test:e2e
