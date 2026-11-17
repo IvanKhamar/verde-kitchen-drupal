@@ -15,6 +15,11 @@ return [
     'breakfast' => 'Сніданки',
   ],
 
+  'cities' => [
+    'fresh-corner' => ['Львів', 'Київ', 'Харків'],
+    'market-37' => ['Львів', 'Одеса'],
+  ],
+
   'dietary_tags' => [
     'vegan' => 'Веганське',
     'vegetarian' => 'Вегетаріанське',

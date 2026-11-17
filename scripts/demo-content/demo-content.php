@@ -226,6 +226,34 @@ $articles = [
 ];
 
 // Menu => [title, link URI]. "internal:" links point to paths on this site.
+// Where to buy: invented retailers. The links go to example.com, a domain
+// reserved for examples, so they never point to a real shop.
+$retailers = [
+  'greenbasket' => ['GreenBasket', 'online', 'https://www.example.com/greenbasket', []],
+  'daily-box' => ['Daily Box', 'online', 'https://www.example.com/daily-box', []],
+  'fresh-corner' => ['FreshCorner', 'store', '', ['Lviv', 'Kyiv', 'Kharkiv']],
+  'market-37' => ['Market 37', 'store', '', ['Lviv', 'Odesa']],
+];
+
+// Product => retailers. The spelt banana loaf is in no shop yet, to show
+// the empty state.
+$product_retailers = [
+  'green-glow-smoothie' => ['greenbasket', 'fresh-corner', 'market-37'],
+  'ginger-lemon-shot' => ['greenbasket', 'fresh-corner'],
+  'oat-barista-drink' => ['greenbasket', 'daily-box', 'fresh-corner', 'market-37'],
+  'berry-kombucha' => ['fresh-corner'],
+  'quinoa-power-bowl' => ['daily-box', 'fresh-corner'],
+  'mediterranean-lentil-bowl' => ['daily-box'],
+  'teriyaki-tofu-bowl' => ['daily-box', 'market-37'],
+  'almond-date-bar' => ['greenbasket', 'daily-box', 'fresh-corner', 'market-37'],
+  'sea-salt-chickpea-crisps' => ['greenbasket', 'market-37'],
+  'cocoa-hazelnut-bites' => ['greenbasket'],
+  'spelt-banana-loaf' => [],
+  'mango-overnight-oats' => ['fresh-corner'],
+  'buckwheat-granola' => ['greenbasket', 'daily-box', 'fresh-corner'],
+  'chia-coconut-pudding' => ['daily-box', 'market-37'],
+];
+
 $menus = [
   'main' => [
     ['Home', 'internal:/'],
@@ -325,7 +353,7 @@ $node_storage->delete($node_storage->loadMultiple($node_ids));
 $term_storage = $entity_type_manager->getStorage('taxonomy_term');
 $term_ids = $term_storage->getQuery()
   ->accessCheck(FALSE)
-  ->condition('vid', ['product_category', 'dietary_tag'], 'IN')
+  ->condition('vid', ['product_category', 'dietary_tag', 'retailer'], 'IN')
   ->execute();
 $term_storage->delete($term_storage->loadMultiple($term_ids));
 
@@ -338,6 +366,21 @@ $link_storage->delete($link_storage->loadByProperties(['menu_name' => array_keys
 $uk = require __DIR__ . '/demo-content.uk.php';
 $category_ids = verde_demo_terms('product_category', $categories, $uk['categories']);
 $tag_ids = verde_demo_terms('dietary_tag', $dietary_tags, $uk['dietary_tags']);
+
+$retailer_ids = [];
+foreach ($retailers as $slug => [$name, $type, $website, $cities]) {
+  $term = Term::create([
+    'vid' => 'retailer',
+    'name' => $name,
+    'field_retailer_type' => $type,
+    'field_website' => $website ? ['uri' => $website] : [],
+    'field_cities' => $cities,
+  ]);
+  $term->save();
+  // Shop names are brands and stay the same; city names are translated.
+  verde_demo_translate($term, ['name' => $name, 'field_cities' => $uk['cities'][$slug] ?? []]);
+  $retailer_ids[$slug] = (int) $term->id();
+}
 
 // Fixed dates keep the order of products stable (useful for screenshots).
 $created = strtotime('2026-09-01 09:00');
@@ -359,6 +402,7 @@ foreach ($products as $slug => $product) {
     'field_category' => $category_ids[$product['category']],
     'field_dietary_tags' => array_map(fn(string $tag) => $tag_ids[$tag], $product['tags']),
     'field_price' => $product['price'],
+    'field_retailers' => array_map(fn(string $retailer) => $retailer_ids[$retailer], $product_retailers[$slug]),
   ]);
   $node->save();
   $translation = $uk['products'][$slug];
@@ -437,9 +481,10 @@ foreach ($banners as $uuid => $banner) {
 }
 
 printf(
-  "Demo content created: %d categories, %d dietary tags, %d products, %d articles, %d menu links, %d banners.\n",
+  "Demo content created: %d categories, %d dietary tags, %d retailers, %d products, %d articles, %d menu links, %d banners.\n",
   count($category_ids),
   count($tag_ids),
+  count($retailer_ids),
   count($products),
   count($articles),
   count($menus['main']) + count($menus['footer']),
