@@ -16,6 +16,9 @@ base_url=http://127.0.0.1:8888
 # A random admin password that is never printed: without --account-pass, Drush
 # would print a generated one, and CI logs of a public repository are public.
 $drush site:install --existing-config --db-url="$DB_URL" --account-pass="$(openssl rand -hex 24)" --yes
+# Ukrainian interface translations (localize.drupal.org and the theme's .po file).
+$drush locale:check
+$drush locale:update
 $drush php:script scripts/demo-content/demo-content.php
 
 # The active configuration must match config/sync exactly.
@@ -63,5 +66,13 @@ grep --quiet '<meta property="og:image"' <<< "$product"
 grep --quiet '<script type="application/ld+json">' <<< "$product"
 # Responsive images: srcset with WebP files.
 grep --quiet 'srcset="[^"]*\.webp' <<< "$product"
+
+# Ukrainian: translated content under /uk, interface strings from the .po file.
+home_uk=$(curl --fail --silent --show-error "$base_url/uk")
+grep --quiet '<html lang="uk"' <<< "$home_uk"
+grep --quiet 'Свіжа їжа, від якої добре' <<< "$home_uk"
+grep --quiet 'Перейти до основного вмісту' <<< "$home_uk"
+product_uk=$(curl --fail --silent --show-error "$base_url/uk/products/smuzi-zelene-syayvo")
+grep --quiet 'hreflang="en"' <<< "$product_uk"
 
 echo "Install test passed."
