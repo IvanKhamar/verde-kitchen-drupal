@@ -43,10 +43,6 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
 
-  // `hidden` must win over display: inline-flex above.
-  &[hidden] {
-    display: none;
-  }
 }
 
 // Three bars drawn with one element and two pseudo-elements.
@@ -79,9 +75,19 @@
   }
 }
 
-// Small screens with JavaScript: the list becomes a panel under the header.
-@media (width < 768px) {
-  .navigation--enhanced .navigation__list {
+// The button is only useful with JavaScript, and the panel only on small
+// screens. `(scripting: enabled)` is a CSS media feature: the browser knows
+// before any script runs whether JavaScript is on. So the header has its final
+// layout on the very first paint, and nothing jumps when navigation.js loads
+// (no Cumulative Layout Shift). Without JavaScript the links stay visible.
+@media (scripting: none), (width >= 768px) {
+  .navigation__toggle {
+    display: none;
+  }
+}
+
+@media (scripting: enabled) and (width < 768px) {
+  .navigation__list {
     position: absolute;
     top: 100%;
     right: 0;
@@ -95,14 +101,7 @@
     box-shadow: var(--shadow-md);
   }
 
-  .navigation--enhanced.is-open .navigation__list {
+  .navigation.is-open .navigation__list {
     display: flex;
-  }
-}
-
-// Wide screens: always show the links, never the button.
-@include mq('md') {
-  .navigation__toggle:not([hidden]) {
-    display: none;
   }
 }

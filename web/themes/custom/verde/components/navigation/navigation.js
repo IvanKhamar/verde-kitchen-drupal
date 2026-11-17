@@ -22,9 +22,7 @@
           nav.classList.toggle('is-open', open);
         };
 
-        // From here on the list is collapsed on small screens (see navigation.scss).
-        toggle.hidden = false;
-        nav.classList.add('navigation--enhanced');
+        // The layout (button shown, list collapsed) comes from CSS: see navigation.scss.
 
         toggle.addEventListener('click', () => setOpen(!isOpen()));
 
