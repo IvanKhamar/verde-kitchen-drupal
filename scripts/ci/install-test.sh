@@ -13,7 +13,9 @@ set -euo pipefail
 drush=vendor/bin/drush
 base_url=http://127.0.0.1:8888
 
-$drush site:install --existing-config --db-url="$DB_URL" --yes
+# A random admin password that is never printed: without --account-pass, Drush
+# would print a generated one, and CI logs of a public repository are public.
+$drush site:install --existing-config --db-url="$DB_URL" --account-pass="$(openssl rand -hex 24)" --yes
 $drush php:script scripts/demo-content/demo-content.php
 
 # The active configuration must match config/sync exactly.
