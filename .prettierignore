@@ -26,3 +26,6 @@ config/sync/
 # DDEV writes its own config; the audit script writes its own report.
 .ddev/
 docs/audit-results.md
+
+# Storybook build output.
+storybook-static/
