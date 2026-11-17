@@ -7,7 +7,21 @@ performance and SEO.
 
 > Verde Kitchen is an invented brand. It is not connected to any real company.
 
-**Status:** complete. Built in seven phases; the history is in the [pull requests](https://github.com/IvanKhamar/verde-kitchen-drupal/pulls?q=is%3Apr).
+**Status:** complete. Built in seven phases plus extras (E2E tests, Storybook, Ukrainian
+version, security, deployment); the history is in the
+[pull requests](https://github.com/IvanKhamar/verde-kitchen-drupal/pulls?q=is%3Apr).
+
+## Live demo
+
+| What                                     | Where                                                                                                               |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Static copy of the site (both languages) | [ivankhamar.github.io/verde-kitchen-drupal](https://ivankhamar.github.io/verde-kitchen-drupal/)                     |
+| Storybook (components)                   | [ivankhamar.github.io/verde-kitchen-drupal/storybook](https://ivankhamar.github.io/verde-kitchen-drupal/storybook/) |
+
+The static copy is exported from Drupal with [Tome](https://www.drupal.org/project/tome) on
+every green build of `main` (`.github/workflows/pages.yml`). GitHub Pages has no PHP, so it has
+no admin and no live JSON:API: the catalog filter reads exported JSON files and filters in the
+browser. How it is built: [Deployment](#deployment).
 
 ## Stack
 
@@ -302,6 +316,26 @@ git config core.hooksPath .githooks
 ```
 
 The project rules are in `.gitleaks.toml`; CI runs the same scan over the whole history.
+
+## Deployment
+
+### GitHub Pages: static copy and Storybook
+
+`.github/workflows/pages.yml` runs after CI passes on `main`:
+
+1. installs the site in a throwaway database (`scripts/ci/install-site.sh`), like CI;
+2. exports every page to HTML with Tome (`drush tome:static`), with `VERDE_STATIC_EXPORT=1`,
+   so the theme adds a "static preview" notice and points the catalog widget to exported data;
+3. `scripts/static/build.mjs` prepares the files for GitHub Pages: it adds the sub-path
+   `/verde-kitchen-drupal` to every URL (Tome exports from the site root, which avoids a Tome
+   problem with language prefixes under a sub-path), writes the widget's JSON files per language,
+   puts the Content Security Policy into a `<meta>` tag (GitHub Pages cannot send headers),
+   removes raw JSON:API documents, and adds the Storybook build;
+4. `scripts/static/check.mjs` follows every internal link, image, script and stylesheet and
+   tests the catalog filter in both languages; gitleaks scans the finished site for secrets;
+5. the site is published with `actions/deploy-pages`.
+
+Tome is a development dependency: it is installed for the export and never on a production server.
 
 ## Security
 
