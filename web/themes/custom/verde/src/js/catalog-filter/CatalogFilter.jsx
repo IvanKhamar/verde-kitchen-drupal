@@ -3,11 +3,9 @@ import { buildProductsUrl, buildTermsUrl, fetchJsonApi, filterByTags, parseProdu
 import ProductCard from './ProductCard.jsx';
 import useDebouncedValue from './useDebouncedValue.js';
 
-// Drupal.t() makes strings translatable in the Drupal admin UI. The fallback
-// keeps the component usable outside Drupal (for example in tests).
-const t = (text, args) => window.Drupal?.t(text, args) ?? text;
-const formatPlural = (count, singular, plural) =>
-  window.Drupal?.formatPlural(count, singular, plural) ?? (count === 1 ? singular : plural).replace('@count', count);
+// Strings are passed to Drupal.t() and Drupal.formatPlural() as literals:
+// Drupal scans the JavaScript files of a library for these calls, and only
+// strings it finds there get Ukrainian translations in the browser.
 
 const EMPTY_FILTERS = { search: '', category: '', tags: [] };
 
@@ -20,12 +18,14 @@ const EMPTY_FILTERS = { search: '', category: '', tags: [] };
  *
  * @param {object} props - Component props.
  * @param {string} props.apiBase - JSON:API root, for example "/jsonapi".
- * @param {string} props.basePath - Site base path, for example "/".
+ * @param {string} props.basePath - Front page path for the current language,
+ *   "/" or "/uk": product links get the same language prefix.
+ * @param {string} props.langcode - Current language, "en" or "uk".
  * @param {Function} props.onLiveResultsChange - Called with true when the widget
  *   shows its own results, and false when the server-rendered list should show.
  * @returns {JSX.Element} The widget.
  */
-export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }) {
+export default function CatalogFilter({ apiBase, basePath, langcode, onLiveResultsChange }) {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [terms, setTerms] = useState({ categories: [], tags: [] });
   const [termsFailed, setTermsFailed] = useState(false);
@@ -70,7 +70,7 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
   // twice; the React docs and the react-hooks lint rules advise against it.)
   useEffect(() => {
     const controller = new AbortController();
-    fetchJsonApi(buildProductsUrl(apiBase, { search, category: filters.category }), controller.signal)
+    fetchJsonApi(buildProductsUrl(apiBase, { search, category: filters.category, langcode }), controller.signal)
       .then((document) => {
         setResult({ key: requestKey, products: parseProducts(document, basePath), failed: false, loadedOnce: true });
       })
@@ -81,7 +81,7 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
     // Aborting the previous request means an old, slow response can never
     // overwrite the results of a newer one.
     return () => controller.abort();
-  }, [apiBase, basePath, search, filters.category, requestKey]);
+  }, [apiBase, basePath, search, filters.category, langcode, requestKey]);
 
   let status = 'success';
   if (termsFailed || (result.key === requestKey && result.failed)) {
@@ -127,11 +127,11 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
 
   let message = '';
   if (status === 'loading') {
-    message = t('Loading products…');
+    message = Drupal.t('Loading products…');
   } else if (status === 'error') {
-    message = t('Products could not be loaded.');
+    message = Drupal.t('Products could not be loaded.');
   } else {
-    message = formatPlural(visibleProducts.length, '1 product found', '@count products found');
+    message = Drupal.formatPlural(visibleProducts.length, '1 product found', '@count products found');
   }
 
   return (
@@ -140,11 +140,11 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
       <form
         className="catalog-filter__form"
         role="search"
-        aria-label={t('Filter products')}
+        aria-label={Drupal.t('Filter products')}
         onSubmit={(e) => e.preventDefault()}
       >
         <div className="catalog-filter__field">
-          <label htmlFor={`${id}-search`}>{t('Search by name')}</label>
+          <label htmlFor={`${id}-search`}>{Drupal.t('Search by name')}</label>
           <input
             ref={searchRef}
             id={`${id}-search`}
@@ -156,13 +156,13 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
         </div>
 
         <div className="catalog-filter__field">
-          <label htmlFor={`${id}-category`}>{t('Category')}</label>
+          <label htmlFor={`${id}-category`}>{Drupal.t('Category')}</label>
           <select
             id={`${id}-category`}
             value={filters.category}
             onChange={(e) => setFilters({ ...filters, category: e.target.value })}
           >
-            <option value="">{t('All categories')}</option>
+            <option value="">{Drupal.t('All categories')}</option>
             {terms.categories.map((term) => (
               <option key={term.id} value={term.id}>
                 {term.name}
@@ -173,7 +173,7 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
 
         {terms.tags.length > 0 && (
           <fieldset className="catalog-filter__tags">
-            <legend>{t('Dietary needs')}</legend>
+            <legend>{Drupal.t('Dietary needs')}</legend>
             {terms.tags.map((term) => (
               <label key={term.id} className="catalog-filter__tag">
                 <input type="checkbox" checked={filters.tags.includes(term.id)} onChange={() => toggleTag(term.id)} />
@@ -185,7 +185,7 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
 
         {isFiltered && (
           <button type="button" className="button button--secondary catalog-filter__clear" onClick={clearFilters}>
-            {t('Clear filters')}
+            {Drupal.t('Clear filters')}
           </button>
         )}
       </form>
@@ -201,9 +201,9 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
 
       {status === 'error' && (
         <div className="catalog-filter__error">
-          <p>{t('Check your connection and try again.')}</p>
+          <p>{Drupal.t('Check your connection and try again.')}</p>
           <button type="button" className="button button--primary" onClick={retry}>
-            {t('Try again')}
+            {Drupal.t('Try again')}
           </button>
         </div>
       )}
@@ -217,6 +217,7 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
                 <li key={product.id} className="teaser-grid__item">
                   <ProductCard
                     product={product}
+                    langcode={langcode}
                     category={names[product.categoryId] ?? ''}
                     badges={product.tagIds.map((tagId) => names[tagId]).filter(Boolean)}
                   />
@@ -226,9 +227,9 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
           ) : (
             status === 'success' && (
               <div className="catalog-filter__empty">
-                <p>{t('No products match your filters.')}</p>
+                <p>{Drupal.t('No products match your filters.')}</p>
                 <button type="button" className="button button--secondary" onClick={clearFilters}>
-                  {t('Clear filters')}
+                  {Drupal.t('Clear filters')}
                 </button>
               </div>
             )

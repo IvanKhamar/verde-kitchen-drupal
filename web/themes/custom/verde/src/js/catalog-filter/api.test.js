@@ -31,6 +31,11 @@ describe('buildProductsUrl', () => {
     assert.equal(params(buildProductsUrl('/jsonapi', { search: '   ' })).get('filter[search][condition][path]'), null);
   });
 
+  it('limits the results to one language when a langcode is given', () => {
+    assert.equal(params(buildProductsUrl('/uk/jsonapi', { langcode: 'uk' })).get('filter[langcode]'), 'uk');
+    assert.equal(params(buildProductsUrl('/jsonapi')).get('filter[langcode]'), null);
+  });
+
   it('filters by category UUID', () => {
     const p = params(buildProductsUrl('/jsonapi', { category: 'abc-123' }));
     assert.equal(p.get('filter[category][condition][path]'), 'field_category.id');
@@ -119,6 +124,11 @@ describe('filterByTags', () => {
 describe('formatPrice', () => {
   it('formats euro with two decimals', () => {
     assert.equal(formatPrice('3.9'), '€3.90');
+  });
+
+  it('uses a decimal comma and the sign after the number in Ukrainian', () => {
+    assert.equal(formatPrice('3.9', 'uk'), '3,90\u00A0€');
+    assert.equal(formatPrice('1234.5', 'uk'), '1\u00A0234,50\u00A0€');
   });
 
   it('returns an empty string without a value', () => {

@@ -9,12 +9,13 @@ import { formatPrice } from './api.js';
  *
  * @param {object} props - Component props.
  * @param {object} props.product - A product from parseProducts().
+ * @param {string} props.langcode - Current language, for the price format.
  * @param {string} props.category - The category name.
  * @param {string[]} props.badges - Dietary tag names.
  * @returns {JSX.Element} The card.
  */
-export default function ProductCard({ product, category, badges }) {
-  const price = formatPrice(product.price);
+export default function ProductCard({ product, langcode, category, badges }) {
+  const price = formatPrice(product.price, langcode);
 
   return (
     <article className="card">

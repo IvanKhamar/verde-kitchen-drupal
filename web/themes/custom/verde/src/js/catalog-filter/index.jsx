@@ -31,6 +31,7 @@ Drupal.behaviors.verdeCatalogFilter = {
         <CatalogFilter
           apiBase={element.dataset.apiBase}
           basePath={element.dataset.basePath}
+          langcode={document.documentElement.lang || 'en'}
           onLiveResultsChange={toggleFallback}
         />,
       );
