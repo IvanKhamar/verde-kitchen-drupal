@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * Theme override for the language switcher block.
+ *
+ * Every link has lang and hreflang, so screen readers pronounce "УКР" in
+ * Ukrainian and search engines know the language of the target page. The
+ * short visible text is an <abbr> with the full name of the language.
+ * language_items comes from verde_preprocess_links__language_block().
+ */
+#}
+{% if language_items %}
+  <nav class="language-switcher" aria-label="{{ 'Language'|t }}">
+    <ul class="language-switcher__list" role="list">
+      {% for item in language_items %}
+        <li>
+          <a href="{{ item.url }}" class="language-switcher__link" lang="{{ item.langcode }}" hreflang="{{ item.langcode }}"{% if item.active %} aria-current="true"{% endif %}>
+            <abbr title="{{ item.name }}">{{ item.code }}</abbr>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+{% endif %}
