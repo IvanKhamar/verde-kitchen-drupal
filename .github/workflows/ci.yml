@@ -19,8 +19,8 @@ jobs:
           fetch-depth: 0
       - name: Run gitleaks
         run: |
-          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest \
-            git /repo --redact --verbose
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            git /repo --redact --verbose --config /repo/.gitleaks.toml
 
   lint:
     name: lint

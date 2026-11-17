@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# Blocks a commit that would add a secret (key, token, password) to the repository.
+# The repository is public: a secret that reaches a commit counts as leaked.
+#
+# Enable once per clone:
+#   git config core.hooksPath .githooks
+#
+# Uses a local gitleaks if installed, otherwise the gitleaks Docker image.
+
+set -euo pipefail
+
+GITLEAKS_IMAGE="ghcr.io/gitleaks/gitleaks:v8.30.1"
+args=(git --pre-commit --staged --redact --no-banner --config .gitleaks.toml)
+
+if command -v gitleaks > /dev/null 2>&1; then
+  gitleaks "${args[@]}" .
+elif command -v docker > /dev/null 2>&1; then
+  # "pwd -W" gives a Windows path in Git Bash; Docker on Linux and macOS uses "pwd".
+  repo="$(pwd -W 2> /dev/null || pwd)"
+  MSYS_NO_PATHCONV=1 docker run --rm -v "${repo}:/repo" -w /repo "$GITLEAKS_IMAGE" "${args[@]}" /repo
+else
+  echo "pre-commit: install gitleaks or Docker, so staged changes can be scanned for secrets." >&2
+  exit 1
+fi
