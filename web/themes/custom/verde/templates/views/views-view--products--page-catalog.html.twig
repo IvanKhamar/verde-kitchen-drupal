@@ -18,7 +18,7 @@
     class="catalog__filter"
     data-catalog-filter
     data-api-base="{{ path('jsonapi.resource_list') }}"
-    data-base-path="{{ base_path|default('/') }}"
+    data-base-path="{{ path('<front>') }}"
     data-fallback-id="catalog-fallback"
   ></div>
   <div id="catalog-fallback" class="catalog__fallback">

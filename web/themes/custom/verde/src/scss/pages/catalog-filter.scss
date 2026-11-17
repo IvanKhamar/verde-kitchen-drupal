@@ -128,4 +128,12 @@
       min-height: 16.5rem; // 263px
     }
   }
+
+  // Ukrainian labels are longer: below 400px the tags take one more line.
+  // :lang() matches the lang attribute that Drupal sets on <html>.
+  @media (width < 400px) {
+    :lang(uk) .catalog__filter {
+      min-height: 35.3rem; // 565px at 360px wide
+    }
+  }
 }

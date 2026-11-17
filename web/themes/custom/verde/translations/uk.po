@@ -1,0 +1,85 @@
+# Ukrainian translation of the Verde theme and its React catalog filter.
+#
+# Drupal imports this file with the interface translations (drush locale:update),
+# because verde.info.yml points "interface translation server pattern" here.
+# Core and contributed strings come from localize.drupal.org.
+msgid ""
+msgstr ""
+"Project-Id-Version: verde\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2));\n"
+"Language: uk\n"
+
+# Twig templates and components.
+msgid "Skip to main content"
+msgstr "Перейти до основного вмісту"
+
+msgid "Menu"
+msgstr "Меню"
+
+msgid "Main"
+msgstr "Головне меню"
+
+msgid "Language"
+msgstr "Мова"
+
+msgid "Dietary tags"
+msgstr "Харчові позначки"
+
+msgid "Back to all products"
+msgstr "До всіх продуктів"
+
+# verde.theme (preprocess functions).
+msgid "Featured products"
+msgstr "Рекомендовані продукти"
+
+msgid "All products"
+msgstr "Усі продукти"
+
+msgid "Latest articles"
+msgstr "Останні статті"
+
+msgid "All articles"
+msgstr "Усі статті"
+
+# React catalog filter (Drupal.t and Drupal.formatPlural in CatalogFilter.jsx).
+msgid "Loading products…"
+msgstr "Завантажуємо продукти…"
+
+msgid "Products could not be loaded."
+msgstr "Не вдалося завантажити продукти."
+
+msgid "1 product found"
+msgid_plural "@count products found"
+msgstr[0] "Знайдено @count продукт"
+msgstr[1] "Знайдено @count продукти"
+msgstr[2] "Знайдено @count продуктів"
+
+msgid "Filter products"
+msgstr "Фільтр продуктів"
+
+msgid "Search by name"
+msgstr "Пошук за назвою"
+
+msgid "Category"
+msgstr "Категорія"
+
+msgid "All categories"
+msgstr "Усі категорії"
+
+msgid "Dietary needs"
+msgstr "Харчові потреби"
+
+msgid "Clear filters"
+msgstr "Скинути фільтри"
+
+msgid "Check your connection and try again."
+msgstr "Перевірте з’єднання та спробуйте ще раз."
+
+msgid "Try again"
+msgstr "Спробувати ще раз"
+
+msgid "No products match your filters."
+msgstr "Жоден продукт не відповідає фільтрам."

@@ -19,3 +19,8 @@ regions:
   breadcrumb: Breadcrumb
   content: Content
   footer: Footer
+
+# Ukrainian strings of the theme and the React widget: translations/uk.po.
+# drush locale:update imports it together with core's translations.
+'interface translation project': verde
+'interface translation server pattern': themes/custom/verde/translations/%language.po

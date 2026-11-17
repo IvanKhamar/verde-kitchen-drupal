@@ -1,0 +1,37 @@
+// Language switcher in the header: ENG | УКР.
+.language-switcher__list {
+  display: flex;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.language-switcher__link {
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+
+  &:hover {
+    color: var(--color-primary-dark);
+    background-color: var(--color-surface-alt);
+  }
+
+  &[aria-current='true'] {
+    color: var(--color-primary-dark);
+    background-color: var(--color-primary-light);
+  }
+
+  // The full language name is in the title; no dotted underline.
+  abbr {
+    text-decoration: none;
+  }
+}

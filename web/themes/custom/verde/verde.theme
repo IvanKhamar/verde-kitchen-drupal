@@ -233,10 +233,23 @@ function verde_preprocess_block(array &$variables): void {
 }
 
 /**
- * Formats a decimal price value, for example "3.9" as "€3.90".
+ * Formats a decimal price for the current language.
+ *
+ * English: "€3.90". Ukrainian: "3,90 €" (decimal comma, the currency sign
+ * after the number, non-breaking spaces). formatPrice() in the React widget
+ * (src/js/catalog-filter/api.js) produces the same strings.
  */
 function verde_format_price(?string $value): string {
-  return $value === NULL ? '' : '€' . number_format((float) $value, 2);
+  if ($value === NULL) {
+    return '';
+  }
+  // The rendered card varies by language; Drupal's render cache already
+  // includes the "languages:language_interface" cache context.
+  $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  if ($langcode === 'uk') {
+    return number_format((float) $value, 2, ',', "\u{00A0}") . "\u{00A0}€";
+  }
+  return '€' . number_format((float) $value, 2);
 }
 
 /**
@@ -330,6 +343,7 @@ function verde_article_schema(NodeInterface $node): array {
   $data = [
     '@context' => 'https://schema.org',
     '@type' => 'Article',
+    'inLanguage' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
     'headline' => $node->label(),
     'url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
     'datePublished' => date(DATE_ATOM, (int) $node->getCreatedTime()),
@@ -350,4 +364,35 @@ function verde_schema_image_url(NodeInterface $node): ?string {
   $file = $node->get('field_image')->entity;
   $style = ImageStyle::load('social');
   return $file && $style ? $style->buildUrl($file->getFileUri()) : NULL;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for links--language-block.html.twig.
+ *
+ * Turns the language links into plain items: URL, short code, native name and
+ * whether it is the current language.
+ */
+function verde_preprocess_links__language_block(array &$variables): void {
+  $current = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  // Short codes as Ukrainian sites usually show them: ENG / УКР.
+  $codes = ['en' => 'ENG', 'uk' => 'УКР'];
+  $names = ['en' => 'English', 'uk' => 'Українська'];
+
+  $variables['language_items'] = [];
+  foreach ($variables['links'] as $langcode => $link) {
+    if (empty($link['link']['#url'])) {
+      continue;
+    }
+    // The target language is in the link's #options, not in the Url object:
+    // without merging them, every link would point to the current language.
+    $url = clone $link['link']['#url'];
+    $url->mergeOptions(['language' => $link['link']['#options']['language'] ?? NULL]);
+    $variables['language_items'][] = [
+      'url' => $url->toString(),
+      'langcode' => $langcode,
+      'code' => $codes[$langcode] ?? strtoupper($langcode),
+      'name' => $names[$langcode] ?? $langcode,
+      'active' => $langcode === $current,
+    ];
+  }
 }
