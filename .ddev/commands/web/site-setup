@@ -10,6 +10,10 @@ set -euo pipefail
 # --existing-config installs the site from config/sync instead of an install profile's
 # defaults, so every environment gets exactly the same content types, fields and settings.
 drush site:install --existing-config --account-name=admin --yes
+# Interface translations: core and contrib strings from localize.drupal.org,
+# the theme's own strings from web/themes/custom/verde/translations/uk.po.
+drush locale:check
+drush locale:update
 drush php:script scripts/demo-content/demo-content.php
 drush cache:rebuild
 

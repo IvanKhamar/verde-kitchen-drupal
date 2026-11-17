@@ -58,6 +58,8 @@ const pages = [
   ['Catalog', '/products'],
   ['Product', productPath],
   ['Article', articlePath],
+  ['Home, Ukrainian', '/uk'],
+  ['Catalog, Ukrainian', '/uk/products'],
 ];
 
 // --- axe -------------------------------------------------------------------------
@@ -88,11 +90,11 @@ try {
     await browser.page('Emulation.setDeviceMetricsOverride', viewport);
     for (const [name, pagePath] of pages) {
       await browser.open(baseUrl + pagePath);
-      if (name === 'Catalog') {
+      if (name.startsWith('Catalog')) {
         // Wait until the React widget has loaded its data.
         await waitUntil(
           browser.evaluate,
-          "/found/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')",
+          "/(found|Знайдено)/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')",
         );
       }
       axeResults.push(await runAxe(`${name} (${viewportName})`));
@@ -112,7 +114,7 @@ try {
   await browser.open(`${baseUrl}/products`);
   await waitUntil(
     browser.evaluate,
-    "/found/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')",
+    "/(found|Знайдено)/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')",
   );
   // Tick the first dietary tag the way a user would (React listens to real events).
   await browser.evaluate("document.querySelector('.catalog-filter__tag input').click(), true");
@@ -134,7 +136,7 @@ for (const [name, pagePath] of pages) {
       logLevel: 'error',
       onlyCategories: categories,
     });
-    const slug = name.toLowerCase();
+    const slug = name.toLowerCase().replace(/[^a-z]+/g, '-');
     await writeFile(path.join(reportDir, `lighthouse-${slug}.html`), report);
     const scores = Object.fromEntries(categories.map((id) => [id, Math.round(lhr.categories[id].score * 100)]));
     const metrics = {
