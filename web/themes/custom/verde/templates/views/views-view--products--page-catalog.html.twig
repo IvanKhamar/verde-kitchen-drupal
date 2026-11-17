@@ -20,6 +20,11 @@
     data-api-base="{{ path('jsonapi.resource_list') }}"
     data-base-path="{{ path('<front>') }}"
     data-fallback-id="catalog-fallback"
+    {#
+      Set only in the static copy (GitHub Pages), which has no JSON:API:
+      the widget then reads exported JSON files from this folder.
+    #}
+    {% if static_data_path %}data-static-data="{{ static_data_path }}"{% endif %}
   ></div>
   <div id="catalog-fallback" class="catalog__fallback">
     {{ rows }}

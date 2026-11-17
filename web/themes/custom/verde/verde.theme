@@ -396,3 +396,44 @@ function verde_preprocess_links__language_block(array &$variables): void {
     ];
   }
 }
+
+/**
+ * Tells whether the page is being rendered for the static copy.
+ *
+ * The GitHub Pages workflow sets VERDE_STATIC_EXPORT=1 while Tome exports the
+ * site. Pages rendered for the live site never see this variable.
+ */
+function verde_is_static_export(): bool {
+  return getenv('VERDE_STATIC_EXPORT') === '1';
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for page.html.twig.
+ *
+ * Adds a notice to every page of the static copy, with a link to the full
+ * site (VERDE_FULL_SITE_URL) or, until it exists, to the source code.
+ */
+function verde_preprocess_page(array &$variables): void {
+  if (!verde_is_static_export()) {
+    return;
+  }
+  $full_site = getenv('VERDE_FULL_SITE_URL');
+  $variables['static_notice'] = $full_site
+    ? ['url' => $full_site, 'label' => (string) t('Open the full site')]
+    : ['url' => 'https://github.com/IvanKhamar/verde-kitchen-drupal', 'label' => (string) t('Source code')];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for views-view.html.twig.
+ *
+ * In the static copy the catalog widget reads exported JSON files from
+ * /static-data/LANGCODE instead of JSON:API (scripts/static/build.mjs
+ * writes them).
+ */
+function verde_preprocess_views_view(array &$variables): void {
+  $variables['static_data_path'] = NULL;
+  if (verde_is_static_export()) {
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $variables['static_data_path'] = base_path() . 'static-data/' . $langcode;
+  }
+}
