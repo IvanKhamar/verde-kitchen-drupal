@@ -118,6 +118,19 @@ if (process.env.CHROME_PATH) {
         problems.push(`catalog filter${prefix}: status is "${await browser.evaluate(statusText)}"`);
       }
     }
+
+    // The shopping list: add two products on the catalog, then the list page
+    // shows them from the exported JSON (the list is in localStorage).
+    try {
+      await browser.evaluate(
+        "[...document.querySelectorAll('[data-shopping-list-toggle]')].slice(0, 2).forEach((b) => b.click()), true",
+      );
+      await browser.open(`${origin}${base}/uk/shopping-list`);
+      await waitUntil(browser.evaluate, "document.querySelectorAll('.shopping-list__item').length === 2");
+      console.log('✔ shopping list/uk: 2 products from the static data');
+    } catch {
+      problems.push('shopping list: the list page did not show the 2 added products');
+    }
   } finally {
     await browser.close();
   }
