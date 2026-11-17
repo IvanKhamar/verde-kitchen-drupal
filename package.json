@@ -79,7 +79,7 @@
       "locutus": "^3.0.36"
     },
     "twig": {
-      "minimatch": "^10.2.6"
+      "minimatch": "^11.0.9"
     }
   }
 }
