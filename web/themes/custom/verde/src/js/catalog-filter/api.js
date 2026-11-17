@@ -39,7 +39,7 @@ const PRODUCT_FIELDS = [
  * @param {{search?: string, category?: string}} filters - Category is a term UUID.
  * @returns {string} A root-relative URL.
  */
-export function buildProductsUrl(apiBase, { search = '', category = '' } = {}) {
+export function buildProductsUrl(apiBase, { search = '', category = '', langcode = '' } = {}) {
   const params = new URLSearchParams();
   // Asking for published content explicitly lets Drupal filter in SQL instead
   // of loading unpublished items and removing them during the access check.
@@ -53,6 +53,12 @@ export function buildProductsUrl(apiBase, { search = '', category = '' } = {}) {
     params.set('filter[search][condition][path]', 'title');
     params.set('filter[search][condition][operator]', 'CONTAINS');
     params.set('filter[search][condition][value]', query);
+  }
+  if (langcode) {
+    // Products exist in several languages. The language prefix of apiBase
+    // (/uk/jsonapi) makes Drupal return the Ukrainian translations; this filter
+    // makes the title search match titles in that language only.
+    params.set('filter[langcode]', langcode);
   }
   if (category) {
     // "field_category.id" filters by the UUID of the referenced term.
@@ -150,14 +156,26 @@ export function filterByTags(products, selectedTagIds) {
   return products.filter((product) => selectedTagIds.every((id) => product.tagIds.includes(id)));
 }
 
-const priceFormat = new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' });
+const numberFormats = {
+  en: new Intl.NumberFormat('en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  uk: new Intl.NumberFormat('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+};
 
 /**
- * Formats a decimal string from Drupal, for example "3.90" as "€3.90".
+ * Formats a decimal string from Drupal for a language, like the theme's
+ * verde_format_price(): "€3.90" in English, "3,90 €" in Ukrainian.
+ *
+ * Intl's currency style would print "EUR" for Ukrainian, so the number is
+ * formatted by Intl and the sign is placed by hand (with a non-breaking space).
  *
  * @param {string|null} value - The price.
+ * @param {string} [langcode] - "en" or "uk".
  * @returns {string} The formatted price, or "" when there is none.
  */
-export function formatPrice(value) {
-  return value === null || value === undefined || value === '' ? '' : priceFormat.format(Number(value));
+export function formatPrice(value, langcode = 'en') {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+  const number = Number(value);
+  return langcode === 'uk' ? `${numberFormats.uk.format(number)}\u00A0€` : `€${numberFormats.en.format(number)}`;
 }
