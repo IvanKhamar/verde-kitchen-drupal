@@ -88,6 +88,31 @@ page" are the featured products on the home page.
 | `/articles`                        | Recipes and news, newest first, 6 per page             | View `articles`                  |
 | `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)     | `node--TYPE--full.html.twig`     |
 
+Every page also exists in Ukrainian under `/uk/`, for example `/uk/products/smuzi-zelene-syayvo`.
+
+## Multilingual (English and Ukrainian)
+
+English is the default language without a URL prefix; Ukrainian lives under `/uk/`.
+
+| Part                | How it is translated                                                                                                                                                 |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Content             | Content Translation: products, articles, terms, menu links and banners. Text and image alt texts are translated; price, category, tags and the image file are shared |
+| Configuration       | Config Translation: view titles, empty texts, pager, meta tags, article type labels (`config/sync/language/uk/`)                                                     |
+| Core and contrib UI | Imported from localize.drupal.org by `drush locale:update` (part of `ddev site-setup`)                                                                               |
+| Theme and React UI  | `web/themes/custom/verde/translations/uk.po`, registered in `verde.info.yml`; includes the three Ukrainian plural forms ("1 продукт", "3 продукти", "14 продуктів")  |
+| URLs                | Pathauto transliterates Ukrainian titles: `/uk/products/smuzi-zelene-syayvo`                                                                                         |
+
+Details that matter on multilingual sites:
+
+- The language switcher keeps the visitor on the same page, marks links with `lang` and
+  `hreflang`, and Drupal adds `<link rel="alternate" hreflang>` to translated pages.
+- Prices follow the language: `€3.90` and `3,90 €`, the same in Twig and in React.
+- The React widget asks `/uk/jsonapi` for Ukrainian data and filters by `langcode`, so the
+  name search matches Ukrainian titles. Its strings are literal `Drupal.t()` calls, the only
+  form Drupal finds in a JavaScript file to translate.
+- Ukrainian labels are longer: the reserved height of the filter form is larger for
+  `:lang(uk)` on narrow screens, so the page does not shift when the widget appears.
+
 ## Components
 
 The theme's UI parts are [Single Directory Components](https://www.drupal.org/docs/develop/theming-drupal/using-single-directory-components)
