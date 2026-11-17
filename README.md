@@ -7,7 +7,7 @@ performance and SEO.
 
 > Verde Kitchen is an invented brand. It is not connected to any real company.
 
-**Status:** work in progress — phase 5 of 7 (React catalog filter with JSON:API).
+**Status:** work in progress — phase 6 of 7 (performance, accessibility, SEO, Lighthouse and axe).
 
 ## Stack
 
@@ -19,7 +19,8 @@ performance and SEO.
 | Theme       | Custom theme `verde` (no base theme), Twig, Single Directory Components, Views |
 | Front end   | SCSS with design tokens, Webpack 5, Babel, PostCSS/Autoprefixer, React 19 (one widget) |
 | Data        | JSON:API (Drupal core, read-only), a small custom module for a computed field |
-| Quality     | ESLint, Stylelint, Prettier, PHPCS, GitHub Actions _(planned)_ |
+| SEO         | Pathauto, Metatag (with Open Graph), JSON-LD from the theme |
+| Quality     | Lighthouse, axe-core, Node test runner, GitHub Actions; ESLint, Stylelint, Prettier, PHPCS _(planned)_ |
 
 ## Requirements
 
@@ -85,7 +86,7 @@ page" are the featured products on the home page.
 | `/`         | Hero, featured products, promo banner, latest articles               | Views page + blocks on `<front>` |
 | `/products` | Product catalog                                                      | View `products`                |
 | `/articles` | Recipes and news, newest first, 6 per page                           | View `articles`                |
-| `/node/N`   | Product or article page                                              | `node--TYPE--full.html.twig`   |
+| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto) | `node--TYPE--full.html.twig` |
 
 ## Components
 
@@ -153,11 +154,11 @@ so `node_modules/` is never served by the web server.
 Node.js runs in the DDEV container (version 24, see `.nvmrc`). With Node.js 24 on the
 host, the same commands work without `ddev`.
 
-`scripts/screenshots.mjs` takes full-page screenshots at 360, 768 and 1280 px with a
-local Chrome or Edge (no npm packages needed):
+`npm run screenshots` (`scripts/screenshots.mjs`) takes full-page screenshots at 360, 768 and 1280 px with a
+local Chrome or Edge, through the Chrome DevTools Protocol (no extra packages):
 
 ```bash
-CHROME_PATH="/path/to/chrome" BASE_URL="http://127.0.0.1:PORT" node scripts/screenshots.mjs
+CHROME_PATH="/path/to/chrome" BASE_URL="http://127.0.0.1:PORT" npm run screenshots
 ```
 
 `ddev describe` shows the `127.0.0.1` address. Recent Chromium versions block pages on
@@ -174,6 +175,10 @@ on reload.
 config/sync/            Exported Drupal configuration
 scripts/demo-content/   Demo content script and its images
 scripts/ci/             Scripts used by GitHub Actions
+scripts/audit.mjs       Lighthouse and axe audit (npm run audit:site)
+scripts/screenshots.mjs Screenshots at three widths (npm run screenshots)
+scripts/lib/            Small Chrome DevTools Protocol client used by both
+scripts/scaffold/       Lines Composer scaffold appends to .gitattributes
 web/                    Web root (Drupal core and contributed code are installed by Composer)
 web/modules/custom/verde_catalog/
                         Computed "card image URL" field for JSON:API
@@ -211,9 +216,63 @@ Every push is scanned with [gitleaks](https://github.com/gitleaks/gitleaks).
 
 _To be added in phase 7._
 
-## Lighthouse and axe results
+## Performance, accessibility and SEO
 
-_To be added in phase 6._
+### Lighthouse and axe results
+
+Lighthouse, mobile preset (emulated phone, slow 4G, 4x CPU slowdown), on the local DDEV site:
+
+| Page    | Performance | Accessibility | Best Practices | SEO |
+| ------- | ----------: | ------------: | -------------: | --: |
+| Home    | 100         | 100           | 100            | 100 |
+| Catalog | 98          | 100           | 100            | 100 |
+| Product | 100         | 100           | 100            | 100 |
+| Article | 100         | 100           | 100            | 100 |
+
+axe-core (WCAG 2.0/2.1 A and AA, plus best practices): **0 violations** on all four pages at
+360 and 1280 px, with the mobile menu open and with the catalog filter applied.
+
+Full numbers (LCP, CLS, TBT per page): [`docs/audit-results.md`](docs/audit-results.md).
+Run the audit yourself:
+
+```bash
+CHROME_PATH="/path/to/chrome" BASE_URL="http://127.0.0.1:PORT" npm run audit:site
+```
+
+It writes HTML reports to `reports/` (not committed) and exits with code 1 when a score is
+under 90 or axe finds a critical or serious issue.
+
+### What makes it fast
+
+- **Responsive images:** `srcset` + `sizes` (responsive image styles `card` and `detail`),
+  WebP files, `width`/`height` attributes against layout shift.
+- **Loading priority:** the hero and the main image of a product or article page load
+  eagerly with `fetchpriority="high"` (the LCP image); the first row of cards in a list is
+  eager; everything below loads lazily.
+- **Little JavaScript:** pages load only the navigation behaviour; React (71 KB gzip) loads
+  only on `/products`. CSS and JS are aggregated, component CSS loads only where the
+  component is used.
+- **No layout shift:** the mobile menu and the catalog filter get their final layout from
+  CSS (`@media (scripting: enabled)`), before any script runs.
+- **System fonts:** nothing to download, so no font swap.
+- **Caching:** Drupal's page cache, and `Cache-Control: max-age=3600, public` for browsers and CDNs.
+
+### Accessibility
+
+Skip link, landmarks (`header`, `nav` with labels, `main`, `footer`), one `<h1>` per page and
+no skipped heading levels, visible `:focus-visible` outlines, WCAG AA contrast for every colour
+pair ([`docs/design-tokens.md`](docs/design-tokens.md)), 44 px touch targets, required alt
+texts, a disclosure-pattern mobile menu (Escape closes it), and a live region for filter results.
+
+### SEO
+
+- **Clean URLs:** Pathauto patterns `products/[node:title]` and `articles/[node:title]`.
+- **Meta tags:** Metatag sets the title, description and canonical URL per page type
+  (global, front page, content, and the listing views through Metatag Views).
+- **Open Graph:** `og:title`, `og:description`, `og:image` (a 1200x630 "social" image style) and more.
+- **Structured data:** the theme adds JSON-LD (`Product` with an `Offer`, `Article`) in
+  `verde_page_attachments_alter()`. The JSON is encoded with `JSON_HEX_TAG`, so text with
+  `</script>` cannot break out of the script element.
 
 ## Documentation
 

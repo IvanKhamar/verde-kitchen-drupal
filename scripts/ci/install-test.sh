@@ -54,4 +54,12 @@ grep --quiet 'Green Glow Smoothie' <<< "$page"
 # The Verde theme is the default theme: its skip link is on every page.
 grep --quiet 'class="skip-link"' <<< "$page"
 
+# SEO: Pathauto made a clean URL; Metatag and the theme add meta tags and JSON-LD.
+product=$(curl --fail --silent --show-error "$base_url/products/green-glow-smoothie")
+grep --quiet '<meta name="description"' <<< "$product"
+grep --quiet '<meta property="og:image"' <<< "$product"
+grep --quiet '<script type="application/ld+json">' <<< "$product"
+# Responsive images: srcset with WebP files.
+grep --quiet 'srcset="[^"]*\.webp' <<< "$product"
+
 echo "Install test passed."
