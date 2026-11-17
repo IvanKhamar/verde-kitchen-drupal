@@ -20,8 +20,10 @@
         "drupal/core-project-message": "^11.4",
         "drupal/core-recipe-unpack": "^11.4",
         "drupal/core-recommended": "^11.4",
+        "drupal/csp": "^2.2",
         "drupal/metatag": "^2.2",
         "drupal/pathauto": "^1.16",
+        "drupal/security_review": "^3.1",
         "drush/drush": "^13.8"
     },
     "conflict": {

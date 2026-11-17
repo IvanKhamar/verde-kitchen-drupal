@@ -1,0 +1,7 @@
+name: 'Verde security'
+type: module
+description: 'Security headers for the Verde Kitchen site, and a Content Security Policy relaxed only for administrators.'
+package: Verde
+core_version_requirement: ^11
+dependencies:
+  - csp:csp
