@@ -28,10 +28,11 @@ const EMPTY_FILTERS = { search: '', category: '', tags: [] };
  * @param {object} props - Component props.
  * @param {string} props.apiBase - JSON:API root, for example "/jsonapi".
  * @param {string} props.basePath - Site base path, for example "/".
- * @param {Function} props.onReady - Called once, after the first successful load.
+ * @param {Function} props.onLiveResultsChange - Called with true when the widget
+ *   shows its own results, and false when the server-rendered list should show.
  * @returns {JSX.Element} The widget.
  */
-export default function CatalogFilter({ apiBase, basePath, onReady }) {
+export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }) {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [terms, setTerms] = useState({ categories: [], tags: [] });
   const [products, setProducts] = useState([]);
@@ -78,12 +79,6 @@ export default function CatalogFilter({ apiBase, basePath, onReady }) {
     return () => controller.abort();
   }, [apiBase, basePath, search, filters.category, attempt]);
 
-  // Tell the page (once) that live results are ready, so it can hide the
-  // server-rendered fallback list.
-  useEffect(() => {
-    if (hasLoaded) onReady?.();
-  }, [hasLoaded, onReady]);
-
   // Derived data: computed from state on each render, not stored in state.
   const visibleProducts = useMemo(() => filterByTags(products, filters.tags), [products, filters.tags]);
   const names = useMemo(
@@ -91,7 +86,18 @@ export default function CatalogFilter({ apiBase, basePath, onReady }) {
     [terms],
   );
 
+  // Shows the "Clear filters" button as soon as the user types or clicks.
   const isFiltered = filters.search !== '' || filters.category !== '' || filters.tags.length > 0;
+
+  // The widget shows its own list only once a filter is active (search counts
+  // after the debounce). Before that, the server-rendered list stays: it is
+  // already painted, so replacing it with identical React cards would only
+  // delay the Largest Contentful Paint and re-render images for nothing.
+  const showLiveResults = hasLoaded && (search.trim() !== '' || filters.category !== '' || filters.tags.length > 0);
+
+  useEffect(() => {
+    onLiveResultsChange?.(showLiveResults);
+  }, [showLiveResults, onLiveResultsChange]);
 
   const toggleTag = (tagId) =>
     setFilters((current) => ({
@@ -183,8 +189,8 @@ export default function CatalogFilter({ apiBase, basePath, onReady }) {
         </div>
       )}
 
-      {/* Until the first load succeeds, the server-rendered list is shown instead. */}
-      {hasLoaded && status !== 'error' && (
+      {/* Without an active filter the server-rendered list is shown instead. */}
+      {showLiveResults && status !== 'error' && (
         <div className="catalog-filter__results" aria-busy={status === 'loading'}>
           {visibleProducts.length > 0 ? (
             <ul className="teaser-grid__list" role="list">

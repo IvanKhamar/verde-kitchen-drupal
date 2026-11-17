@@ -6,9 +6,9 @@
  * the catalog page attaches (views-view--products--page-catalog.html.twig).
  *
  * Progressive enhancement: the page already contains a server-rendered list of
- * products. It stays visible while the widget loads, and if JavaScript or the
- * API fails. After the first successful API response the widget shows its own
- * results and the fallback list is hidden.
+ * products. It stays visible until the user applies a filter, and whenever
+ * JavaScript or the API fails. While a filter is active the widget shows its
+ * own results and the server list is hidden.
  */
 import { createRoot } from 'react-dom/client';
 import CatalogFilter from './CatalogFilter.jsx';
@@ -22,13 +22,13 @@ Drupal.behaviors.verdeCatalogFilter = {
     // (for example after an AJAX request) does not mount React twice.
     once('verde-catalog-filter', '[data-catalog-filter]', context).forEach((element) => {
       const fallback = document.getElementById(element.dataset.fallbackId);
-      const hideFallback = () => {
-        if (fallback) fallback.hidden = true;
+      const toggleFallback = (liveResults) => {
+        if (fallback) fallback.hidden = liveResults;
       };
 
       const root = createRoot(element);
       root.render(
-        <CatalogFilter apiBase={element.dataset.apiBase} basePath={element.dataset.basePath} onReady={hideFallback} />,
+        <CatalogFilter apiBase={element.dataset.apiBase} basePath={element.dataset.basePath} onLiveResultsChange={toggleFallback} />,
       );
       roots.set(element, root);
     });

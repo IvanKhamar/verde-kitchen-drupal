@@ -104,3 +104,27 @@
 .catalog-filter__error {
   border-left: 4px solid var(--color-danger);
 }
+
+// Reserved space for the widget. React renders the form only after the
+// JavaScript bundle has loaded; without a reserved height the product list
+// would jump down at that moment, which Lighthouse counts as Cumulative Layout
+// Shift. The heights were measured with the rendered widget (form + status
+// line) at each breakpoint; rem keeps them right when the text is enlarged.
+// (scripting: enabled) keeps the space empty for nobody without JavaScript.
+@media (scripting: enabled) {
+  .catalog__filter {
+    min-height: 32.1rem; // 513px at 360px wide: tags wrap onto three lines
+
+    @include mq('sm') {
+      min-height: 28.9rem; // 461px
+    }
+
+    @include mq('md') {
+      min-height: 19.7rem; // 315px
+    }
+
+    @include mq('lg') {
+      min-height: 16.5rem; // 263px
+    }
+  }
+}
