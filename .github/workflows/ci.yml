@@ -92,6 +92,12 @@ jobs:
         run: npm test
       - name: Build theme assets
         run: npm run build
+      - name: Build Storybook
+        run: npm run build-storybook
+      - name: Check every story (renders without errors, axe)
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: npm run test:storybook
       - name: Install the site from config and smoke-test it
         env:
           DB_URL: mysql://drupal:drupal@127.0.0.1:3306/drupal
