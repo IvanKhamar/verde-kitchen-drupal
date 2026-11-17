@@ -179,3 +179,34 @@ export function formatPrice(value, langcode = 'en') {
   const number = Number(value);
   return langcode === 'uk' ? `${numberFormats.uk.format(number)}\u00A0€` : `€${numberFormats.en.format(number)}`;
 }
+
+/**
+ * The exported JSON files the widget reads in the static copy (GitHub Pages),
+ * which has no JSON:API. scripts/static/build.mjs writes them per language.
+ *
+ * @param {string} folder - For example "/verde-kitchen-drupal/static-data/uk".
+ * @returns {{products: string, categories: string, tags: string}} File URLs.
+ */
+export function staticDataUrls(folder) {
+  return {
+    products: `${folder}/products.json`,
+    categories: `${folder}/product_category.json`,
+    tags: `${folder}/dietary_tag.json`,
+  };
+}
+
+/**
+ * Filters products by name and category in the browser. The live site lets
+ * Drupal do this (see buildProductsUrl()); the static copy has no server.
+ *
+ * @param {Array<object>} products - Products from parseProducts().
+ * @param {{search?: string, category?: string}} filters - Category is a term UUID.
+ * @returns {Array<object>} The matching products.
+ */
+export function filterProducts(products, { search = '', category = '' } = {}) {
+  const query = search.trim().toLocaleLowerCase();
+  return products.filter(
+    (product) =>
+      (!query || product.title.toLocaleLowerCase().includes(query)) && (!category || product.categoryId === category),
+  );
+}
