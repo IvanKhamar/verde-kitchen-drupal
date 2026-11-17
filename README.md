@@ -7,20 +7,20 @@ performance and SEO.
 
 > Verde Kitchen is an invented brand. It is not connected to any real company.
 
-**Status:** work in progress — phase 6 of 7 (performance, accessibility, SEO, Lighthouse and axe).
+**Status:** complete. Built in seven phases; the history is in the [pull requests](https://github.com/IvanKhamar/verde-kitchen-drupal/pulls?q=is%3Apr).
 
 ## Stack
 
-| Area        | Tool                                                |
-| ----------- | --------------------------------------------------- |
-| Local env   | [DDEV](https://ddev.com/) 1.25 (Docker)             |
-| CMS         | Drupal 11.4 (`drupal/recommended-project`), Drush 13 |
-| Runtime     | PHP 8.4, MariaDB 11.8, Node.js 24                   |
-| Theme       | Custom theme `verde` (no base theme), Twig, Single Directory Components, Views |
-| Front end   | SCSS with design tokens, Webpack 5, Babel, PostCSS/Autoprefixer, React 19 (one widget) |
-| Data        | JSON:API (Drupal core, read-only), a small custom module for a computed field |
-| SEO         | Pathauto, Metatag (with Open Graph), JSON-LD from the theme |
-| Quality     | Lighthouse, axe-core, Node test runner, GitHub Actions; ESLint, Stylelint, Prettier, PHPCS _(planned)_ |
+| Area      | Tool                                                                                                                    |
+| --------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Local env | [DDEV](https://ddev.com/) 1.25 (Docker)                                                                                 |
+| CMS       | Drupal 11.4 (`drupal/recommended-project`), Drush 13                                                                    |
+| Runtime   | PHP 8.4, MariaDB 11.8, Node.js 24                                                                                       |
+| Theme     | Custom theme `verde` (no base theme), Twig, Single Directory Components, Views                                          |
+| Front end | SCSS with design tokens, Webpack 5, Babel, PostCSS/Autoprefixer, React 19 (one widget)                                  |
+| Data      | JSON:API (Drupal core, read-only), a small custom module for a computed field                                           |
+| SEO       | Pathauto, Metatag (with Open Graph), JSON-LD from the theme                                                             |
+| Quality   | ESLint, Stylelint, Prettier, PHP_CodeSniffer (Drupal standards), Node test runner, Lighthouse, axe-core, GitHub Actions |
 
 ## Requirements
 
@@ -61,19 +61,19 @@ ddev drush php:script scripts/demo-content/demo-content.php
 
 ## Content model
 
-| Content type | Fields                                                                     |
-| ------------ | -------------------------------------------------------------------------- |
+| Content type | Fields                                                                      |
+| ------------ | --------------------------------------------------------------------------- |
 | Product      | title, image, description (with summary), category, dietary tags, price (€) |
 | Article      | title, article type (recipe / news), image, body                            |
 
-| Vocabulary       | Terms                                                                  |
-| ---------------- | ---------------------------------------------------------------------- |
-| Product category | Drinks, Bowls, Snacks, Breakfast                                       |
+| Vocabulary       | Terms                                                                    |
+| ---------------- | ------------------------------------------------------------------------ |
+| Product category | Drinks, Bowls, Snacks, Breakfast                                         |
 | Dietary tag      | Vegan, Vegetarian, Gluten-free, Dairy-free, High protein, No added sugar |
 
-| Custom block type | Fields                                                  |
-| ----------------- | ------------------------------------------------------- |
-| Banner            | variant (hero / promo), heading, text, link, image      |
+| Custom block type | Fields                                             |
+| ----------------- | -------------------------------------------------- |
+| Banner            | variant (hero / promo), heading, text, link, image |
 
 Demo content: 14 products, 5 articles, 2 banners and the main and footer menu links,
 created by `scripts/demo-content/demo-content.php`. Products marked "Promoted to front
@@ -81,12 +81,12 @@ page" are the featured products on the home page.
 
 ## Pages
 
-| Path        | What it shows                                                        | Built with                     |
-| ----------- | -------------------------------------------------------------------- | ------------------------------ |
-| `/`         | Hero, featured products, promo banner, latest articles               | Views page + blocks on `<front>` |
-| `/products` | Product catalog                                                      | View `products`                |
-| `/articles` | Recipes and news, newest first, 6 per page                           | View `articles`                |
-| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto) | `node--TYPE--full.html.twig` |
+| Path                               | What it shows                                          | Built with                       |
+| ---------------------------------- | ------------------------------------------------------ | -------------------------------- |
+| `/`                                | Hero, featured products, promo banner, latest articles | Views page + blocks on `<front>` |
+| `/products`                        | Product catalog                                        | View `products`                  |
+| `/articles`                        | Recipes and news, newest first, 6 per page             | View `articles`                  |
+| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)     | `node--TYPE--full.html.twig`     |
 
 ## Components
 
@@ -145,11 +145,11 @@ ddev drush config:import -y
 `package.json` and `webpack.config.js` sit in the project root, outside the web root,
 so `node_modules/` is never served by the web server.
 
-| Command               | What it does                                                   |
-| --------------------- | -------------------------------------------------------------- |
-| `ddev npm run build`  | Production build: compressed CSS, no source maps               |
-| `ddev npm run watch`  | Development build with source maps; rebuilds when a file changes |
-| `ddev npm test`       | JavaScript unit tests (`*.test.js`)                            |
+| Command              | What it does                                                     |
+| -------------------- | ---------------------------------------------------------------- |
+| `ddev npm run build` | Production build: compressed CSS, no source maps                 |
+| `ddev npm run watch` | Development build with source maps; rebuilds when a file changes |
+| `ddev npm test`      | JavaScript unit tests (`*.test.js`)                              |
 
 Node.js runs in the DDEV container (version 24, see `.nvmrc`). With Node.js 24 on the
 host, the same commands work without `ddev`.
@@ -199,11 +199,28 @@ webpack.config.js       Webpack configuration
 
 ## Continuous integration
 
-On every push GitHub Actions scans the history for secrets, validates and audits the
-Composer and npm dependencies, runs the JavaScript unit tests, builds the theme assets,
-then installs the site from `config/sync` into an empty MariaDB
-database, creates the demo content and requests a few pages
-(`scripts/ci/install-test.sh`).
+GitHub Actions runs three jobs on every push:
+
+| Job       | What it checks                                                                                                                                                                                                                           |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `secrets` | gitleaks scans the whole history for keys and passwords                                                                                                                                                                                  |
+| `lint`    | `npm run lint` (ESLint, Stylelint, Prettier) and `composer lint` (PHP_CodeSniffer with the Drupal and DrupalPractice standards)                                                                                                          |
+| `build`   | Composer and npm audits, JavaScript unit tests, the Webpack build, then a site install from `config/sync` into an empty MariaDB database with the demo content, a smoke test (`scripts/ci/install-test.sh`) and a Lighthouse + axe audit |
+
+The CI site runs on PHP's built-in server instead of DDEV: installing Drupal from config and
+auditing the pages needs only PHP and a database, which start in seconds, while DDEV would
+first pull several Docker images on every run. Lighthouse's Performance score is reported but
+not enforced in CI, because timings on shared CI machines vary from run to run; Accessibility,
+Best Practices, SEO (90 or more) and axe (no critical or serious issues) are enforced. The
+reports are kept as a build artifact.
+
+Run the same checks locally:
+
+```bash
+ddev npm run lint
+ddev composer lint
+ddev npm test
+```
 
 ## Secrets
 
@@ -214,7 +231,13 @@ Every push is scanned with [gitleaks](https://github.com/gitleaks/gitleaks).
 
 ## Screenshots
 
-_To be added in phase 7._
+| Desktop (1280 px)                                                                    | Mobile (360 px)                                                                    |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| ![Home page on desktop](docs/screenshots/home-desktop.webp)                          | ![Home page on mobile](docs/screenshots/home-mobile.webp)                          |
+| ![Product catalog with the filter on desktop](docs/screenshots/catalog-desktop.webp) | ![Product catalog with the filter on mobile](docs/screenshots/catalog-mobile.webp) |
+| ![Product page on desktop](docs/screenshots/product-desktop.webp)                    | ![Product page on mobile](docs/screenshots/product-mobile.webp)                    |
+
+Made with `npm run screenshots` and converted to WebP.
 
 ## Performance, accessibility and SEO
 
@@ -224,10 +247,10 @@ Lighthouse, mobile preset (emulated phone, slow 4G, 4x CPU slowdown), on the loc
 
 | Page    | Performance | Accessibility | Best Practices | SEO |
 | ------- | ----------: | ------------: | -------------: | --: |
-| Home    | 100         | 100           | 100            | 100 |
-| Catalog | 98          | 100           | 100            | 100 |
-| Product | 100         | 100           | 100            | 100 |
-| Article | 100         | 100           | 100            | 100 |
+| Home    |         100 |           100 |            100 | 100 |
+| Catalog |          98 |           100 |            100 | 100 |
+| Product |         100 |           100 |            100 | 100 |
+| Article |         100 |           100 |            100 | 100 |
 
 axe-core (WCAG 2.0/2.1 A and AA, plus best practices): **0 violations** on all four pages at
 360 and 1280 px, with the mobile menu open and with the catalog filter applied.
@@ -276,8 +299,8 @@ texts, a disclosure-pattern mobile menu (Escape closes it), and a live region fo
 
 ## Documentation
 
-- `docs/ARCHITECTURE.md` — theme structure and data flow _(planned)_
-- `docs/LEARNING.md` — how Drupal theming works in this project _(planned)_
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — theme structure, data flow from Drupal to Twig and to React, caching
+- [`docs/LEARNING.md`](docs/LEARNING.md) — how Drupal theming works in this project, with interview questions
 - [`docs/design-tokens.md`](docs/design-tokens.md) — colours (with WCAG contrast ratios), typography, spacing, breakpoints
 
 Image and content credits: `CREDITS.md`.
