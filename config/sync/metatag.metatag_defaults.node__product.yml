@@ -1,0 +1,8 @@
+uuid: 4492f44d-a967-4c1c-ab57-8cdad5c2446f
+langcode: en
+status: true
+dependencies: {  }
+id: node__product
+label: 'Content: Product'
+tags:
+  og_type: product

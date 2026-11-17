@@ -1,0 +1,20 @@
+uuid: 1698d4dc-c806-4b44-bd9c-9acb151dbdf0
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: rpwvgyEURXLz_JjgMCrkS1rUv-0k3L79BpO-ReN7fDI
+id: node
+label: Content
+tags:
+  title: '[node:title] | [site:name]'
+  description: '[node:summary]'
+  canonical_url: '[node:url]'
+  og_type: article
+  og_url: '[node:url]'
+  og_title: '[node:title]'
+  og_description: '[node:summary]'
+  og_image: '[node:field_image:social:url]'
+  og_image_width: '1200'
+  og_image_height: '630'
+  og_image_alt: '[node:field_image:alt]'
