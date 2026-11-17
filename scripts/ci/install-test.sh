@@ -67,6 +67,18 @@ grep --quiet '<script type="application/ld+json">' <<< "$product"
 # Responsive images: srcset with WebP files.
 grep --quiet 'srcset="[^"]*\.webp' <<< "$product"
 
+# Security: a title with HTML (as a malicious editor could type) must be escaped by
+# Twig, and in JSON-LD it must not be able to close the <script> element.
+xss_nid=$($drush php:eval '$node = \Drupal\node\Entity\Node::create(["type" => "product", "title" => "<script>alert(1)</script> XSS test", "field_price" => "1.00"]); $node->save(); echo $node->id();')
+xss_page=$(curl --fail --silent --show-error "$base_url/node/$xss_nid")
+grep --quiet '&lt;script&gt;alert(1)&lt;/script&gt; XSS test' <<< "$xss_page"
+if grep --quiet '<script>alert(1)' <<< "$xss_page"; then
+  echo "Unescaped <script> found on the page."
+  exit 1
+fi
+grep --quiet '\\u003Cscript\\u003Ealert(1)' <<< "$xss_page"
+$drush entity:delete node "$xss_nid"
+
 # Ukrainian: translated content under /uk, interface strings from the .po file.
 home_uk=$(curl --fail --silent --show-error "$base_url/uk")
 grep --quiet '<html lang="uk"' <<< "$home_uk"
