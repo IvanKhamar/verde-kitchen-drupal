@@ -1,12 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import {
-  buildProductsUrl,
-  buildTermsUrl,
-  fetchJsonApi,
-  filterByTags,
-  parseProducts,
-  parseTerms,
-} from './api.js';
+import { buildProductsUrl, buildTermsUrl, fetchJsonApi, filterByTags, parseProducts, parseTerms } from './api.js';
 import ProductCard from './ProductCard.jsx';
 import useDebouncedValue from './useDebouncedValue.js';
 
@@ -35,15 +28,22 @@ const EMPTY_FILTERS = { search: '', category: '', tags: [] };
 export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }) {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [terms, setTerms] = useState({ categories: [], tags: [] });
-  const [products, setProducts] = useState([]);
-  const [status, setStatus] = useState('loading');
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [termsFailed, setTermsFailed] = useState(false);
+  // The last finished products request: which request it was ("key"), and
+  // its outcome. Products from the last success stay while a new request runs.
+  const [result, setResult] = useState({ key: null, products: [], failed: false, loadedOnce: false });
   // Changing this number repeats the request (the "Try again" button).
   const [attempt, setAttempt] = useState(0);
   const searchRef = useRef(null);
   const id = useId();
 
   const search = useDebouncedValue(filters.search, 300);
+
+  // "Try again" repeats every request that can have failed.
+  const retry = () => {
+    setTermsFailed(false);
+    setAttempt((n) => n + 1);
+  };
 
   // Load the category and tag lists once.
   useEffect(() => {
@@ -54,30 +54,42 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
     ])
       .then(([categories, tags]) => setTerms({ categories: parseTerms(categories), tags: parseTerms(tags) }))
       .catch((error) => {
-        if (error.name !== 'AbortError') setStatus('error');
+        if (error.name !== 'AbortError') setTermsFailed(true);
       });
     // Cleanup on unmount: abort requests that are still running.
     return () => controller.abort();
-  }, [apiBase]);
+  }, [apiBase, attempt]);
 
-  // Load products whenever the server-side filters change.
+  // Every combination of server-side filters (and every retry) is one request.
+  const requestKey = JSON.stringify([search.trim(), filters.category, attempt]);
+
+  // Load products whenever the request changes. State is only set in the
+  // promise callbacks, when the response arrives: "loading" is not stored but
+  // derived below, from the difference between this request and the last
+  // finished one. (Setting state at the start of an effect makes React render
+  // twice; the React docs and the react-hooks lint rules advise against it.)
   useEffect(() => {
     const controller = new AbortController();
-    setStatus('loading');
     fetchJsonApi(buildProductsUrl(apiBase, { search, category: filters.category }), controller.signal)
       .then((document) => {
-        setProducts(parseProducts(document, basePath));
-        setStatus('success');
-        setHasLoaded(true);
+        setResult({ key: requestKey, products: parseProducts(document, basePath), failed: false, loadedOnce: true });
       })
       .catch((error) => {
         // A newer request replaced this one: not an error.
-        if (error.name !== 'AbortError') setStatus('error');
+        if (error.name !== 'AbortError') setResult((previous) => ({ ...previous, key: requestKey, failed: true }));
       });
     // Aborting the previous request means an old, slow response can never
     // overwrite the results of a newer one.
     return () => controller.abort();
-  }, [apiBase, basePath, search, filters.category, attempt]);
+  }, [apiBase, basePath, search, filters.category, requestKey]);
+
+  let status = 'success';
+  if (termsFailed || (result.key === requestKey && result.failed)) {
+    status = 'error';
+  } else if (result.key !== requestKey) {
+    status = 'loading';
+  }
+  const { products, loadedOnce: hasLoaded } = result;
 
   // Derived data: computed from state on each render, not stored in state.
   const visibleProducts = useMemo(() => filterByTags(products, filters.tags), [products, filters.tags]);
@@ -102,7 +114,9 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
   const toggleTag = (tagId) =>
     setFilters((current) => ({
       ...current,
-      tags: current.tags.includes(tagId) ? current.tags.filter((selected) => selected !== tagId) : [...current.tags, tagId],
+      tags: current.tags.includes(tagId)
+        ? current.tags.filter((selected) => selected !== tagId)
+        : [...current.tags, tagId],
     }));
 
   const clearFilters = () => {
@@ -123,7 +137,12 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
   return (
     <div className="catalog-filter">
       {/* role="search" makes the form a landmark; it never submits a page. */}
-      <form className="catalog-filter__form" role="search" aria-label={t('Filter products')} onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="catalog-filter__form"
+        role="search"
+        aria-label={t('Filter products')}
+        onSubmit={(e) => e.preventDefault()}
+      >
         <div className="catalog-filter__field">
           <label htmlFor={`${id}-search`}>{t('Search by name')}</label>
           <input
@@ -183,7 +202,7 @@ export default function CatalogFilter({ apiBase, basePath, onLiveResultsChange }
       {status === 'error' && (
         <div className="catalog-filter__error">
           <p>{t('Check your connection and try again.')}</p>
-          <button type="button" className="button button--primary" onClick={() => setAttempt((n) => n + 1)}>
+          <button type="button" className="button button--primary" onClick={retry}>
             {t('Try again')}
           </button>
         </div>
