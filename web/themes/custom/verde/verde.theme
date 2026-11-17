@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 use Drupal\block_content\BlockContentInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\image\Entity\ImageStyle;
@@ -66,13 +67,16 @@ function verde_preprocess_node(array &$variables): void {
     // card is re-rendered when an editor renames a term.
     $cacheability = new CacheableMetadata();
     foreach ($node->get('field_dietary_tags')->referencedEntities() as $term) {
-      $card['badges'][] = (string) $term->label();
+      $card['badges'][] = (string) verde_translated($term)->label();
       $cacheability->addCacheableDependency($term);
     }
     $category = $node->get('field_category')->entity;
     if ($category) {
-      $card['meta'] = (string) $category->label();
+      $card['meta'] = (string) verde_translated($category)->label();
       $cacheability->addCacheableDependency($category);
+    }
+    if ($variables['view_mode'] === 'full') {
+      $variables['where_to_buy'] = verde_where_to_buy($node, $cacheability);
     }
     $cacheability->applyTo($variables);
   }
@@ -322,7 +326,7 @@ function verde_product_schema(NodeInterface $node): array {
     ],
   ];
   if ($category = $node->get('field_category')->entity) {
-    $data['category'] = $category->label();
+    $data['category'] = verde_translated($category)->label();
   }
   if ($image = verde_schema_image_url($node)) {
     $data['image'] = $image;
@@ -436,4 +440,54 @@ function verde_preprocess_views_view(array &$variables): void {
     $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
     $variables['static_data_path'] = base_path() . 'static-data/' . $langcode;
   }
+}
+
+/**
+ * Returns an entity in the language of the current page.
+ *
+ * Entity reference fields return the referenced entity in its original
+ * language. On /uk pages that would show "Vegan" instead of "Веганське",
+ * so every term printed by the theme goes through this function.
+ */
+function verde_translated(EntityInterface $entity): EntityInterface {
+  return \Drupal::service('entity.repository')->getTranslationFromContext($entity);
+}
+
+/**
+ * Builds the props of the where-to-buy component for a product.
+ *
+ * Online shops become links to their websites; store chains list the cities
+ * they are in. Each retailer's cache tag is added, so the block updates when
+ * an editor changes a shop.
+ */
+function verde_where_to_buy(NodeInterface $node, CacheableMetadata $cacheability): array {
+  $online = [];
+  $stores = [];
+  foreach ($node->get('field_retailers')->referencedEntities() as $retailer) {
+    $cacheability->addCacheableDependency($retailer);
+    $retailer = verde_translated($retailer);
+    $name = (string) $retailer->label();
+    $type = $retailer->get('field_retailer_type')->value;
+    if ($type === 'online' && !$retailer->get('field_website')->isEmpty()) {
+      $online[] = [
+        'name' => $name,
+        'url' => $retailer->get('field_website')->first()->getUrl()->toString(),
+        'label' => (string) t('Buy at @shop', ['@shop' => $name]),
+      ];
+    }
+    elseif ($type === 'store') {
+      $cities = array_column($retailer->get('field_cities')->getValue(), 'value');
+      $stores[] = ['name' => $name, 'cities' => implode(', ', $cities)];
+    }
+  }
+
+  return [
+    'heading' => (string) t('Where to buy'),
+    'online_heading' => (string) t('Online'),
+    'stores_heading' => (string) t('In stores'),
+    'empty_text' => (string) t('Not in shops yet. Check back soon.'),
+    'external_hint' => (string) t('(external site)'),
+    'online' => $online,
+    'stores' => $stores,
+  ];
 }
