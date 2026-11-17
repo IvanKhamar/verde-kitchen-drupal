@@ -87,7 +87,9 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
       - name: Check Node dependencies for known vulnerabilities
-        run: npm audit --audit-level=high
+        # Fails on high/critical advisories; reviewed exceptions with an expiry
+        # date live in scripts/ci/npm-audit-allowlist.json.
+        run: node scripts/ci/npm-audit.mjs
       - name: Run JavaScript unit tests
         run: npm test
       - name: Build theme assets
