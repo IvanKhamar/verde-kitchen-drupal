@@ -19,6 +19,17 @@ updates:
       build-tools:
         patterns:
           - '*'
+    # Major versions that the project's plugins do not support yet. Minor,
+    # patch and security updates of these packages still come.
+    ignore:
+      # eslint-plugin-react and eslint-plugin-jsx-a11y support ESLint up to 9.
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@eslint/js'
+        update-types: ['version-update:semver-major']
+      # vite-plugin-twig-drupal (Storybook) supports Vite up to 7.
+      - dependency-name: 'vite'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: '/'
