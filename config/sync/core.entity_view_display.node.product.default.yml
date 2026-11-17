@@ -8,10 +8,10 @@ dependencies:
     - field.field.node.product.field_dietary_tags
     - field.field.node.product.field_image
     - field.field.node.product.field_price
-    - image.style.detail
     - node.type.product
+    - responsive_image.styles.detail
   module:
-    - image
+    - responsive_image
     - text
     - user
 id: node.product.default
@@ -43,13 +43,13 @@ content:
     weight: 4
     region: content
   field_image:
-    type: image
+    type: responsive_image
     label: hidden
     settings:
+      responsive_image_style: detail
       image_link: ''
-      image_style: detail
       image_loading:
-        attribute: eager
+        attribute: lazy
     third_party_settings: {  }
     weight: 0
     region: content

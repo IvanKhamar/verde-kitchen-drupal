@@ -1,0 +1,25 @@
+uuid: e08d64bd-d727-4a59-ab36-e97cbef17bc8
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.detail
+    - image.style.detail_lg
+    - image.style.detail_sm
+  theme:
+    - verde
+id: detail
+label: Detail
+image_style_mappings:
+  -
+    image_mapping_type: sizes
+    image_mapping:
+      sizes: '(min-width: 1200px) 600px, (min-width: 768px) 50vw, calc(100vw - 2rem)'
+      sizes_image_styles:
+        - detail_sm
+        - detail
+        - detail_lg
+    breakpoint_id: verde.all
+    multiplier: 1x
+breakpoint_group: verde
+fallback_image_style: detail

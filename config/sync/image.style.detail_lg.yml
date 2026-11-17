@@ -1,0 +1,21 @@
+uuid: 484d9870-bec1-4354-b593-9290791cf0eb
+langcode: en
+status: true
+dependencies: {  }
+name: detail_lg
+label: 'Detail large (4:3, 1200)'
+effects:
+  a6fd856e-a4c8-45f4-94eb-26a432249e40:
+    uuid: a6fd856e-a4c8-45f4-94eb-26a432249e40
+    id: image_scale_and_crop
+    weight: 0
+    data:
+      width: 1200
+      height: 900
+      anchor: center-center
+  5ee85071-135a-4df1-954e-e12173eb8811:
+    uuid: 5ee85071-135a-4df1-954e-e12173eb8811
+    id: image_convert
+    weight: 1
+    data:
+      extension: webp

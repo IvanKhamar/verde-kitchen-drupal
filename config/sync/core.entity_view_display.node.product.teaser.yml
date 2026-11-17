@@ -9,10 +9,10 @@ dependencies:
     - field.field.node.product.field_dietary_tags
     - field.field.node.product.field_image
     - field.field.node.product.field_price
-    - image.style.card
     - node.type.product
+    - responsive_image.styles.card
   module:
-    - image
+    - responsive_image
     - text
     - user
 id: node.product.teaser
@@ -45,11 +45,11 @@ content:
     weight: 4
     region: content
   field_image:
-    type: image
+    type: responsive_image
     label: hidden
     settings:
+      responsive_image_style: card
       image_link: ''
-      image_style: card
       image_loading:
         attribute: lazy
     third_party_settings: {  }

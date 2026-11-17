@@ -9,20 +9,20 @@ dependencies:
     - field.field.block_content.banner.field_link
     - field.field.block_content.banner.field_text
     - field.field.block_content.banner.field_variant
-    - image.style.detail
+    - responsive_image.styles.detail
   module:
-    - image
+    - responsive_image
 id: block_content.banner.default
 targetEntityType: block_content
 bundle: banner
 mode: default
 content:
   field_image:
-    type: image
+    type: responsive_image
     label: hidden
     settings:
+      responsive_image_style: detail
       image_link: ''
-      image_style: detail
       image_loading:
         attribute: lazy
     third_party_settings: {  }

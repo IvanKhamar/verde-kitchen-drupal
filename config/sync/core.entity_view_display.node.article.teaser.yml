@@ -7,11 +7,11 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_article_type
     - field.field.node.article.field_image
-    - image.style.card
     - node.type.article
+    - responsive_image.styles.card
   module:
-    - image
     - options
+    - responsive_image
     - text
     - user
 id: node.article.teaser
@@ -35,11 +35,11 @@ content:
     weight: -1
     region: content
   field_image:
-    type: image
+    type: responsive_image
     label: hidden
     settings:
+      responsive_image_style: card
       image_link: ''
-      image_style: card
       image_loading:
         attribute: lazy
     third_party_settings: {  }
