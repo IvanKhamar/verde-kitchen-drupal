@@ -1,5 +1,10 @@
 {#
   Badge. Usage:
-  {{ include('verde:badge', { label: 'Vegan' }, with_context = false) }}
+  {% include 'verde:badge' with { label: 'Vegan' } only %}
 #}
+{#
+  Drupal gives every component an "attributes" object. Storybook's Twig.js
+  does not do that for nested components, so create one when it is missing.
+#}
+{% set attributes = attributes|default(create_attribute()) %}
 <span{{ attributes.addClass(['badge', 'badge--' ~ (variant|default('default'))]) }}>{{ label }}</span>

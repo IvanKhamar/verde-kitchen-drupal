@@ -15,11 +15,16 @@
       <p class="hero__text">{{ text }}</p>
     {% endif %}
     {% if cta_label and cta_url %}
-      {{ include('verde:button', {
+      {#
+        The include tag with "only" passes just these variables, like
+        include(…, with_context = false). The tag form is used inside
+        components because Storybook's Twig.js understands it too.
+      #}
+      {% include 'verde:button' with {
         label: cta_label,
         url: cta_url,
-        variant: variant == 'hero' ? 'primary' : 'secondary',
-      }, with_context = false) }}
+        variant: variant == 'hero' ? 'primary' : 'secondary'
+      } only %}
     {% endif %}
   </div>
   {% if image %}

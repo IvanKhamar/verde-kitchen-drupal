@@ -26,7 +26,7 @@
         {% if badges %}
           <ul class="card__badges" role="list">
             {% for badge in badges %}
-              <li>{{ include('verde:badge', { label: badge }, with_context = false) }}</li>
+              <li>{% include 'verde:badge' with { label: badge } only %}</li>
             {% endfor %}
           </ul>
         {% endif %}
