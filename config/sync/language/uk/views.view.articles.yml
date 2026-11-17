@@ -1,0 +1,21 @@
+display:
+  default:
+    display_options:
+      title: Статті
+      pager:
+        options:
+          tags:
+            previous: '‹ Попередня'
+            next: 'Наступна ›'
+      empty:
+        area_text_custom:
+          content: 'Тут поки нічого немає.'
+  page:
+    display_options:
+      display_extenders:
+        metatag_display_extender:
+          metatags:
+            title: 'Рецепти й новини | [site:name]'
+            description: 'Швидкі вегетаріанські рецепти та новини Verde Kitchen.'
+            og_title: 'Рецепти й новини | [site:name]'
+            og_description: 'Швидкі вегетаріанські рецепти та новини Verde Kitchen.'

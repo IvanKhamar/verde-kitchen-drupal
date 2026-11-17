@@ -33,3 +33,4 @@ hidden:
   field_link: true
   field_text: true
   field_variant: true
+  langcode: true

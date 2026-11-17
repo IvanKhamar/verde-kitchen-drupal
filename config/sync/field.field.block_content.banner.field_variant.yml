@@ -14,7 +14,7 @@ bundle: banner
 label: Variant
 description: ''
 required: true
-translatable: true
+translatable: false
 default_value:
   -
     value: promo

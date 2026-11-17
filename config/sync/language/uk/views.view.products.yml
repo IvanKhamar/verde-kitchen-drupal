@@ -1,0 +1,19 @@
+display:
+  default:
+    display_options:
+      title: Продукти
+      empty:
+        area_text_custom:
+          content: 'Тут поки нічого немає.'
+  home:
+    display_options:
+      title: 'Рекомендовані продукти'
+  page_catalog:
+    display_options:
+      display_extenders:
+        metatag_display_extender:
+          metatags:
+            title: 'Продукти | [site:name]'
+            description: 'Усі продукти Verde Kitchen: напої, боули, снеки та сніданки. Фільтр за категорією, назвою і харчовими потребами: веганське, без глютену тощо.'
+            og_title: 'Продукти | [site:name]'
+            og_description: 'Усі продукти Verde Kitchen: напої, боули, снеки та сніданки.'
