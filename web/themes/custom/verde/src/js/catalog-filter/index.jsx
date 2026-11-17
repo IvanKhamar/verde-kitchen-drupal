@@ -28,7 +28,11 @@ Drupal.behaviors.verdeCatalogFilter = {
 
       const root = createRoot(element);
       root.render(
-        <CatalogFilter apiBase={element.dataset.apiBase} basePath={element.dataset.basePath} onLiveResultsChange={toggleFallback} />,
+        <CatalogFilter
+          apiBase={element.dataset.apiBase}
+          basePath={element.dataset.basePath}
+          onLiveResultsChange={toggleFallback}
+        />,
       );
       roots.set(element, root);
     });

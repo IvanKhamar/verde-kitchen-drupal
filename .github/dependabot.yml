@@ -1,26 +1,26 @@
 version: 2
 updates:
   - package-ecosystem: composer
-    directory: "/"
+    directory: '/'
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
       drupal-core:
         patterns:
-          - "drupal/core*"
+          - 'drupal/core*'
 
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
       build-tools:
         patterns:
-          - "*"
+          - '*'
 
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: '/'
     schedule:
       interval: weekly
