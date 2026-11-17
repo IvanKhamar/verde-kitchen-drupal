@@ -3,11 +3,16 @@
  * audit scripts. CDP is the protocol DevTools itself uses to control Chromium
  * browsers (Chrome, Edge) over a WebSocket. Node 22+ has WebSocket built in, so
  * no npm package is needed.
+ *
+ * CHROME_FLAGS (optional, space-separated) adds browser flags, for example
+ * "--no-sandbox", which Chrome needs when it runs as root inside a container.
  */
 import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+
+export const extraChromeFlags = (process.env.CHROME_FLAGS ?? '').split(/\s+/).filter(Boolean);
 
 /**
  * Starts a headless browser and opens one tab (a CDP "page" session).
@@ -23,6 +28,7 @@ export async function startBrowser(chromePath) {
     `--user-data-dir=${profileDir}`,
     '--no-first-run',
     '--hide-scrollbars',
+    ...extraChromeFlags,
     'about:blank',
   ]);
 

@@ -20,7 +20,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as chromeLauncher from 'chrome-launcher';
 import lighthouse from 'lighthouse';
-import { startBrowser, waitUntil } from './lib/cdp.mjs';
+import { extraChromeFlags, startBrowser, waitUntil } from './lib/cdp.mjs';
 
 const chromePath = process.env.CHROME_PATH;
 const baseUrl = (process.env.BASE_URL ?? '').replace(/\/$/, '');
@@ -90,7 +90,10 @@ try {
       await browser.open(baseUrl + pagePath);
       if (name === 'Catalog') {
         // Wait until the React widget has loaded its data.
-        await waitUntil(browser.evaluate, "/found/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')");
+        await waitUntil(
+          browser.evaluate,
+          "/found/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')",
+        );
       }
       axeResults.push(await runAxe(`${name} (${viewportName})`));
     }
@@ -100,11 +103,17 @@ try {
   await browser.page('Emulation.setDeviceMetricsOverride', viewports.mobile);
   await browser.open(`${baseUrl}/`);
   await browser.evaluate("document.querySelector('.navigation__toggle').click(), true");
-  await waitUntil(browser.evaluate, "document.querySelector('.navigation__toggle').getAttribute('aria-expanded') === 'true'");
+  await waitUntil(
+    browser.evaluate,
+    "document.querySelector('.navigation__toggle').getAttribute('aria-expanded') === 'true'",
+  );
   axeResults.push(await runAxe('Home, mobile menu open (mobile)'));
 
   await browser.open(`${baseUrl}/products`);
-  await waitUntil(browser.evaluate, "/found/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')");
+  await waitUntil(
+    browser.evaluate,
+    "/found/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')",
+  );
   // Tick the first dietary tag the way a user would (React listens to real events).
   await browser.evaluate("document.querySelector('.catalog-filter__tag input').click(), true");
   await waitUntil(browser.evaluate, "document.querySelector('.catalog-filter__results') !== null");
@@ -117,7 +126,7 @@ try {
 await mkdir(reportDir, { recursive: true });
 const lighthouseResults = [];
 for (const [name, pagePath] of pages) {
-  const chrome = await chromeLauncher.launch({ chromePath, chromeFlags: ['--headless=new'] });
+  const chrome = await chromeLauncher.launch({ chromePath, chromeFlags: ['--headless=new', ...extraChromeFlags] });
   try {
     const { lhr, report } = await lighthouse(baseUrl + pagePath, {
       port: chrome.port,
@@ -171,7 +180,8 @@ const lines = [
   '| Page and state | Critical | Serious | Moderate | Minor |',
   '| -------------- | -------: | ------: | -------: | ----: |',
   ...axeResults.map(
-    ({ label, counts }) => `| ${label} | ${counts.critical} | ${counts.serious} | ${counts.moderate} | ${counts.minor} |`,
+    ({ label, counts }) =>
+      `| ${label} | ${counts.critical} | ${counts.serious} | ${counts.moderate} | ${counts.minor} |`,
   ),
   '',
 ];
