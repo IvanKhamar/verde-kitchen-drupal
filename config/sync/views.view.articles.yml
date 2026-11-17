@@ -249,7 +249,14 @@ display:
     display_plugin: page
     position: 1
     display_options:
-      display_extenders: {  }
+      display_extenders:
+        metatag_display_extender:
+          metatags:
+            title: 'Recipes and news | [site:name]'
+            description: 'Quick vegetarian recipes and news from Verde Kitchen.'
+            og_title: 'Recipes and news | [site:name]'
+            og_description: 'Quick vegetarian recipes and news from Verde Kitchen.'
+          tokenize: false
       path: articles
     cache_metadata:
       max-age: -1

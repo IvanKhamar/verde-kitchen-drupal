@@ -396,7 +396,14 @@ display:
     display_plugin: page
     position: 1
     display_options:
-      display_extenders: {  }
+      display_extenders:
+        metatag_display_extender:
+          metatags:
+            title: 'Products | [site:name]'
+            description: 'All Verde Kitchen products: drinks, bowls, snacks and breakfast. Filter by category, by name and by dietary needs such as vegan or gluten-free.'
+            og_title: 'Products | [site:name]'
+            og_description: 'All Verde Kitchen products: drinks, bowls, snacks and breakfast. Filter by category, by name and by dietary needs such as vegan or gluten-free.'
+          tokenize: false
       path: products
     cache_metadata:
       max-age: -1

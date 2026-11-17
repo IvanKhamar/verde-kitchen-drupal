@@ -1,0 +1,17 @@
+uuid: 63b58758-6cb5-499c-94f7-ceede3ab4e7f
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: sL588ui1E_8-2c_UupwyYxcqX2OVyMFp3HTLbbFqvPc
+id: global
+label: Global
+tags:
+  title: '[current-page:title] | [site:name]'
+  description: 'Verde Kitchen is a fictional brand of healthy food and drinks: smoothies, bowls, snacks and breakfast, all vegetarian and mostly vegan.'
+  canonical_url: '[current-page:url]'
+  og_site_name: '[site:name]'
+  og_type: website
+  og_url: '[current-page:url]'
+  og_title: '[current-page:title]'
+  og_description: 'Verde Kitchen is a fictional brand of healthy food and drinks: smoothies, bowls, snacks and breakfast, all vegetarian and mostly vegan.'
