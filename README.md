@@ -201,11 +201,11 @@ webpack.config.js       Webpack configuration
 
 GitHub Actions runs three jobs on every push:
 
-| Job       | What it checks                                                                                                                                                                                                                           |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `secrets` | gitleaks scans the whole history for keys and passwords                                                                                                                                                                                  |
-| `lint`    | `npm run lint` (ESLint, Stylelint, Prettier) and `composer lint` (PHP_CodeSniffer with the Drupal and DrupalPractice standards)                                                                                                          |
-| `build`   | Composer and npm audits, JavaScript unit tests, the Webpack build, then a site install from `config/sync` into an empty MariaDB database with the demo content, a smoke test (`scripts/ci/install-test.sh`) and a Lighthouse + axe audit |
+| Job       | What it checks                                                                                                                                                                                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `secrets` | gitleaks scans the whole history for keys and passwords                                                                                                                                                                                                                   |
+| `lint`    | `npm run lint` (ESLint, Stylelint, Prettier) and `composer lint` (PHP_CodeSniffer with the Drupal and DrupalPractice standards)                                                                                                                                           |
+| `build`   | Composer and npm audits, JavaScript unit tests, the Webpack build, then a site install from `config/sync` into an empty MariaDB database with the demo content, a smoke test (`scripts/ci/install-test.sh`), a Lighthouse + axe audit and the Playwright end-to-end tests |
 
 The CI site runs on PHP's built-in server instead of DDEV: installing Drupal from config and
 auditing the pages needs only PHP and a database, which start in seconds, while DDEV would
@@ -221,6 +221,43 @@ ddev npm run lint
 ddev composer lint
 ddev npm test
 ```
+
+### End-to-end tests
+
+[Playwright](https://playwright.dev/) drives real browsers through the site: desktop Chromium,
+Firefox and WebKit (Safari's engine), and phone emulation for Chrome on Android and Safari on
+iOS. The tests live in `tests/e2e/`:
+
+| File                 | What it checks                                                                                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `navigation.spec.js` | Skip link focus, the mobile menu with the keyboard (Enter, Escape), wide-screen menu                                                                             |
+| `catalog.spec.js`    | Search, category, "all selected tags", empty state, "Clear filters" focus, API error and "Try again" (the API failure is simulated), the page without JavaScript |
+| `pages.spec.js`      | One `<h1>` per page, `lang`, meta description, Product JSON-LD, responsive WebP images                                                                           |
+
+```bash
+BASE_URL="http://127.0.0.1:PORT" npm run test:e2e
+```
+
+Playwright needs its browsers once (`npx playwright install`). Without installing them on the
+host, run the tests in the official Playwright image on the DDEV network:
+
+```bash
+docker run --rm --network ddev-verde-kitchen_default -v "$PWD:/work" -w /work \
+  -e BASE_URL=http://web mcr.microsoft.com/playwright:v1.65.1-noble \
+  node node_modules/@playwright/test/cli.js test
+```
+
+### Secret scanning before each commit
+
+The repository is public, so a pre-commit hook scans staged changes with
+[gitleaks](https://github.com/gitleaks/gitleaks) (installed locally, or through Docker) and
+blocks the commit when it finds a key, token or password. Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The project rules are in `.gitleaks.toml`; CI runs the same scan over the whole history.
 
 ## Secrets
 
