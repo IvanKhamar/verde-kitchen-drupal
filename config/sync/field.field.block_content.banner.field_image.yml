@@ -6,7 +6,12 @@ dependencies:
     - block_content.type.banner
     - field.storage.block_content.field_image
   module:
+    - content_translation
     - image
+third_party_settings:
+  content_translation:
+    translation_sync:
+      file: file
 id: block_content.banner.field_image
 field_name: field_image
 entity_type: block_content

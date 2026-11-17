@@ -6,7 +6,12 @@ dependencies:
     - field.storage.node.field_image
     - node.type.product
   module:
+    - content_translation
     - image
+third_party_settings:
+  content_translation:
+    translation_sync:
+      file: file
 id: node.product.field_image
 field_name: field_image
 entity_type: node
