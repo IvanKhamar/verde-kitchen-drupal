@@ -1,0 +1,6 @@
+services:
+  verde_security.response_subscriber:
+    class: Drupal\verde_security\EventSubscriber\SecurityHeadersSubscriber
+    arguments: ['@router.admin_context', '@current_user']
+    tags:
+      - { name: event_subscriber }
