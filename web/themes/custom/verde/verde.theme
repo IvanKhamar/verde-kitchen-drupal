@@ -78,7 +78,7 @@ function verde_preprocess_node(array &$variables): void {
   }
 
   if ($node->bundle() === 'article') {
-    // Field values come from the database as strings; strict_types needs an int.
+    // Values come from the database as strings; strict_types needs an int.
     $created = (int) $node->getCreatedTime();
     $variables['published'] = \Drupal::service('date.formatter')->format($created, 'custom', 'j F Y');
     $variables['published_iso'] = date('Y-m-d', $created);
@@ -111,7 +111,7 @@ function verde_preprocess_field(array &$variables): void {
   $view_mode = $element['#view_mode'];
   $is_hero = $entity instanceof BlockContentInterface && $entity->get('field_variant')->value === 'hero';
   $is_full_node = $entity instanceof NodeInterface && $view_mode === 'full';
-  // Set by verde_preprocess_views_view_unformatted() on the first cards of a list.
+  // Set on the first cards of a list, see the views preprocess function below.
   $is_first_row = !empty($element['#verde_eager']);
 
   $priority = $is_hero || $is_full_node;

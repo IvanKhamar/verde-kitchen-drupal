@@ -5,7 +5,7 @@
  * Creates the Verde Kitchen demo content: terms, products and articles.
  *
  * Run it with Drush, which boots Drupal before it includes this file:
- *   ddev drush php:script scripts/demo-content/demo-content.php
+ *   ddev drush php:script scripts/demo-content/demo-content.php.
  *
  * The script is idempotent: it first deletes every product, article, term of
  * the two vocabularies and menu link of the main and footer menus, then
@@ -25,8 +25,7 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
-// --- Data -------------------------------------------------------------------
-
+// Data: everything the site shows, in plain arrays.
 $categories = [
   'drinks' => 'Drinks',
   'bowls' => 'Bowls',
@@ -225,7 +224,7 @@ $articles = [
   ],
 ];
 
-// menu => [title, link URI]. "internal:" links point to paths on this site.
+// Menu => [title, link URI]. "internal:" links point to paths on this site.
 $menus = [
   'main' => [
     ['Home', 'internal:/'],
@@ -263,8 +262,6 @@ $banners = [
   ],
 ];
 
-// --- Helpers ----------------------------------------------------------------
-
 /**
  * Copies a demo image into the public files folder and returns its file entity.
  *
@@ -286,6 +283,7 @@ function verde_demo_image(string $slug, string $directory): FileInterface {
  * Creates the terms of one vocabulary and returns their IDs keyed by slug.
  *
  * @return array<string, int>
+ *   Term IDs keyed by slug.
  */
 function verde_demo_terms(string $vid, array $names): array {
   $ids = [];
@@ -298,8 +296,7 @@ function verde_demo_terms(string $vid, array $names): array {
   return $ids;
 }
 
-// --- Clean up ---------------------------------------------------------------
-
+// Clean up: delete the content a previous run created.
 $entity_type_manager = \Drupal::entityTypeManager();
 
 $node_storage = $entity_type_manager->getStorage('node');
@@ -321,9 +318,7 @@ $link_storage->delete($link_storage->loadByProperties(['menu_name' => array_keys
 
 // Banners are updated, not deleted: deleting a custom block also deletes its
 // placements (block.block.verde_home_*), because they depend on it.
-
-// --- Create -----------------------------------------------------------------
-
+// Create the content.
 $category_ids = verde_demo_terms('product_category', $categories);
 $tag_ids = verde_demo_terms('dietary_tag', $dietary_tags);
 
