@@ -117,6 +117,8 @@ try {
   }
 } finally {
   await browser.close();
+  // Also drop keep-alive connections a leftover browser process may hold.
+  server.closeAllConnections();
   server.close();
 }
 

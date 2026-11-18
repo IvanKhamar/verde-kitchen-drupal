@@ -136,6 +136,7 @@ if (process.env.CHROME_PATH) {
   }
 }
 
+server.closeAllConnections();
 server.close();
 if (problems.length) {
   console.error(`\nProblems:\n- ${problems.join('\n- ')}`);
