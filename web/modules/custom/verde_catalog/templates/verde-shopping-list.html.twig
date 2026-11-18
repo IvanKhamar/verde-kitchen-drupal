@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Default template of the shopping list page: a mount point for JavaScript.
+ *
+ * Themes override this template and attach their JavaScript (the Verde theme
+ * does, with a React app).
+ *
+ * Available variables:
+ * - api_base: The JSON:API root for the current language, for example "/uk/jsonapi".
+ * - base_path: The front page path for the current language, "/" or "/uk".
+ * - static_data: Folder of exported JSON files in the static copy, or empty.
+ */
+#}
+<div
+  data-shopping-list-page
+  data-api-base="{{ api_base }}"
+  data-base-path="{{ base_path }}"
+  {% if static_data %}data-static-data="{{ static_data }}"{% endif %}
+>
+  <noscript>{{ 'The shopping list is kept in your browser and needs JavaScript.'|t }}</noscript>
+</div>

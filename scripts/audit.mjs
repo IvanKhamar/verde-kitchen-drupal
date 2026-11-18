@@ -48,11 +48,15 @@ const failures = [];
 
 // --- Find the pages --------------------------------------------------------------
 const browser = await startBrowser(chromePath);
-const firstCard = "document.querySelector('.card__link').getAttribute('href')";
+// On /products React replaces the server list with its own cards, so wait for a card.
+const firstCard = async () => {
+  await waitUntil(browser.evaluate, "document.querySelector('.card__link') !== null");
+  return browser.evaluate("document.querySelector('.card__link').getAttribute('href')");
+};
 await browser.open(`${baseUrl}/products`);
-const productPath = await browser.evaluate(firstCard);
+const productPath = await firstCard();
 await browser.open(`${baseUrl}/articles`);
-const articlePath = await browser.evaluate(firstCard);
+const articlePath = await firstCard();
 const pages = [
   ['Home', '/'],
   ['Catalog', '/products'],
@@ -60,6 +64,7 @@ const pages = [
   ['Article', articlePath],
   ['Home, Ukrainian', '/uk'],
   ['Catalog, Ukrainian', '/uk/products'],
+  ['Shopping list', '/shopping-list'],
 ];
 
 // --- axe -------------------------------------------------------------------------
@@ -97,6 +102,10 @@ try {
           "/(found|Знайдено)/.test(document.querySelector('.catalog-filter__status')?.textContent ?? '')",
         );
       }
+      if (name.startsWith('Shopping list')) {
+        // The React list page renders after the scripts load (an empty list here).
+        await waitUntil(browser.evaluate, "document.querySelector('.shopping-list') !== null");
+      }
       axeResults.push(await runAxe(`${name} (${viewportName})`));
     }
   }
@@ -120,6 +129,18 @@ try {
   await browser.evaluate("document.querySelector('.catalog-filter__tag input').click(), true");
   await waitUntil(browser.evaluate, "document.querySelector('.catalog-filter__results') !== null");
   axeResults.push(await runAxe('Catalog, filter applied (mobile)'));
+
+  // The shopping list with products in it: add two from the catalog cards.
+  await browser.evaluate(
+    "[...document.querySelectorAll('[data-shopping-list-toggle]')].slice(0, 2).forEach((b) => b.click()), true",
+  );
+  await browser.open(`${baseUrl}/shopping-list`);
+  await waitUntil(browser.evaluate, "document.querySelectorAll('.shopping-list__item').length === 2");
+  axeResults.push(await runAxe('Shopping list with products (mobile)'));
+  // "Clear list" asks first; check the question too.
+  await browser.evaluate("document.querySelector('.shopping-list__actions button:last-child').click(), true");
+  await waitUntil(browser.evaluate, "document.querySelector('.shopping-list__confirm') !== null");
+  axeResults.push(await runAxe('Shopping list, clear confirmation (mobile)'));
 } finally {
   await browser.close();
 }

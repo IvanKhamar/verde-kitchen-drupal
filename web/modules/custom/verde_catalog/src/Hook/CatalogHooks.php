@@ -46,4 +46,19 @@ final class CatalogHooks {
     ];
   }
 
+  /**
+   * Implements hook_theme().
+   *
+   * The shopping list page template. The module ships a plain default
+   * (templates/verde-shopping-list.html.twig); the theme overrides it.
+   */
+  #[Hook('theme')]
+  public function theme(): array {
+    return [
+      'verde_shopping_list' => [
+        'variables' => ['api_base' => NULL, 'base_path' => NULL, 'static_data' => NULL],
+      ],
+    ];
+  }
+
 }

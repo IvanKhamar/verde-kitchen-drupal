@@ -40,3 +40,6 @@ slots:
     title: Image
   summary:
     title: Summary
+  actions:
+    title: Actions
+    description: Buttons below the card content, for example "Add to list". They sit above the stretched link.

@@ -20,6 +20,7 @@
       <p class="product__category">{{ card.meta }}</p>
     {% endif %}
     <p class="product__price">{{ card.price }}</p>
+    {{ include('verde:shopping-list-button', shopping_list, with_context = false) }}
     {% if card.badges %}
       <ul class="product__badges" role="list" aria-label="{{ 'Dietary tags'|t }}">
         {% for badge in card.badges %}

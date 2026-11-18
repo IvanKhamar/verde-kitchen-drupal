@@ -39,3 +39,27 @@ catalog-filter:
     - core/components.verde--badge
     - core/components.verde--card
     - core/components.verde--teaser-grid
+    - core/components.verde--shopping-list-button
+
+# "Add to list" buttons and the header counter. Plain JavaScript (no React),
+# on every page through verde.info.yml. Drupal.announce() speaks the changes.
+shopping-list:
+  js:
+    dist/js/shopping-list.js: { minified: true }
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/once
+
+# The shopping list page (React).
+shopping-list-page:
+  css:
+    theme:
+      dist/css/shopping-list-page.css: {}
+  js:
+    dist/js/shopping-list-page.js: { minified: true }
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/once
+    - core/components.verde--button

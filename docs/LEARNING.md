@@ -289,7 +289,21 @@ await expect(page.getByRole('status')).toHaveText('3 products found');
 - **Secrets** never go into a public repository; a pre-commit hook, CI and GitHub push
   protection all scan for them, and CI logs (also public) must not print passwords.
 
-## 15. Try it yourself
+## 15. A shopping list without a server
+
+- **Where to keep it:** a list that belongs to one visitor and needs no account fits in
+  `localStorage`. The server never sees it, so every page stays cacheable for everyone.
+- **Never trust storage:** the user (or an old version of the code) can put anything there.
+  `parse()` keeps only valid UUIDs and whole quantities from 1 to 99 and never throws.
+- **One source of truth, many views:** the buttons, the header counter and the list page all
+  read the same store and listen for one custom event; the `storage` event updates other tabs.
+- **Event delegation:** one click listener on `document` works for buttons that React adds
+  later, without attaching listeners to each one.
+- **Translations survive the build only as literal calls:** Drupal finds strings in the
+  built file by looking for `Drupal.t('…')`. Copying `Drupal` into a local variable lets the
+  minifier rename it, and the strings silently stay in English (an E2E test caught this).
+
+## 16. Try it yourself
 
 1. Add a `field--field-price.html.twig` template that wraps the price in `<data value="…">`.
    Check with Twig debug that Drupal picks it.
@@ -438,3 +452,18 @@ Tome exports every page to static HTML; a script adds the repository sub-path to
 exports the API data the React widget needs as JSON, and adds the CSP as a meta tag; another
 script checks every link before the site is published. The trade-off: no admin and no live
 API on the static copy.
+
+**27. Why is the shopping list in `localStorage` and not in Drupal?**
+It belongs to one anonymous visitor, so a server copy would need sessions or accounts and would
+make pages uncacheable. In the browser it costs nothing, works on the static copy too, and the
+trade-off is acceptable: the list stays on one device. The data is validated on every read.
+
+**28. How do the "Add to list" buttons stay in sync on the page and across tabs?**
+All of them read one store. Saving dispatches a custom event that updates every button and the
+header counter; the browser fires a `storage` event in other tabs, which reload the list. One
+delegated click listener also covers buttons that React renders later.
+
+**29. How do you model "Where to buy" in Drupal?**
+A `retailer` taxonomy (type, website, cities) and a multi-value entity reference on products.
+A preprocess function turns the referenced terms, in the page language, into component props
+and adds their cache tags, so editing a shop updates every product page that lists it.

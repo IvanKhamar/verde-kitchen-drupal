@@ -1,0 +1,25 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Shopping list button
+status: stable
+description: Adds a product to the visitor's shopping list, or removes it. Hidden without JavaScript.
+props:
+  type: object
+  required:
+    - product_id
+    - product_title
+    - add_label
+    - remove_label
+  properties:
+    product_id:
+      type: string
+      title: Product UUID
+    product_title:
+      type: string
+      title: Product name
+      description: Added to the accessible name and to the screen reader announcement.
+    add_label:
+      type: string
+      title: Text of the "add" state, for example "Add to list"
+    remove_label:
+      type: string
+      title: Text of the "remove" state, for example "Remove from list"

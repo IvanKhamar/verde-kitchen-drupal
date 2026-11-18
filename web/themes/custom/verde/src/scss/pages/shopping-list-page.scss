@@ -1,0 +1,163 @@
+// Shopping list page (library verde/shopping-list-page).
+@use '../abstracts' as *;
+
+// Space for the list while JavaScript loads, so the footer does not jump.
+.shopping-list-page {
+  min-height: 12rem;
+}
+
+.shopping-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+
+  > * {
+    margin: 0;
+  }
+
+  &[aria-busy='true'] {
+    opacity: 0.6;
+  }
+}
+
+.shopping-list--empty {
+  align-items: flex-start;
+}
+
+.shopping-list__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.shopping-list__item {
+  display: grid;
+  grid-template-areas:
+    'image info info'
+    'quantity total remove';
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-3) var(--space-4);
+  align-items: center;
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+
+  @include mq('md') {
+    grid-template-areas: 'image info quantity total remove';
+    grid-template-columns: auto 1fr auto 7rem auto;
+  }
+}
+
+.shopping-list__image {
+  grid-area: image;
+  border-radius: var(--radius-md);
+}
+
+.shopping-list__info {
+  display: flex;
+  flex-direction: column;
+  grid-area: info;
+}
+
+.shopping-list__title {
+  font-weight: var(--font-weight-semibold);
+}
+
+.shopping-list__unit-price {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.shopping-list__quantity {
+  display: inline-flex;
+  grid-area: quantity;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.shopping-list__step {
+  width: 44px;
+  height: 44px;
+  font: inherit;
+  font-size: var(--font-size-lg);
+  color: var(--color-primary-dark);
+  cursor: pointer;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.shopping-list__count {
+  min-width: 2ch;
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}
+
+.shopping-list__line-total {
+  grid-area: total;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  text-align: end;
+}
+
+.shopping-list__remove {
+  grid-area: remove;
+  min-height: 44px;
+  padding-inline: var(--space-2);
+  font: inherit;
+  color: var(--color-danger);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+// For screen readers only: which product the "Remove" button removes.
+.shopping-list__context {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.shopping-list__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shopping-list__total {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.shopping-list__actions,
+.shopping-list__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+// Printing the list: only the products, quantities and the total.
+@media print {
+  .site-header,
+  .site-footer,
+  .breadcrumb,
+  .shopping-list__actions,
+  .shopping-list__remove,
+  .shopping-list__step,
+  .skip-link {
+    display: none !important;
+  }
+}

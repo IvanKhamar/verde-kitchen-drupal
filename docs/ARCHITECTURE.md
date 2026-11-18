@@ -183,6 +183,34 @@ sequenceDiagram
   "Loading" is derived from state, not stored. Old requests are cancelled with `AbortController`.
 - **Progressive enhancement:** without JavaScript, or if the API fails, the server list stays.
 
+## Where to buy and the shopping list
+
+**Where to buy** is plain Drupal: a `retailer` vocabulary (type online or store, website,
+cities) and a `field_retailers` reference on products. `verde_where_to_buy()` in `verde.theme`
+turns the referenced terms, in the page language, into the props of the `where-to-buy`
+component; the term cache tags go into the page's cache metadata.
+
+The **shopping list** has no server state:
+
+```mermaid
+flowchart LR
+  B[Add to list buttons<br>Twig and React cards] -- click --> S[store.js<br>localStorage]
+  S -- verde:shopping-list-change --> B
+  S -- verde:shopping-list-change --> C[Header counter]
+  S -- storage event --> T[Other open tabs]
+  P["/shopping-list<br>React"] -- product UUIDs --> A["JSON:API<br>filter id IN"]
+  S --> P
+```
+
+- `store.js` holds pure functions (`parse`, `add`, `remove`, `setQuantity`) plus `load` and
+  `save`; `parse` validates UUIDs and quantities, so edited or broken storage never breaks a page.
+- `shopping-list.js` (plain JavaScript, on every page) uses one delegated click listener, so it
+  also handles buttons that React renders later; a `MutationObserver` sets their labels.
+- The list page is a route in `verde_catalog` (`/shopping-list`) whose template only adds the
+  mount point. React loads the products with one JSON:API request
+  (`filter[id][operator]=IN`) in the page language, or filters the exported JSON in the static copy.
+- Pages stay fully cacheable: nothing about the list is rendered on the server.
+
 ## Caching
 
 | Layer              | What it does here                                                      |
