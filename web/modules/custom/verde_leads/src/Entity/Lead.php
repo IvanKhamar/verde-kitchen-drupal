@@ -9,6 +9,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\verde_leads\LeadListBuilder;
 use Drupal\verde_leads\LeadStatus;
 
 /**
@@ -27,6 +28,13 @@ use Drupal\verde_leads\LeadStatus;
   entity_keys: [
     'id' => 'id',
     'uuid' => 'uuid',
+  ],
+  handlers: [
+    'list_builder' => LeadListBuilder::class,
+  ],
+  links: [
+    'canonical' => '/admin/content/contact-messages/{verde_lead}',
+    'collection' => '/admin/content/contact-messages',
   ],
   admin_permission: 'view contact messages',
   base_table: 'verde_lead',

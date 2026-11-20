@@ -44,3 +44,6 @@ description = "LeadTriage source token for Verde Kitchen"
 regex = '''(?i)(?:VERDE_LEADS_TOKEN|verde_leads_token'\])\s*[:=]\s*['"]?([^\s'"]{12,})'''
 secretGroup = 1
 keywords = ["verde_leads_token"]
+  # The placeholder in the README instructions.
+  [[rules.allowlists]]
+  regexes = ['''^paste-the-token-here$''']

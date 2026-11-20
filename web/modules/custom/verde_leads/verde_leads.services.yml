@@ -3,4 +3,10 @@ services:
     # Constructor arguments are found by their type.
     autowire: true
 
+  # Log entries of this module appear with the type "verde_leads".
+  logger.channel.verde_leads:
+    parent: logger.channel_base
+    arguments: ['verde_leads']
+
   Drupal\verde_leads\LeadIntake: ~
+  Drupal\verde_leads\LeadForwarder: ~

@@ -110,3 +110,9 @@ test('the contact page is linked from the main menu and sent with a strict CSP',
     .count();
   expect(inline).toBe(0);
 });
+
+test('the list of contact messages is closed to anonymous visitors', async ({ request }) => {
+  for (const path of ['/admin/content/contact-messages', '/admin/content/contact-messages/1']) {
+    expect((await request.get(path)).status()).toBe(403);
+  }
+});
