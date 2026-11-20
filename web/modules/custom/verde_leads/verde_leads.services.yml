@@ -1,0 +1,6 @@
+services:
+  _defaults:
+    # Constructor arguments are found by their type.
+    autowire: true
+
+  Drupal\verde_leads\LeadIntake: ~

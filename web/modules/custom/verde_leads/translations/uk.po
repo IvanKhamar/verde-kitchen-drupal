@@ -1,0 +1,70 @@
+# Ukrainian translation of the Verde Leads module (contact form).
+#
+# Drupal imports this file with the interface translations (drush locale:update),
+# because verde_leads.info.yml points "interface translation server pattern" here.
+msgid ""
+msgstr ""
+"Project-Id-Version: verde_leads\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2));\n"
+"Language: uk\n"
+
+msgctxt "Contact form"
+msgid "Contact"
+msgstr "Контакти"
+
+msgid "Questions about our products, wholesale orders or a recipe? Write to us and we will answer within two working days. All fields are required unless marked optional."
+msgstr "Маєте питання про продукти, оптові замовлення чи рецепт? Напишіть нам, і ми відповімо протягом двох робочих днів. Усі поля обов’язкові, якщо не позначено інакше."
+
+msgctxt "Contact form"
+msgid "Name"
+msgstr "Ім’я"
+
+msgctxt "Contact form"
+msgid "Email"
+msgstr "Email"
+
+msgid "Phone (optional)"
+msgstr "Телефон (необов’язково)"
+
+msgctxt "Contact form"
+msgid "Message"
+msgstr "Повідомлення"
+
+msgid "From @min to @max characters."
+msgstr "Від @min до @max символів."
+
+msgid "I agree that Verde Kitchen processes my data to answer my message."
+msgstr "Я погоджуюся, що Verde Kitchen обробляє мої дані, щоб відповісти на повідомлення."
+
+msgid "How we handle it: <a href=\":url\">privacy notice</a>."
+msgstr "Як ми це робимо: <a href=\":url\">політика приватності</a>."
+
+msgid "Leave this field empty"
+msgstr "Залиште це поле порожнім"
+
+msgid "Send message"
+msgstr "Надіслати"
+
+msgid "You have sent several messages in a short time. Please try again in an hour."
+msgstr "Ви надіслали кілька повідомлень за короткий час. Спробуйте, будь ласка, за годину."
+
+msgid "Enter at least @count characters for your name."
+msgstr "Вкажіть ім’я довжиною щонайменше @count символи."
+
+msgid "Enter a phone number with digits only, for example +380 50 123 45 67."
+msgstr "Вкажіть номер телефону лише цифрами, наприклад +380 50 123 45 67."
+
+msgid "Your message must be from @min to @max characters long."
+msgstr "Повідомлення має містити від @min до @max символів."
+
+msgid "Please agree to the processing of your data, so we can answer you."
+msgstr "Погодьтеся, будь ласка, на обробку даних, щоб ми могли вам відповісти."
+
+msgid "Thank you! We have your message and will answer within two working days."
+msgstr "Дякуємо! Ми отримали ваше повідомлення і відповімо протягом двох робочих днів."
+
+msgid "This is a static copy of the site, so the contact form does not work here. It works on the full Drupal site; see the <a href=\":url\">source code</a> for how it is built."
+msgstr "Це статична копія сайту, тому контактна форма тут не працює. Вона працює на повному сайті на Drupal; як її зроблено, дивіться у <a href=\":url\">вихідному коді</a>."

@@ -1,6 +1,8 @@
 # Not secret: the LeadTriage URL and token come from environment variables
 # (settings.php), never from configuration, which is exported to the public repository.
 retention_days: 30
+# English URL alias of the Privacy page, linked from the consent checkbox.
+privacy_path: /privacy
 flood:
   # Messages allowed per visitor IP address in the window (seconds).
   limit: 5

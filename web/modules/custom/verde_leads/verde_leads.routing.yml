@@ -1,0 +1,9 @@
+verde_leads.contact:
+  path: '/contact'
+  defaults:
+    _controller: '\Drupal\verde_leads\Controller\ContactController::page'
+    _title: 'Contact'
+    _title_context: 'Contact form'
+  requirements:
+    # Open to everyone: it is the public contact form.
+    _access: 'TRUE'

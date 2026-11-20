@@ -4,5 +4,9 @@ description: 'Contact form messages: saved in Drupal first, then forwarded to th
 package: Verde Kitchen
 core_version_requirement: ^11.2
 dependencies:
-  # The status field is a list_string field.
+  # The status field is a list_string field; the form links to the Privacy alias.
   - drupal:options
+  - drupal:path_alias
+# Ukrainian strings of the form and messages (see the theme's .info.yml).
+'interface translation project': verde_leads
+'interface translation server pattern': modules/custom/verde_leads/translations/%language.po
