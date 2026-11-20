@@ -132,12 +132,6 @@ try {
   await waitUntil(browser.evaluate, "document.querySelector('.catalog-filter__results') !== null");
   axeResults.push(await runAxe('Catalog, filter applied (mobile)'));
 
-  // The contact form sent empty: the error summary and the inline errors.
-  await browser.open(`${baseUrl}/contact`);
-  await browser.evaluate("document.querySelector('.contact-form [type=submit]').click(), true");
-  await waitUntil(browser.evaluate, "document.querySelector('.messages--error') !== null");
-  axeResults.push(await runAxe('Contact, form with errors (mobile)'));
-
   // The shopping list with products in it: add two from the catalog cards.
   await browser.evaluate(
     "[...document.querySelectorAll('[data-shopping-list-toggle]')].slice(0, 2).forEach((b) => b.click()), true",
@@ -149,6 +143,12 @@ try {
   await browser.evaluate("document.querySelector('.shopping-list__actions button:last-child').click(), true");
   await waitUntil(browser.evaluate, "document.querySelector('.shopping-list__confirm') !== null");
   axeResults.push(await runAxe('Shopping list, clear confirmation (mobile)'));
+
+  // The contact form sent empty: the error summary and the inline errors.
+  await browser.open(`${baseUrl}/contact`);
+  await browser.evaluate("document.querySelector('.contact-form [type=submit]').click(), true");
+  await waitUntil(browser.evaluate, "document.querySelector('.messages--error') !== null");
+  axeResults.push(await runAxe('Contact, form with errors (mobile)'));
 } finally {
   await browser.close();
 }
