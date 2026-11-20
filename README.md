@@ -248,7 +248,10 @@ Forwarding is off until `VERDE_LEADS_URL` is set, so CI, GitHub Pages and fresh 
 messages in Drupal only (status "Not forwarded"). The URL and the token are read from
 environment variables in `settings.php` and are never stored in configuration.
 
-1. Start LeadTriage (see its README) and create a source token for `verde-kitchen` there.
+1. Start LeadTriage (see its README). Its git-ignored `.env` holds `SOURCE_TOKEN_VERDE_KITCHEN`;
+   put a long random value there (not the example one) and use the same value below. Its API
+   listens on `127.0.0.1:8000`, which the DDEV container reaches as `host.docker.internal:8000`
+   on Docker Desktop.
 2. Create `.ddev/.env` (git-ignored) with two lines:
 
    ```bash
