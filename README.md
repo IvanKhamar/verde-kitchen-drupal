@@ -96,14 +96,15 @@ page" are the featured products on the home page.
 
 ## Pages
 
-| Path                               | What it shows                                                 | Built with                       |
-| ---------------------------------- | ------------------------------------------------------------- | -------------------------------- |
-| `/`                                | Hero, featured products, promo banner, latest articles        | Views page + blocks on `<front>` |
-| `/products`                        | Product catalog                                               | View `products`                  |
-| `/articles`                        | Recipes and news, newest first, 6 per page                    | View `articles`                  |
-| `/shopping-list`                   | The visitor's shopping list (React, saved in the browser)     | Route in `verde_catalog` + React |
-| `/privacy`                         | What happens to contact messages (basic page, both languages) | Content type `page`              |
-| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)            | `node--TYPE--full.html.twig`     |
+| Path                               | What it shows                                                  | Built with                       |
+| ---------------------------------- | -------------------------------------------------------------- | -------------------------------- |
+| `/`                                | Hero, featured products, promo banner, latest articles         | Views page + blocks on `<front>` |
+| `/products`                        | Product catalog                                                | View `products`                  |
+| `/articles`                        | Recipes and news, newest first, 6 per page                     | View `articles`                  |
+| `/shopping-list`                   | The visitor's shopping list (React, saved in the browser)      | Route in `verde_catalog` + React |
+| `/privacy`                         | What happens to contact messages (basic page, both languages)  | Content type `page`              |
+| `/contact`                         | Contact form; messages are saved, then forwarded to LeadTriage | Module `verde_leads` (Form API)  |
+| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)             | `node--TYPE--full.html.twig`     |
 
 Every page also exists in Ukrainian under `/uk/`, for example `/uk/products/smuzi-zelene-syayvo`.
 
@@ -136,16 +137,18 @@ The theme's UI parts are [Single Directory Components](https://www.drupal.org/do
 in `web/themes/custom/verde/components/`. Each folder holds the component's metadata
 (`*.component.yml`, with a JSON schema for its props), Twig template, SCSS and, if needed, JS.
 
-| Component              | Used for                                                                                  |
-| ---------------------- | ----------------------------------------------------------------------------------------- |
-| `button`               | Calls to action (link or `<button>`)                                                      |
-| `badge`                | Dietary tags, article type                                                                |
-| `card`                 | Product and article teasers; the whole card is clickable                                  |
-| `hero`                 | Home hero (`<h1>`) and promo banner                                                       |
-| `teaser-grid`          | Every list of cards; responsive grid without media queries                                |
-| `navigation`           | Main menu with an accessible mobile toggle (disclosure pattern)                           |
-| `where-to-buy`         | Product page: online shops as external links, store chains with their cities, empty state |
-| `shopping-list-button` | "Add to list" / "Remove from list" toggle on product cards and product pages              |
+| Component              | Used for                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `button`               | Calls to action (link or `<button>`)                                                              |
+| `badge`                | Dietary tags, article type                                                                        |
+| `card`                 | Product and article teasers; the whole card is clickable                                          |
+| `hero`                 | Home hero (`<h1>`) and promo banner                                                               |
+| `teaser-grid`          | Every list of cards; responsive grid without media queries                                        |
+| `navigation`           | Main menu with an accessible mobile toggle (disclosure pattern)                                   |
+| `where-to-buy`         | Product page: online shops as external links, store chains with their cities, empty state         |
+| `shopping-list-button` | "Add to list" / "Remove from list" toggle on product cards and product pages                      |
+| `form-field`           | Every front-end form field: label, hint, error before the control, linked with `aria-describedby` |
+| `messages`             | Status and error messages; focused after a form is sent, so the result is read at once            |
 
 ### Storybook
 
@@ -332,6 +335,7 @@ iOS. The tests live in `tests/e2e/`:
 | `security.spec.js`      | Security headers, read-only JSON:API, closed registration, HTML from the API shown as text                                                                         |
 | `where-to-buy.spec.js`  | Online shops as external links, store chains with cities, empty state, Ukrainian version                                                                           |
 | `shopping-list.spec.js` | Adding from product pages and React cards, header counter, quantities and totals, remove, "Clear list" confirmation and focus, persistence after reload, Ukrainian |
+| `contact.spec.js`       | Contact form: error summary and focus, inline errors linked to fields, email/length/consent checks, thank-you message, honeypot, Ukrainian version, menu link, CSP |
 
 ```bash
 BASE_URL="http://127.0.0.1:PORT" npm run test:e2e

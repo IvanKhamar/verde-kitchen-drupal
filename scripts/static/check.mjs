@@ -95,6 +95,16 @@ broken.forEach((url) => console.log(`  not found: ${url}`));
 
 // The catalog filter on the exported JSON files.
 const problems = [...broken.map((url) => `not found: ${url}`)];
+
+// The contact pages: a notice instead of the form, because nothing on GitHub
+// Pages could receive it.
+for (const prefix of ['', '/uk']) {
+  const file = await resolveFile(`${base}${prefix}/contact`);
+  const html = file ? await readFile(file, 'utf8') : '';
+  if (!html.includes('contact-static-notice') || html.includes('contact-form')) {
+    problems.push(`${prefix || '(en)'}/contact: expected the static notice instead of the form`);
+  }
+}
 if (process.env.CHROME_PATH) {
   const browser = await startBrowser(process.env.CHROME_PATH);
   try {

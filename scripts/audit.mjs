@@ -65,6 +65,8 @@ const pages = [
   ['Home, Ukrainian', '/uk'],
   ['Catalog, Ukrainian', '/uk/products'],
   ['Shopping list', '/shopping-list'],
+  ['Contact', '/contact'],
+  ['Contact, Ukrainian', '/uk/contact'],
 ];
 
 // --- axe -------------------------------------------------------------------------
@@ -129,6 +131,12 @@ try {
   await browser.evaluate("document.querySelector('.catalog-filter__tag input').click(), true");
   await waitUntil(browser.evaluate, "document.querySelector('.catalog-filter__results') !== null");
   axeResults.push(await runAxe('Catalog, filter applied (mobile)'));
+
+  // The contact form sent empty: the error summary and the inline errors.
+  await browser.open(`${baseUrl}/contact`);
+  await browser.evaluate("document.querySelector('.contact-form [type=submit]').click(), true");
+  await waitUntil(browser.evaluate, "document.querySelector('.messages--error') !== null");
+  axeResults.push(await runAxe('Contact, form with errors (mobile)'));
 
   // The shopping list with products in it: add two from the catalog cards.
   await browser.evaluate(
