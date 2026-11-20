@@ -1,0 +1,6 @@
+entity.verde_lead.collection:
+  title: 'Contact messages'
+  description: 'Messages from the contact form and their forwarding to LeadTriage.'
+  parent: system.admin_content
+  route_name: entity.verde_lead.collection
+  weight: 20

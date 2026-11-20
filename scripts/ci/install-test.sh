@@ -99,5 +99,8 @@ grep --quiet 'href="/contact"' <<< "$home"
 grep --quiet 'Надіслати' <<< "$(curl --fail --silent --show-error "$base_url/uk/contact")"
 # Contact messages module: installed, and its entity table exists.
 $drush php:eval 'echo \Drupal::entityTypeManager()->getStorage("verde_lead")->getQuery()->accessCheck(FALSE)->count()->execute();' > /dev/null
+# Without VERDE_LEADS_URL (as in CI) messages are kept, not forwarded, and the
+# forwarding queue runs without errors.
+$drush queue:run verde_leads_forward
 
 echo "Install test passed."
