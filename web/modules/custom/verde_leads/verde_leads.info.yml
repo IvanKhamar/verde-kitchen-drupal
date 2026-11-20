@@ -1,0 +1,8 @@
+name: Verde Leads
+type: module
+description: 'Contact form messages: saved in Drupal first, then forwarded to the LeadTriage service.'
+package: Verde Kitchen
+core_version_requirement: ^11.2
+dependencies:
+  # The status field is a list_string field.
+  - drupal:options

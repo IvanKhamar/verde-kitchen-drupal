@@ -111,8 +111,13 @@
         }
     },
     "require-dev": {
+        "behat/mink": "^1.11",
         "drupal/coder": "^9.0",
-        "drupal/tome": "^1.16"
+        "drupal/tome": "^1.16",
+        "mikey179/vfsstream": "^1.6.11",
+        "phpspec/prophecy-phpunit": "^2",
+        "phpunit/phpunit": "^11.5.50",
+        "symfony/error-handler": "^7.4"
     },
     "scripts": {
         "lint": "phpcs",

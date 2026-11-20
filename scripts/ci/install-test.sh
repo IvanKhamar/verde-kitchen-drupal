@@ -81,4 +81,12 @@ grep --quiet 'Перейти до основного вмісту' <<< "$home_uk
 product_uk=$(curl --fail --silent --show-error "$base_url/uk/products/smuzi-zelene-syayvo")
 grep --quiet 'hreflang="en"' <<< "$product_uk"
 
+# The Privacy page in both languages, linked from the footer.
+grep --quiet 'href="/uk/pryvatnist"' <<< "$home_uk"
+grep --quiet 'What we collect' <<< "$(curl --fail --silent --show-error "$base_url/privacy")"
+grep --quiet 'Що ми збираємо' <<< "$(curl --fail --silent --show-error "$base_url/uk/pryvatnist")"
+
+# Contact messages module: installed, and its entity table exists.
+$drush php:eval 'echo \Drupal::entityTypeManager()->getStorage("verde_lead")->getQuery()->accessCheck(FALSE)->count()->execute();' > /dev/null
+
 echo "Install test passed."

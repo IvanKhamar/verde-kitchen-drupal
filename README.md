@@ -96,13 +96,14 @@ page" are the featured products on the home page.
 
 ## Pages
 
-| Path                               | What it shows                                             | Built with                       |
-| ---------------------------------- | --------------------------------------------------------- | -------------------------------- |
-| `/`                                | Hero, featured products, promo banner, latest articles    | Views page + blocks on `<front>` |
-| `/products`                        | Product catalog                                           | View `products`                  |
-| `/articles`                        | Recipes and news, newest first, 6 per page                | View `articles`                  |
-| `/shopping-list`                   | The visitor's shopping list (React, saved in the browser) | Route in `verde_catalog` + React |
-| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)        | `node--TYPE--full.html.twig`     |
+| Path                               | What it shows                                                 | Built with                       |
+| ---------------------------------- | ------------------------------------------------------------- | -------------------------------- |
+| `/`                                | Hero, featured products, promo banner, latest articles        | Views page + blocks on `<front>` |
+| `/products`                        | Product catalog                                               | View `products`                  |
+| `/articles`                        | Recipes and news, newest first, 6 per page                    | View `articles`                  |
+| `/shopping-list`                   | The visitor's shopping list (React, saved in the browser)     | Route in `verde_catalog` + React |
+| `/privacy`                         | What happens to contact messages (basic page, both languages) | Content type `page`              |
+| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)            | `node--TYPE--full.html.twig`     |
 
 Every page also exists in Ukrainian under `/uk/`, for example `/uk/products/smuzi-zelene-syayvo`.
 
@@ -285,11 +286,11 @@ webpack.config.js       Webpack configuration
 
 GitHub Actions runs three jobs on every push:
 
-| Job       | What it checks                                                                                                                                                                                                                                                            |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `secrets` | gitleaks scans the whole history for keys and passwords                                                                                                                                                                                                                   |
-| `lint`    | `npm run lint` (ESLint, Stylelint, Prettier) and `composer lint` (PHP_CodeSniffer with the Drupal and DrupalPractice standards)                                                                                                                                           |
-| `build`   | Composer and npm audits, JavaScript unit tests, the Webpack build, then a site install from `config/sync` into an empty MariaDB database with the demo content, a smoke test (`scripts/ci/install-test.sh`), a Lighthouse + axe audit and the Playwright end-to-end tests |
+| Job       | What it checks                                                                                                                                                                                                                                                                                  |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `secrets` | gitleaks scans the whole history for keys and passwords                                                                                                                                                                                                                                         |
+| `lint`    | `npm run lint` (ESLint, Stylelint, Prettier) and `composer lint` (PHP_CodeSniffer with the Drupal and DrupalPractice standards)                                                                                                                                                                 |
+| `build`   | Composer and npm audits, PHPUnit kernel tests, JavaScript unit tests, the Webpack build, then a site install from `config/sync` into an empty MariaDB database with the demo content, a smoke test (`scripts/ci/install-test.sh`), a Lighthouse + axe audit and the Playwright end-to-end tests |
 
 The CI site runs on PHP's built-in server instead of DDEV: installing Drupal from config and
 auditing the pages needs only PHP and a database, which start in seconds, while DDEV would
@@ -304,6 +305,16 @@ Run the same checks locally:
 ddev npm run lint
 ddev composer lint
 ddev npm test
+```
+
+### PHP tests
+
+PHPUnit kernel tests for the custom modules live in `web/modules/custom/*/tests/`. A kernel
+test boots a minimal Drupal with only the modules it needs and a throwaway SQLite database,
+so it runs in seconds without an installed site.
+
+```bash
+ddev exec vendor/bin/phpunit
 ```
 
 ### End-to-end tests

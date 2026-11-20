@@ -35,3 +35,12 @@ keywords = ["drupal_hash_salt", "db_password", "mariadb_password", "mariadb_root
   # The CI-only salt is a fixed, public test value, documented as not secret.
   [[rules.allowlists]]
   regexes = ['''^ci-only-hash-salt-not-a-secret$''']
+
+# The LeadTriage source token for the contact form (module verde_leads), in an
+# environment file, a shell command or a settings file.
+[[rules]]
+id = "verde-leads-token"
+description = "LeadTriage source token for Verde Kitchen"
+regex = '''(?i)(?:VERDE_LEADS_TOKEN|verde_leads_token'\])\s*[:=]\s*['"]?([^\s'"]{12,})'''
+secretGroup = 1
+keywords = ["verde_leads_token"]

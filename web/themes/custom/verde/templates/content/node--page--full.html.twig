@@ -1,0 +1,15 @@
+{#
+/**
+ * @file
+ * A basic page (for example Privacy) in full view mode.
+ *
+ * The page title is the <h1> of the page title block. The text uses the same
+ * reading column as articles, so it shares the article library and classes.
+ */
+#}
+{{ attach_library('verde/article') }}
+<article{{ attributes.addClass('article') }}>
+  <div class="article__body">
+    {{ content|without('links') }}
+  </div>
+</article>

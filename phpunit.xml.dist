@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PHPUnit for the custom modules (unit and kernel tests).
+
+    vendor/bin/phpunit                  in CI
+    ddev exec vendor/bin/phpunit        locally
+
+  Kernel tests boot a minimal Drupal with a throwaway SQLite database, so they
+  need no MariaDB and no installed site. Based on web/core/phpunit.xml.dist.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="web/core/tests/bootstrap.php"
+         colors="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutOutputDuringTests="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         cacheResult="false">
+  <php>
+    <ini name="error_reporting" value="32767"/>
+    <ini name="memory_limit" value="-1"/>
+    <!-- An environment variable with the same name wins (force="false" is the default). -->
+    <env name="SIMPLETEST_DB" value="sqlite://localhost//tmp/verde-phpunit.sqlite"/>
+    <env name="SIMPLETEST_BASE_URL" value="http://localhost"/>
+  </php>
+  <testsuites>
+    <testsuite name="custom">
+      <directory>web/modules/custom/*/tests/src</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

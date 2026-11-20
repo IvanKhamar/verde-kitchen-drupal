@@ -40,6 +40,7 @@ module:
   update: 0
   user: 0
   verde_catalog: 0
+  verde_leads: 0
   verde_security: 0
   views_ui: 0
   pathauto: 1

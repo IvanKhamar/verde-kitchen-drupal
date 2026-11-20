@@ -1,0 +1,4 @@
+view contact messages:
+  title: 'View contact messages'
+  description: 'Read the messages sent through the contact form. They contain personal data.'
+  restrict access: true
