@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Creates the Verde Kitchen demo content: terms, products and articles.
+ * Creates the Verde Kitchen demo content: terms, products, articles and pages.
  *
  * Run it with Drush, which boots Drupal before it includes this file:
  *   ddev drush php:script scripts/demo-content/demo-content.php.
  *
- * The script is idempotent: it first deletes every product, article, term of
- * the two vocabularies and menu link of the main and footer menus, then
- * creates them again. The two banners are updated in place.
+ * The script is idempotent: it first deletes every product, article, page,
+ * term of the two vocabularies and menu link of the main and footer menus,
+ * then creates them again. The two banners are updated in place.
  * Use it on a local site only.
  *
  * All names and texts are invented for this portfolio project.
@@ -267,6 +267,15 @@ $menus = [
   ],
 ];
 
+// Basic pages. The footer links to them by node ID, so the link follows each
+// translation's own URL alias.
+$pages = [
+  'privacy' => [
+    'title' => 'Privacy',
+    'body' => '<p>Verde Kitchen is an invented brand for a portfolio project. This page explains what happens to a message you send through the contact form.</p><h2>What we collect</h2><p>Your name, email address, phone number (only if you give it), your message, the language of the page and the time you sent it. We use them only to answer you.</p><h2>How a message is handled</h2><p>Your message is saved on this site first. It is then sent to LeadTriage, our message sorting service. There an AI model (Claude, by Anthropic) reads it to sort it by topic and urgency, and the result is stored in Airtable, the spreadsheet tool our team answers from.</p><h2>How long we keep it</h2><p>This site deletes messages 30 days after they arrive.</p><h2>Your rights</h2><p>To see, correct or delete your data, write to <a href="mailto:privacy@example.com">privacy@example.com</a>. We answer within 30 days.</p><h2>Who we are</h2><p>Verde Kitchen Demo, 1 Example Street, Lviv, Ukraine (an invented company).</p>',
+  ],
+];
+
 // Banner blocks are content, but their placement (block.block.verde_home_*) is
 // configuration that refers to them by UUID, so the UUIDs must stay fixed.
 $banners = [
@@ -346,7 +355,7 @@ $entity_type_manager = \Drupal::entityTypeManager();
 $node_storage = $entity_type_manager->getStorage('node');
 $node_ids = $node_storage->getQuery()
   ->accessCheck(FALSE)
-  ->condition('type', ['product', 'article'], 'IN')
+  ->condition('type', ['product', 'article', 'page'], 'IN')
   ->execute();
 $node_storage->delete($node_storage->loadMultiple($node_ids));
 
@@ -441,6 +450,27 @@ foreach ($articles as $slug => $article) {
   $article_ids[$slug] = $node->id();
 }
 
+$page_ids = [];
+foreach ($pages as $slug => $page) {
+  $node = Node::create([
+    'type' => 'page',
+    'title' => $page['title'],
+    'uid' => 1,
+    'status' => 1,
+    'promote' => FALSE,
+    'body' => ['value' => $page['body'], 'format' => 'basic_html'],
+  ]);
+  $node->save();
+  $translation = $uk['pages'][$slug];
+  verde_demo_translate($node, [
+    'title' => $translation['title'],
+    'status' => 1,
+    'body' => ['value' => $translation['body'], 'format' => 'basic_html'],
+  ]);
+  $page_ids[$slug] = $node->id();
+}
+$menus['footer'][] = ['Privacy', 'entity:node/' . $page_ids['privacy']];
+
 foreach ($menus as $menu => $links) {
   foreach ($links as $weight => [$title, $uri]) {
     $link = MenuLinkContent::create([
@@ -481,12 +511,13 @@ foreach ($banners as $uuid => $banner) {
 }
 
 printf(
-  "Demo content created: %d categories, %d dietary tags, %d retailers, %d products, %d articles, %d menu links, %d banners.\n",
+  "Demo content created: %d categories, %d dietary tags, %d retailers, %d products, %d articles, %d pages, %d menu links, %d banners.\n",
   count($category_ids),
   count($tag_ids),
   count($retailer_ids),
   count($products),
   count($articles),
+  count($pages),
   count($menus['main']) + count($menus['footer']),
   count($banners),
 );
