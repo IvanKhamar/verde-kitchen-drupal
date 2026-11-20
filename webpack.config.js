@@ -23,6 +23,7 @@ const libraryEntries = {
   'dist/css/global': './src/scss/global.scss',
   'dist/css/product': './src/scss/pages/product.scss',
   'dist/css/article': './src/scss/pages/article.scss',
+  'dist/css/contact': './src/scss/pages/contact.scss',
   'dist/css/catalog-filter': './src/scss/pages/catalog-filter.scss',
   // The React widget: one file with React included, loaded only on /products.
   'dist/js/catalog-filter': './src/js/catalog-filter/index.jsx',

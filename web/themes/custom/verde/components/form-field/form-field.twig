@@ -1,0 +1,43 @@
+{#
+/**
+ * @file
+ * Form field: label, hint, error message and the control.
+ *
+ * Text fields: label, hint, error, control. Checkboxes and radios
+ * (label_position "after"): error, then the control with its label, then the
+ * hint. The hint keeps the id Drupal gave it, so aria-describedby on the
+ * control still finds it.
+ */
+#}
+{% set attributes = attributes|default(create_attribute()) %}
+{# Schema defaults are documentation only: neither Drupal nor Storybook applies them. #}
+{% set label_position = label_position|default('before') %}
+{%
+  set classes = [
+    'form-field',
+    type ? 'form-field--' ~ type|clean_class,
+    error ? 'form-field--error',
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {% if label_position == 'before' %}
+    {{ label }}
+  {% endif %}
+  {% if description and label_position != 'after' %}
+    {{ description }}
+  {% endif %}
+  {% if error %}
+    <p class="form-field__error" id="{{ error_id }}">
+      <span class="form-field__error-prefix">{{ 'Error:'|t }}</span> {{ error }}
+    </p>
+  {% endif %}
+  {% if label_position == 'after' %}
+    <div class="form-field__choice">
+      {{ control }}
+      {{ label }}
+    </div>
+    {{ description }}
+  {% else %}
+    {{ control }}
+  {% endif %}
+</div>

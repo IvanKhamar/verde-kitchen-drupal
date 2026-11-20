@@ -96,14 +96,15 @@ page" are the featured products on the home page.
 
 ## Pages
 
-| Path                               | What it shows                                                 | Built with                       |
-| ---------------------------------- | ------------------------------------------------------------- | -------------------------------- |
-| `/`                                | Hero, featured products, promo banner, latest articles        | Views page + blocks on `<front>` |
-| `/products`                        | Product catalog                                               | View `products`                  |
-| `/articles`                        | Recipes and news, newest first, 6 per page                    | View `articles`                  |
-| `/shopping-list`                   | The visitor's shopping list (React, saved in the browser)     | Route in `verde_catalog` + React |
-| `/privacy`                         | What happens to contact messages (basic page, both languages) | Content type `page`              |
-| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)            | `node--TYPE--full.html.twig`     |
+| Path                               | What it shows                                                  | Built with                       |
+| ---------------------------------- | -------------------------------------------------------------- | -------------------------------- |
+| `/`                                | Hero, featured products, promo banner, latest articles         | Views page + blocks on `<front>` |
+| `/products`                        | Product catalog                                                | View `products`                  |
+| `/articles`                        | Recipes and news, newest first, 6 per page                     | View `articles`                  |
+| `/shopping-list`                   | The visitor's shopping list (React, saved in the browser)      | Route in `verde_catalog` + React |
+| `/privacy`                         | What happens to contact messages (basic page, both languages)  | Content type `page`              |
+| `/contact`                         | Contact form; messages are saved, then forwarded to LeadTriage | Module `verde_leads` (Form API)  |
+| `/products/NAME`, `/articles/NAME` | Product or article page (clean URLs from Pathauto)             | `node--TYPE--full.html.twig`     |
 
 Every page also exists in Ukrainian under `/uk/`, for example `/uk/products/smuzi-zelene-syayvo`.
 
@@ -136,16 +137,18 @@ The theme's UI parts are [Single Directory Components](https://www.drupal.org/do
 in `web/themes/custom/verde/components/`. Each folder holds the component's metadata
 (`*.component.yml`, with a JSON schema for its props), Twig template, SCSS and, if needed, JS.
 
-| Component              | Used for                                                                                  |
-| ---------------------- | ----------------------------------------------------------------------------------------- |
-| `button`               | Calls to action (link or `<button>`)                                                      |
-| `badge`                | Dietary tags, article type                                                                |
-| `card`                 | Product and article teasers; the whole card is clickable                                  |
-| `hero`                 | Home hero (`<h1>`) and promo banner                                                       |
-| `teaser-grid`          | Every list of cards; responsive grid without media queries                                |
-| `navigation`           | Main menu with an accessible mobile toggle (disclosure pattern)                           |
-| `where-to-buy`         | Product page: online shops as external links, store chains with their cities, empty state |
-| `shopping-list-button` | "Add to list" / "Remove from list" toggle on product cards and product pages              |
+| Component              | Used for                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `button`               | Calls to action (link or `<button>`)                                                              |
+| `badge`                | Dietary tags, article type                                                                        |
+| `card`                 | Product and article teasers; the whole card is clickable                                          |
+| `hero`                 | Home hero (`<h1>`) and promo banner                                                               |
+| `teaser-grid`          | Every list of cards; responsive grid without media queries                                        |
+| `navigation`           | Main menu with an accessible mobile toggle (disclosure pattern)                                   |
+| `where-to-buy`         | Product page: online shops as external links, store chains with their cities, empty state         |
+| `shopping-list-button` | "Add to list" / "Remove from list" toggle on product cards and product pages                      |
+| `form-field`           | Every front-end form field: label, hint, error before the control, linked with `aria-describedby` |
+| `messages`             | Status and error messages; focused after a form is sent, so the result is read at once            |
 
 ### Storybook
 
@@ -209,6 +212,58 @@ on every product card and product page, a counter in the header, and a list page
   lost, and "Clear list" asks first and moves focus to the safe choice.
 - **Without JavaScript** the buttons are hidden and the list page explains that it needs
   JavaScript; the rest of the site works as before.
+
+## Contact form and LeadTriage
+
+`/contact` (module `verde_leads`) sends visitors' messages to
+[LeadTriage](https://github.com/IvanKhamar/LeadTriage), a separate project of the same
+invented brand: FastAPI and n8n sort each message with Claude by topic and urgency and put it
+into the team's Airtable within seconds.
+
+```mermaid
+flowchart LR
+  V[Visitor] -- POST /contact --> F[ContactForm<br>validation, honeypot, flood]
+  F --> S[(verde_lead entity<br>status pending)]
+  S --> Q[Queue verde_leads_forward]
+  Q -- cron / drush queue:run --> W[ForwardLead worker]
+  W -- "POST /api/sources/verde-kitchen/leads<br>X-Source-Token" --> L[LeadTriage]
+  L --> A[(Airtable)]
+```
+
+- **Save first, send later.** Every valid message is stored in Drupal, then a queue worker
+  forwards it. The visitor never waits for LeadTriage, and nothing is lost while it is down.
+- **Answers** follow the shared intake contract (`docs/phase-10-contact-form.md`): 202 or
+  "duplicate" → sent; 400 → failed; 401 → waits, the admin page shows a warning; 413, 429,
+  5xx and network errors → retried 8 times over about a day.
+- **Protection:** server-side validation, a honeypot field, core Flood control (5 messages an
+  hour per IP), the Form API CSRF token for logged-in users and the strict CSP.
+- **Admin:** _Content → Contact messages_ (`view contact messages` permission) lists the
+  messages with their status, and failed ones can be sent again (a CSRF-protected link).
+- **Privacy:** a Privacy page in both languages; messages are deleted after 30 days
+  (`verde_leads.settings:retention_days`); logs hold only the message id, status and HTTP code.
+
+### Turning forwarding on locally
+
+Forwarding is off until `VERDE_LEADS_URL` is set, so CI, GitHub Pages and fresh clones keep
+messages in Drupal only (status "Not forwarded"). The URL and the token are read from
+environment variables in `settings.php` and are never stored in configuration.
+
+1. Start LeadTriage (see its README) and create a source token for `verde-kitchen` there.
+2. Create `.ddev/.env` (git-ignored) with two lines:
+
+   ```bash
+   VERDE_LEADS_URL=http://host.docker.internal:8000
+   VERDE_LEADS_TOKEN=paste-the-token-here
+   ```
+
+3. `ddev restart`, then check without printing the token:
+
+   ```bash
+   ddev exec 'printenv VERDE_LEADS_URL; test -n "$VERDE_LEADS_TOKEN" && echo "token is set"'
+   ```
+
+4. Send a message on `/contact`, then `ddev drush queue:run verde_leads_forward` (cron does
+   the same on its own).
 
 ## Working with configuration
 
@@ -323,15 +378,16 @@ ddev exec vendor/bin/phpunit
 Firefox and WebKit (Safari's engine), and phone emulation for Chrome on Android and Safari on
 iOS. The tests live in `tests/e2e/`:
 
-| File                    | What it checks                                                                                                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `navigation.spec.js`    | Skip link focus, the mobile menu with the keyboard (Enter, Escape), wide-screen menu                                                                               |
-| `catalog.spec.js`       | Search, category, "all selected tags", empty state, "Clear filters" focus, API error and "Try again" (the API failure is simulated), the page without JavaScript   |
-| `pages.spec.js`         | One `<h1>` per page, `lang`, meta description, Product JSON-LD, responsive WebP images                                                                             |
-| `i18n.spec.js`          | Language switcher, `hreflang`, the Ukrainian home page and catalog filter                                                                                          |
-| `security.spec.js`      | Security headers, read-only JSON:API, closed registration, HTML from the API shown as text                                                                         |
-| `where-to-buy.spec.js`  | Online shops as external links, store chains with cities, empty state, Ukrainian version                                                                           |
-| `shopping-list.spec.js` | Adding from product pages and React cards, header counter, quantities and totals, remove, "Clear list" confirmation and focus, persistence after reload, Ukrainian |
+| File                    | What it checks                                                                                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `navigation.spec.js`    | Skip link focus, the mobile menu with the keyboard (Enter, Escape), wide-screen menu                                                                                                                        |
+| `catalog.spec.js`       | Search, category, "all selected tags", empty state, "Clear filters" focus, API error and "Try again" (the API failure is simulated), the page without JavaScript                                            |
+| `pages.spec.js`         | One `<h1>` per page, `lang`, meta description, Product JSON-LD, responsive WebP images                                                                                                                      |
+| `i18n.spec.js`          | Language switcher, `hreflang`, the Ukrainian home page and catalog filter                                                                                                                                   |
+| `security.spec.js`      | Security headers, read-only JSON:API, closed registration, HTML from the API shown as text                                                                                                                  |
+| `where-to-buy.spec.js`  | Online shops as external links, store chains with cities, empty state, Ukrainian version                                                                                                                    |
+| `shopping-list.spec.js` | Adding from product pages and React cards, header counter, quantities and totals, remove, "Clear list" confirmation and focus, persistence after reload, Ukrainian                                          |
+| `contact.spec.js`       | Contact form: error summary and focus, inline errors linked to fields, email/length/consent checks, thank-you message, honeypot, Ukrainian version, menu link, CSP, admin list closed to anonymous visitors |
 
 ```bash
 BASE_URL="http://127.0.0.1:PORT" npm run test:e2e
@@ -385,7 +441,8 @@ Tome is a development dependency: it is installed for the export and never on a 
 No secret is stored in this repository. `settings.php` is committed without credentials:
 DDEV generates `settings.ddev.php` (git-ignored) with the local database credentials and a
 random hash salt. Outside DDEV, set `DRUPAL_HASH_SALT` and `DRUPAL_TRUSTED_HOST_PATTERNS` as
-environment variables. A pre-commit hook and CI scan every change with
+environment variables. The LeadTriage URL and token (`VERDE_LEADS_URL`, `VERDE_LEADS_TOKEN`) are
+environment variables too, never configuration. A pre-commit hook and CI scan every change with
 [gitleaks](https://github.com/gitleaks/gitleaks), and GitHub push protection is on.
 
 ### Site security

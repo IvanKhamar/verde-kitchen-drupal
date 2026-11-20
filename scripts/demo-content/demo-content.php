@@ -259,6 +259,7 @@ $menus = [
     ['Home', 'internal:/'],
     ['Products', 'internal:/products'],
     ['Articles', 'internal:/articles'],
+    ['Contact', 'internal:/contact'],
   ],
   'footer' => [
     ['Products', 'internal:/products'],

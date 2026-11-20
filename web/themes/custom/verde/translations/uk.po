@@ -187,3 +187,7 @@ msgstr "Так, очистити"
 
 msgid "Cancel"
 msgstr "Скасувати"
+
+# Form field component.
+msgid "Error:"
+msgstr "Помилка:"

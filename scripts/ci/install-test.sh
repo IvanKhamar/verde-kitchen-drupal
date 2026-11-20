@@ -23,6 +23,11 @@ if [ -n "$changes" ]; then
   exit 1
 fi
 
+# The end-to-end tests send the contact form from many browsers, all from one
+# IP address; the real limit (5 an hour) would block them. Active config only,
+# after the check above. The limit itself is covered by a PHPUnit test.
+$drush config:set verde_leads.settings flood.limit 1000 --yes
+
 # PHP's built-in web server is enough for a smoke test.
 $drush runserver 127.0.0.1:8888 > /tmp/runserver.log 2>&1 &
 server_pid=$!
@@ -86,7 +91,16 @@ grep --quiet 'href="/uk/pryvatnist"' <<< "$home_uk"
 grep --quiet 'What we collect' <<< "$(curl --fail --silent --show-error "$base_url/privacy")"
 grep --quiet 'Що ми збираємо' <<< "$(curl --fail --silent --show-error "$base_url/uk/pryvatnist")"
 
+
+# The contact form in both languages, linked from the main menu.
+contact=$(curl --fail --silent --show-error "$base_url/contact")
+grep --quiet 'class="contact-form' <<< "$contact"
+grep --quiet 'href="/contact"' <<< "$home"
+grep --quiet 'Надіслати' <<< "$(curl --fail --silent --show-error "$base_url/uk/contact")"
 # Contact messages module: installed, and its entity table exists.
 $drush php:eval 'echo \Drupal::entityTypeManager()->getStorage("verde_lead")->getQuery()->accessCheck(FALSE)->count()->execute();' > /dev/null
+# Without VERDE_LEADS_URL (as in CI) messages are kept, not forwarded, and the
+# forwarding queue runs without errors.
+$drush queue:run verde_leads_forward
 
 echo "Install test passed."

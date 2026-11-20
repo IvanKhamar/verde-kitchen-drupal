@@ -1,0 +1,34 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Messages
+status: stable
+description: >-
+  Status, warning and error messages (status-messages.html.twig). After a form is sent,
+  messages.js moves keyboard focus here, so screen readers read the result or the list of
+  errors at once.
+props:
+  type: object
+  required:
+    - type
+    - heading
+    - heading_id
+  properties:
+    type:
+      type: string
+      title: Kind of message
+      enum:
+        - status
+        - warning
+        - error
+    heading:
+      type: string
+      title: Heading, for example "Error message"
+    heading_id:
+      type: string
+      title: ID of the heading, which names the region
+slots:
+  content:
+    title: The message or a list of messages
+libraryOverrides:
+  dependencies:
+    - core/drupal
+    - core/once

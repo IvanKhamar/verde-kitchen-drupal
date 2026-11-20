@@ -8,6 +8,9 @@ verde_leads.settings:
       constraints:
         Range:
           min: 1
+    privacy_path:
+      type: path
+      label: 'Privacy page alias (English)'
     flood:
       type: mapping
       label: 'Flood control'

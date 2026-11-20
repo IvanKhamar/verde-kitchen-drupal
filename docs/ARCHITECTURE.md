@@ -211,6 +211,44 @@ flowchart LR
   (`filter[id][operator]=IN`) in the page language, or filters the exported JSON in the static copy.
 - Pages stay fully cacheable: nothing about the list is rendered on the server.
 
+## The contact form: save first, send later
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant F as ContactForm (Form API)
+  participant D as Drupal DB
+  participant W as ForwardLead (queue worker)
+  participant L as LeadTriage
+  B->>F: POST /contact
+  F->>F: validate (contract limits), honeypot, Flood
+  F->>D: save verde_lead (pending) + queue item {id}
+  F-->>B: 303 → /contact with "Thank you"
+  Note over W: cron or drush queue:run
+  W->>D: load message, check next_attempt
+  W->>L: POST /api/sources/verde-kitchen/leads (X-Source-Token)
+  alt 202 / 200 duplicate
+    W->>D: status sent / duplicate
+  else 413 / 429 / 5xx / network
+    W->>D: attempts+1, next_attempt (1 min … 8 h)
+    W-->>W: DelayedRequeueException(delay)
+  else 400, or the 8th failed attempt
+    W->>D: status failed (admin can retry)
+  end
+```
+
+- **Why a queue:** the visitor's request never depends on another service. If LeadTriage is
+  slow or down, the form still answers at once, and the messages wait in the database.
+- **Idempotency:** `externalId` (`verde-kitchen:contact:{id}`) lets LeadTriage recognise a
+  message sent twice, for example when the answer to the first request was lost.
+- **Classes:** `ContactForm` (input), `LeadIntake` (save and enqueue), `LeadForwarder` (HTTP
+  and answer handling), `ForwardLead` (queue worker), `LeadListBuilder` and `LeadController`
+  (admin), `LeadsHooks::deleteOldMessages()` (retention on cron). Services get their
+  dependencies by constructor injection (autowiring).
+- **Configuration vs settings:** limits and retention are configuration (exported, the same
+  everywhere); the LeadTriage URL and token are settings from environment variables (different
+  per server, secret).
+
 ## Caching
 
 | Layer              | What it does here                                                      |

@@ -303,7 +303,29 @@ await expect(page.getByRole('status')).toHaveText('3 products found');
   built file by looking for `Drupal.t('…')`. Copying `Drupal` into a local variable lets the
   minifier rename it, and the strings silently stay in English (an E2E test caught this).
 
-## 16. Try it yourself
+## 16. Drupal back end: the contact form module
+
+- **Form API:** a form is a PHP class with `buildForm()` (an array of elements),
+  `validateForm()` and `submitForm()`. Drupal renders it, checks the form token, keeps the
+  typed values on errors and calls your methods in order. Like an ASP.NET model with
+  validation attributes, but the validation is code.
+- **Services and dependency injection:** a service is a class registered in
+  `MODULE.services.yml`; the container creates it once and passes its dependencies to the
+  constructor (with `autowire: true`, by type). The same idea as `builder.Services.Add…` in
+  .NET or `Depends()` in FastAPI. `\Drupal::service()` also works, but hides dependencies and
+  makes tests harder, so classes use injection.
+- **Queue API:** `createItem()` stores a job in the database; a `QueueWorker` plugin processes
+  items on cron or with `drush queue:run`. Throwing `DelayedRequeueException($seconds)` puts an
+  item back with a pause: a simple retry with back-off, no extra infrastructure.
+- **Content entities:** `verde_lead` is defined in code (`baseFieldDefinitions()`), so Drupal
+  creates the table and gives access control, cache tags and a list builder for free.
+- **`settings.php` vs configuration:** configuration is site behaviour you export and deploy
+  (`config/sync`, in Git); settings are per-server values such as secrets and URLs, read from
+  the environment and never exported.
+- **Privacy by design:** ask only what you need, say where it goes (Privacy page), delete it
+  on a schedule (cron) and keep personal data out of logs.
+
+## 17. Try it yourself
 
 1. Add a `field--field-price.html.twig` template that wraps the price in `<data value="…">`.
    Check with Twig debug that Drupal picks it.
@@ -467,3 +489,34 @@ delegated click listener also covers buttons that React renders later.
 A `retailer` taxonomy (type, website, cities) and a multi-value entity reference on products.
 A preprocess function turns the referenced terms, in the page language, into component props
 and adds their cache tags, so editing a shop updates every product page that lists it.
+
+**30. Why does the contact form save the message before sending it to LeadTriage?**
+So the visitor never waits for, or depends on, another service. The message is in the
+database at once; a queue worker forwards it and retries with a growing pause when LeadTriage
+is down. Nothing is lost, and `externalId` makes a repeated send harmless.
+
+**31. How does a Drupal form protect itself against spam and abuse?**
+Server-side validation (never trust the browser), a honeypot field that people do not see but
+bots fill in, core Flood control to limit messages per IP address, and Form API's token
+against cross-site request forgery for logged-in users. Admin actions such as "Retry" use a
+CSRF token in the link.
+
+**32. Where do secrets go in Drupal, and why not in configuration?**
+Configuration is exported to `config/sync` and committed, so it must not hold secrets. Secrets
+and per-server values go into `$settings` in `settings.php`, read from environment variables
+(`getenv()`), and code reads them through the `Settings` service.
+
+**33. What is dependency injection in Drupal and why use it?**
+Classes declare what they need in the constructor; the service container builds and passes it
+in. Dependencies are visible, and a test can replace one, as the forwarding tests replace the
+HTTP client with a Guzzle mock.
+
+**34. How do you test code that calls an external API?**
+Kernel tests boot a minimal Drupal and swap the `http_client` service for a Guzzle client with
+a `MockHandler` (prepared answers) and a history middleware (records the requests). Each answer
+of the contract gets a test, and the recorded request is checked against the contract.
+
+**35. How do you make a form accessible?**
+Visible labels, hints and errors linked with `aria-describedby`, `aria-invalid` on wrong
+fields, an error summary with links to the fields that gets focus after submit, and the
+thank-you message focused the same way. Validation messages say how to fix the problem.

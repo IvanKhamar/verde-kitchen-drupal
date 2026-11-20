@@ -65,6 +65,8 @@ const pages = [
   ['Home, Ukrainian', '/uk'],
   ['Catalog, Ukrainian', '/uk/products'],
   ['Shopping list', '/shopping-list'],
+  ['Contact', '/contact'],
+  ['Contact, Ukrainian', '/uk/contact'],
 ];
 
 // --- axe -------------------------------------------------------------------------
@@ -141,6 +143,12 @@ try {
   await browser.evaluate("document.querySelector('.shopping-list__actions button:last-child').click(), true");
   await waitUntil(browser.evaluate, "document.querySelector('.shopping-list__confirm') !== null");
   axeResults.push(await runAxe('Shopping list, clear confirmation (mobile)'));
+
+  // The contact form sent empty: the error summary and the inline errors.
+  await browser.open(`${baseUrl}/contact`);
+  await browser.evaluate("document.querySelector('.contact-form [type=submit]').click(), true");
+  await waitUntil(browser.evaluate, "document.querySelector('.messages--error') !== null");
+  axeResults.push(await runAxe('Contact, form with errors (mobile)'));
 } finally {
   await browser.close();
 }

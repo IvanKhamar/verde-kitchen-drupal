@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Every form element on the front end, through the form-field component.
+ *
+ * error_id comes from verde_preprocess_form_element(); the control's
+ * aria-describedby points to it (verde_preprocess_input/textarea/select()).
+ * The Drupal classes (js-form-item, form-item-NAME) stay for core JavaScript.
+ */
+#}
+{% set description_content %}
+  {% if description.content and description_display != 'invisible' %}
+    <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>
+  {% elseif description.content %}
+    <div{{ description.attributes.addClass('description', 'visually-hidden') }}>{{ description.content }}</div>
+  {% endif %}
+{% endset %}
+{% set control %}
+  {% if prefix is not empty %}<span class="field-prefix">{{ prefix }}</span>{% endif %}
+  {{ children }}
+  {% if suffix is not empty %}<span class="field-suffix">{{ suffix }}</span>{% endif %}
+{% endset %}
+{{ include('verde:form-field', {
+  attributes: attributes.addClass('js-form-item', 'form-item', 'js-form-type-' ~ type|clean_class, 'form-item-' ~ name|clean_class, 'js-form-item-' ~ name|clean_class),
+  type: type,
+  label_position: label_display == 'after' ? 'after' : (label_display in ['before', 'invisible'] ? 'before' : 'none'),
+  label: label,
+  description: description_content|trim is empty ? '' : description_content,
+  error: errors,
+  error_id: error_id,
+  control: control,
+}, with_context = false) }}

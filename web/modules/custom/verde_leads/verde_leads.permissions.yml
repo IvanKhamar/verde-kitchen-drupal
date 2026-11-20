@@ -2,3 +2,8 @@ view contact messages:
   title: 'View contact messages'
   description: 'Read the messages sent through the contact form. They contain personal data.'
   restrict access: true
+
+retry contact messages:
+  title: 'Retry contact messages'
+  description: 'Send failed contact messages to LeadTriage again.'
+  restrict access: true

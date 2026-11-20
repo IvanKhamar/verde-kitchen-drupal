@@ -1,6 +1,7 @@
 _core:
   default_config_hash: _4ESPMwA7VYhiRpKRmH6DNOy3mnJt-_XM-tvaIfrRzw
 retention_days: 30
+privacy_path: /privacy
 flood:
   limit: 5
   window: 3600

@@ -1,0 +1,22 @@
+// Contact page (library verde/contact), attached by verde_form_verde_leads_contact_alter().
+@use '../abstracts' as *;
+
+.contact-form {
+  max-width: 46rem;
+  margin-top: var(--space-4);
+}
+
+.contact-form__intro {
+  margin: 0 0 var(--space-6);
+  font-size: var(--font-size-md);
+}
+
+// The honeypot field: off-screen for people, still in the HTML for bots.
+// Not display: none, which some bots detect.
+.contact-form__trap {
+  position: absolute;
+  left: -100vw;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
