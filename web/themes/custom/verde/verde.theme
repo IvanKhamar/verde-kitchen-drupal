@@ -500,3 +500,65 @@ function verde_where_to_buy(NodeInterface $node, CacheableMetadata $cacheability
     'stores' => $stores,
   ];
 }
+
+/**
+ * Implements hook_preprocess_HOOK() for form-element.html.twig.
+ *
+ * Gives the error message an id, so the control can point to it.
+ */
+function verde_preprocess_form_element(array &$variables): void {
+  $variables['error_id'] = '';
+  if (!empty($variables['errors']) && !empty($variables['element']['#id'])) {
+    $variables['error_id'] = $variables['element']['#id'] . '--error';
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for input.html.twig.
+ */
+function verde_preprocess_input(array &$variables): void {
+  verde_describe_error($variables);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for textarea.html.twig.
+ */
+function verde_preprocess_textarea(array &$variables): void {
+  verde_describe_error($variables);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for select.html.twig.
+ */
+function verde_preprocess_select(array &$variables): void {
+  verde_describe_error($variables);
+}
+
+/**
+ * Links a control to its error message with aria-describedby.
+ *
+ * Screen readers then read the error together with the label. Core already
+ * adds aria-invalid and links the hint (description) the same way.
+ */
+function verde_describe_error(array &$variables): void {
+  $element = $variables['element'];
+  if (empty($element['#errors']) || empty($element['#id'])) {
+    return;
+  }
+  $attributes = &$variables['attributes'];
+  $ids = array_filter(explode(' ', (string) ($attributes['aria-describedby'] ?? '')));
+  // The error first: it is the most important thing to hear.
+  array_unshift($ids, $element['#id'] . '--error');
+  $attributes['aria-describedby'] = implode(' ', array_unique($ids));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for the contact form (verde_leads).
+ *
+ * The module builds the form; the theme adds its look.
+ */
+function verde_form_verde_leads_contact_alter(array &$form): void {
+  $form['#attached']['library'][] = 'verde/contact';
+  $form['actions']['submit']['#attributes']['class'][] = 'button';
+  $form['actions']['submit']['#attributes']['class'][] = 'button--primary';
+}

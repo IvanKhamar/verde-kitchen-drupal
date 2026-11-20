@@ -63,3 +63,11 @@ shopping-list-page:
     - core/drupal.announce
     - core/once
     - core/components.verde--button
+
+# The contact form (module verde_leads); attached by verde_form_verde_leads_contact_alter().
+contact:
+  css:
+    theme:
+      dist/css/contact.css: {}
+  dependencies:
+    - core/components.verde--button

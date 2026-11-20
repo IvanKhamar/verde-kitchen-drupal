@@ -1,0 +1,30 @@
+{#
+/**
+ * @file
+ * Status messages, one messages component per type (status, warning, error).
+ *
+ * The data-drupal-messages wrapper stays: core JavaScript (Drupal.Message)
+ * adds messages into it.
+ */
+#}
+<div data-drupal-messages>
+  {% for type, messages in message_list %}
+    {% set content %}
+      {% if messages|length > 1 %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>{{ messages|first }}</p>
+      {% endif %}
+    {% endset %}
+    {{ include('verde:messages', {
+      type: type,
+      heading: status_headings[type] ?? type|capitalize,
+      heading_id: 'messages-' ~ type|clean_class,
+      content: content,
+    }, with_context = false) }}
+  {% endfor %}
+</div>

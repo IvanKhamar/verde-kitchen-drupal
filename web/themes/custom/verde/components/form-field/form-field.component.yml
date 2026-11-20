@@ -1,0 +1,35 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Form field
+status: stable
+description: >-
+  One form field: label, hint, error and the control. Used by form-element.html.twig for
+  every Drupal form element. The error comes before the control, and the control points
+  to it with aria-describedby (set in verde_preprocess_input()).
+props:
+  type: object
+  properties:
+    type:
+      type: string
+      title: Element type, for example textfield, email, textarea, checkbox
+    label_position:
+      type: string
+      title: Where the label goes
+      enum:
+        - before
+        - after
+        - none
+      default: before
+    error_id:
+      type: string
+      title: ID of the error text
+      description: The control's aria-describedby points to it.
+slots:
+  label:
+    title: Label
+  description:
+    title: Hint
+  error:
+    title: Error message
+  control:
+    title: Control
+    description: The input, textarea or select.

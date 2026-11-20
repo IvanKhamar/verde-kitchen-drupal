@@ -1,0 +1,15 @@
+{#
+/**
+ * @file
+ * One group of messages of the same type.
+ *
+ * A labelled <section> is a landmark, so screen reader users can also find it
+ * later. tabindex="-1" lets messages.js focus it without adding a tab stop.
+ */
+#}
+<section class="messages messages--{{ type|clean_class }}" aria-labelledby="{{ heading_id }}" tabindex="-1" data-messages>
+  <h2 class="messages__title" id="{{ heading_id }}">{{ heading }}</h2>
+  <div class="messages__content">
+    {{ content }}
+  </div>
+</section>
