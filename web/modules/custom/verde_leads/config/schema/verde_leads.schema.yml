@@ -1,0 +1,20 @@
+verde_leads.settings:
+  type: config_object
+  label: 'Contact messages settings'
+  mapping:
+    retention_days:
+      type: integer
+      label: 'Delete messages after this many days'
+      constraints:
+        Range:
+          min: 1
+    flood:
+      type: mapping
+      label: 'Flood control'
+      mapping:
+        limit:
+          type: integer
+          label: 'Messages per visitor IP address'
+        window:
+          type: integer
+          label: 'Time window in seconds'

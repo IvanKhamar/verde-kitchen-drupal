@@ -911,6 +911,17 @@ if ($trusted_host_patterns = getenv('DRUPAL_TRUSTED_HOST_PATTERNS')) {
 }
 
 /**
+ * Contact form forwarding to LeadTriage (module verde_leads).
+ *
+ * The URL and the source token come from environment variables: locally from
+ * the git-ignored .ddev/.env, on the server from its own .env. They are never
+ * stored in configuration, which is exported to the public repository. Without
+ * a URL, forwarding is off and messages are only saved in Drupal.
+ */
+$settings['verde_leads_url'] = getenv('VERDE_LEADS_URL') ?: '';
+$settings['verde_leads_token'] = getenv('VERDE_LEADS_TOKEN') ?: '';
+
+/**
  * Local environment settings.
  *
  * DDEV generates settings.ddev.php (git-ignored). It holds the database

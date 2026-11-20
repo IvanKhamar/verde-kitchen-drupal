@@ -1,0 +1,7 @@
+# Not secret: the LeadTriage URL and token come from environment variables
+# (settings.php), never from configuration, which is exported to the public repository.
+retention_days: 30
+flood:
+  # Messages allowed per visitor IP address in the window (seconds).
+  limit: 5
+  window: 3600
