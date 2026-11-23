@@ -66,6 +66,10 @@ current database, so it is also the way to reset the site.
 
 To log in as the administrator, run `ddev drush user:login` and open the link it prints.
 
+On Windows, `ddev drush` needs Git Bash in its default folder (`C:\Program Files\Git`). With Git
+installed elsewhere it fails with "unknown command"; use `ddev exec drush ...` instead, for example
+`ddev exec drush user:login`.
+
 The two steps can also be run one by one:
 
 ```bash
@@ -217,7 +221,8 @@ on every product card and product page, a counter in the header, and a list page
 
 `/contact` (module `verde_leads`) sends visitors' messages to
 [LeadTriage](https://github.com/IvanKhamar/LeadTriage), a separate project of the same
-invented brand: FastAPI and n8n sort each message with Claude by topic and urgency and put it
+invented brand: FastAPI and n8n sort each message with an LLM (Gemini's free tier in the local demo,
+Claude once a key is set) by topic and urgency and put it
 into the team's Airtable within seconds.
 
 ```mermaid
